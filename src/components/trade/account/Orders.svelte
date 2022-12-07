@@ -20,11 +20,12 @@
 	} from '@lib/formatters'
 	import { XMARK_ICON, CHAINLINK_LOGO, LOADING_ICON } from '@lib/icons'
 
-	import { address, ordersSortKey, ordersSorted, ordersColumnsToShow, marketInfos } from '@lib/stores'
+	import { address, ordersSortKey, ordersSorted, ordersColumnsToShow, marketInfos, selectedAsset } from '@lib/stores'
 	import { showModal } from '@lib/ui'
 	import { saveUserSetting } from '@lib/utils'
 
 	import { cancelOrder, selfExecuteOrder, getUserOrders } from '@api/orders'
+	import { getUserAssetBalances } from '@api/assets'
 
 	export let allColumns;
 
@@ -46,6 +47,7 @@
 		ordersCancelling[orderId] = true;
 		const success = await cancelOrder(orderId);
 		ordersCancelling[orderId] = false;
+		await getUserAssetBalances([$selectedAsset]);
 	}
 
 	let ordersSelfExecuting = {};
