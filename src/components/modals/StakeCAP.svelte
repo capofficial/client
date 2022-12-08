@@ -6,12 +6,14 @@
 	
 	import { onMount } from 'svelte'
 
-	import { depositCAP } from '@api/cap'
+	import { depositCAP, getCapWalletBalance } from '@api/cap'
 	import { approveAsset, getAllowance } from '@api/assets'
+	import { formatForDisplay } from '@lib/formatters'
 	import { allowances } from '@lib/stores'
 	import { focusInput, hideModal } from '@lib/ui'
+	import LabelValue from '../layout/LabelValue.svelte'
 
-	let amount, isSubmitting;
+	let amount, isSubmitting, walletBalance = 0;
 
 	async function submit() {
 
@@ -34,7 +36,12 @@
 		const result = await approveAsset('CAP', 'FundStore');
 	}
 
+	async function getBalance() {
+		walletBalance = await getCapWalletBalance();
+	}
+
 	checkAllowance();
+	getBalance();
 
 	onMount(() => {
 		focusInput('Amount');
@@ -55,6 +62,13 @@
 
 			<div class="group">
 				<Input label='Amount' bind:value={amount} />
+				<LabelValue
+					label="Wallet Balance:"
+					value={formatForDisplay(walletBalance, 6)}
+					isClickable={true}
+					hasSemiPadding={true}
+					on:click={() => { amount = formatForDisplay(walletBalance, 6); }}
+				/>
 			</div>
 
 			<div>
