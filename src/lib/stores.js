@@ -290,7 +290,7 @@ export const maxSize = derived([balances, leverage, currentFeeRebate, selectedMa
 
 	if (!$selectedMarketInfo.fee) return $balances[$selectedAsset] * $leverage * 1 - gasFee;
 
-	const balanceAfterFees = $balances[$selectedAsset] * 1 - 1 * $balances[$selectedAsset] * $leverage * ($selectedMarketInfo.fee * 1 / BPS_DIVIDER - 1 * $currentFeeRebate) - gasFee;
+	const balanceAfterFees = $balances[$selectedAsset] * (1 - $leverage * $selectedMarketInfo.fee / BPS_DIVIDER) - gasFee;
 
 	if (balanceAfterFees < 0) return 0;
 
