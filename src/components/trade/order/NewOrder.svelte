@@ -130,7 +130,7 @@
 	
   	// reset inputs on market change
 	function resetOrderFields() {
-    		setPrice();
+			highlightedPriceButton = null;
     		price.set();
     		size.set();
     		tpPrice.set();
@@ -140,7 +140,7 @@
     		isProtectedOrder.set(false);
 	}
 	
-  	selectedMarket.subscribe(resetOrderFields);
+	$: resetOrderFields($selectedMarket)
 	
 </script>
 
