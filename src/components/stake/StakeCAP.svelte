@@ -136,11 +136,7 @@
 				<div class='cell'>100,000</div>
 				<div class='cell'>{formatForDisplay($totalSupplyCAP)}</div>
 				<div class='cell highlighted'>{formatForDisplay($CAPStake)}</div>
-				{#if $totalSupplyCAP!=0}
-				<div class='cell highlighted'>{formatForDisplay(($CAPStake/$totalSupplyCAP *100))}%</div>
-				{:else}
-				<div class='cell highlighted'>N/A</div>
-				{/if}
+				<div class='cell highlighted'>{$totalSupplyCAP == 0 ? 'N/A' : formatForDisplay(($CAPStake/$totalSupplyCAP *100))}%</div>
 			</div>
 		</div>
 	</div>
