@@ -129,7 +129,7 @@
 			<div class='cell'>1M Return</div>
 			<div class='cell'>1Y Return</div>
 			<div class='cell highlighted'>Your Balance</div>
-			<div class='cell highlighted'>Percentage of Pool</div>
+			<div class='cell highlighted'>% of Pool</div>
 		</div>
 		<div class='table-body'>
 			{#each assets as asset}
@@ -140,7 +140,11 @@
 				<div class='cell'>{formatForDisplay($monthlyPerformance[asset] * 100) || 0}%</div>
 				<div class='cell'>{formatForDisplay($yearlyPerformance[asset] * 100) || 0}%</div>
 				<div class='cell highlighted'><span>{formatForDisplay($poolStakes[asset]) || 0}<br><span class='grayed'>${getAmountInUsd(asset, $poolStakes[asset], $prices)}</span></span></div>
-				<div class='cell'>{formatForDisplay(($poolStakes[asset])/$poolBalances[asset]  *100)|| 0}%</div>
+				{#if $poolBalances[asset]!=0}
+				<div class='cell highlighted'>{formatForDisplay(($poolStakes[asset])/$poolBalances[asset]  *100)|| 0}%</div>
+				{:else}
+				<div class='cell highlighted'>N/A</div>
+				{/if}
 			</div>
 			{/each}
 			<div class='row'>
@@ -150,7 +154,7 @@
 				<div class='cell'>-</div>
 				<div class='cell'>-</div>
 				<div class='cell highlighted'>${getTotalAmountInUsd($poolStakes, $prices)}</div>
-				<div class='cell'>-</div>
+				<div class='cell highlighted'>-</div>
 			</div>
 		</div>
 	</div>

@@ -128,7 +128,7 @@
 			<div class='cell'>Total Supply</div>
 			<div class='cell'>Total Staked</div>
 			<div class='cell highlighted'>Your Stake</div>
-			<div class='cell highlighted'>Percantage of Your Stake</div>
+			<div class='cell highlighted'>% of Stake</div>
 		</div>
 		<div class='table-body'>
 			<div class='row'>
@@ -136,7 +136,11 @@
 				<div class='cell'>100,000</div>
 				<div class='cell'>{formatForDisplay($totalSupplyCAP)}</div>
 				<div class='cell highlighted'>{formatForDisplay($CAPStake)}</div>
+				{#if $totalSupplyCAP!=0}
 				<div class='cell highlighted'>{formatForDisplay(($CAPStake/$totalSupplyCAP *100))}%</div>
+				{:else}
+				<div class='cell highlighted'>N/A</div>
+				{/if}
 			</div>
 		</div>
 	</div>
