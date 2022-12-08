@@ -62,8 +62,9 @@
 			<div class="group">
 				<Input label='Amount' bind:value={amount} />
 				<LabelValue
-					label="Wallet Balance:"
+					label="Wallet Balance"
 					value={walletBalance}
+					formatValue={true}
 					isClickable={true}
 					hasSemiPadding={true}
 					on:click={() => { amount = walletBalance; }}

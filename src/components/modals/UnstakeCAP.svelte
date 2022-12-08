@@ -46,8 +46,9 @@
 			<div class="group">
 				<Input label='Amount' bind:value={amount} />
 				<LabelValue
-					label="CAP Staked:"
+					label="CAP Staked"
 					value={$CAPStake}
+					formatValue={true}
 					isClickable={true}
 					hasSemiPadding={true}
 					on:click={() => { amount = $CAPStake; }}
