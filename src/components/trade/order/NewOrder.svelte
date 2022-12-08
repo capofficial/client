@@ -130,7 +130,7 @@
 	
   	// reset inputs on market change
 	function resetOrderFields() {
-			highlightedPriceButton = null;
+		highlightedPriceButton = null;
     		price.set();
     		size.set();
     		tpPrice.set();
