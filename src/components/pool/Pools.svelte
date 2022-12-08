@@ -140,7 +140,7 @@
 				<div class='cell'>{formatForDisplay($monthlyPerformance[asset] * 100) || 0}%</div>
 				<div class='cell'>{formatForDisplay($yearlyPerformance[asset] * 100) || 0}%</div>
 				<div class='cell highlighted'><span>{formatForDisplay($poolStakes[asset]) || 0}<br><span class='grayed'>${getAmountInUsd(asset, $poolStakes[asset], $prices)}</span></span></div>
-				<div class='cell highlighted'>{$poolBalances[asset] == 0 ? 'NA' : formatForDisplay(($poolStakes[asset])/$poolBalances[asset]  *100)|| 0}%</div>
+				<div class='cell highlighted'>{$poolBalances[asset] == 0 ? 'N/A' : formatForDisplay(($poolStakes[asset])/$poolBalances[asset]  *100 )+ '%'|| 0}</div>
 			</div>
 			{/each}
 			<div class='row'>
