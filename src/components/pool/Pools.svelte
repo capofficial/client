@@ -30,7 +30,7 @@
 <style>
 
 	.table {
-		--grid-template: repeat(6, 1fr);
+		--grid-template: repeat(7, 1fr);
 	}
 
 	.header {
@@ -129,6 +129,7 @@
 			<div class='cell'>1M Return</div>
 			<div class='cell'>1Y Return</div>
 			<div class='cell highlighted'>Your Balance</div>
+			<div class='cell highlighted'>Percentage of Pool</div>
 		</div>
 		<div class='table-body'>
 			{#each assets as asset}
@@ -139,6 +140,7 @@
 				<div class='cell'>{formatForDisplay($monthlyPerformance[asset] * 100) || 0}%</div>
 				<div class='cell'>{formatForDisplay($yearlyPerformance[asset] * 100) || 0}%</div>
 				<div class='cell highlighted'><span>{formatForDisplay($poolStakes[asset]) || 0}<br><span class='grayed'>${getAmountInUsd(asset, $poolStakes[asset], $prices)}</span></span></div>
+				<div class='cell'>{formatForDisplay(($poolStakes[asset])/$poolBalances[asset]  *100)|| 0}%</div>
 			</div>
 			{/each}
 			<div class='row'>
@@ -148,6 +150,7 @@
 				<div class='cell'>-</div>
 				<div class='cell'>-</div>
 				<div class='cell highlighted'>${getTotalAmountInUsd($poolStakes, $prices)}</div>
+				<div class='cell'>-</div>
 			</div>
 		</div>
 	</div>
