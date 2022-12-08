@@ -8,7 +8,6 @@
 
 	import { depositCAP, getCapWalletBalance } from '@api/cap'
 	import { approveAsset, getAllowance } from '@api/assets'
-	import { formatForDisplay } from '@lib/formatters'
 	import { allowances } from '@lib/stores'
 	import { focusInput, hideModal } from '@lib/ui'
 	import LabelValue from '../layout/LabelValue.svelte'
@@ -64,10 +63,10 @@
 				<Input label='Amount' bind:value={amount} />
 				<LabelValue
 					label="Wallet Balance:"
-					value={formatForDisplay(walletBalance, 6)}
+					value={walletBalance}
 					isClickable={true}
 					hasSemiPadding={true}
-					on:click={() => { amount = formatForDisplay(walletBalance, 6); }}
+					on:click={() => { amount = walletBalance; }}
 				/>
 			</div>
 
