@@ -27,7 +27,7 @@
 <style>
 
 	.table {
-		--grid-template: repeat(4, 1fr);
+		--grid-template: repeat(5, 1fr);
 	}
 
 	.header {
@@ -128,6 +128,7 @@
 			<div class='cell'>Total Supply</div>
 			<div class='cell'>Total Staked</div>
 			<div class='cell highlighted'>Your Stake</div>
+			<div class='cell highlighted'>% of Stake</div>
 		</div>
 		<div class='table-body'>
 			<div class='row'>
@@ -135,6 +136,7 @@
 				<div class='cell'>100,000</div>
 				<div class='cell'>{formatForDisplay($totalSupplyCAP)}</div>
 				<div class='cell highlighted'>{formatForDisplay($CAPStake)}</div>
+				<div class='cell highlighted'>{$totalSupplyCAP == 0 ? 'N/A' : formatForDisplay(($CAPStake/$totalSupplyCAP *100))+'%'}</div>
 			</div>
 		</div>
 	</div>
