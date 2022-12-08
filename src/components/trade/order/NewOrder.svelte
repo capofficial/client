@@ -127,7 +127,21 @@
 	}
 
 	$: checkWarning($prices[$selectedMarket], $price, $orderType, $isLong);
-
+	
+  	// reset inputs on market change
+	function resetOrderFields() {
+		highlightedPriceButton = null;
+    		price.set();
+    		size.set();
+    		tpPrice.set();
+    		slPrice.set();
+    		hasTPSL.set(false);
+		isReduceOnly.set(false)
+    		isProtectedOrder.set(false);
+	}
+	
+	$: resetOrderFields($selectedMarket)
+	
 </script>
 
 <style>
