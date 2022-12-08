@@ -114,6 +114,13 @@
 			/>
 		</div>
 
+		<div class='row'>
+			<LabelValue 
+				label='Liq. Price' 
+				value={`${size > 0 && !$isReduceOnly ? formatForDisplay($liquidationPrice) : '-'}`}
+			/>
+		</div>
+
 	{/if}
 
 	<div class='row'>
@@ -131,13 +138,6 @@
 	{#if showMore}
 
 		{#if !isClose}
-
-			<div class='row'>
-				<LabelValue 
-					label='Liq. Price' 
-					value={`${size > 0 && !$isReduceOnly ? formatForDisplay($liquidationPrice) : '-'}`}
-				/>
-			</div>
 
 			<div class='row'>
 				<LabelValue 
