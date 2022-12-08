@@ -286,11 +286,11 @@ export const maxSize = derived([balances, leverage, currentFeeRebate, selectedMa
 	// console.log('$leverage', $leverage);
 	
 	let gasFee = 0;
-	if ($selectedAsset == 'ETH') gasFee = 0.002;
+	if ($selectedAsset == 'ETH') gasFee = 0.008;
 
 	if (!$selectedMarketInfo.fee) return $balances[$selectedAsset] * $leverage * 1 - gasFee;
 
-	const balanceAfterFees = $balances[$selectedAsset] * 1 - 1 * $balances[$selectedAsset] * $leverage * ($selectedMarketInfo.fee * 1 / BPS_DIVIDER - 1 * $currentFeeRebate) - gasFee;
+	const balanceAfterFees = $balances[$selectedAsset] * 1 - 1 * $balances[$selectedAsset] * $leverage * ($selectedMarketInfo.fee * 1 / BPS_DIVIDER * (1-$currentFeeRebate)) - gasFee;
 
 	if (balanceAfterFees < 0) return 0;
 
