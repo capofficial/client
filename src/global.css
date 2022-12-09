@@ -1,12 +1,17 @@
-:root { font-family: 'Inter', sans-serif; }
+:root {
+  font-family: 'Inter', sans-serif;
+}
+
 @supports (font-variation-settings: normal) {
-  :root { font-family: 'Inter var', sans-serif; }
+  :root {
+    font-family: 'Inter var', sans-serif;
+  }
 }
 
 html {
   font-size: 15.5px;
   font-variant: none;
-  font-feature-settings: 'ss01','ss02','ss03','cv01','tnum';
+  font-feature-settings: 'ss01', 'ss02', 'ss03', 'cv01', 'tnum';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
@@ -25,10 +30,11 @@ a {
   cursor: pointer;
 }
 
-input::-webkit-outer-spin-button,input::-webkit-inner-spin-button {
-    display: none;
-    -webkit-appearance: none;
-    margin: 0;
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  display: none;
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 input {
@@ -43,7 +49,7 @@ input {
   background-color: transparent;
 }
 
-button{
+button {
   text-align: center;
   cursor: pointer;
   user-select: none;
@@ -57,12 +63,36 @@ button{
   width: 100%;
 }
 
-.no-scrollbar::-webkit-scrollbar{
-    width: 0px;
-    background: transparent; /* Chrome/Safari/Webkit */
+.no-scrollbar::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+  /* Chrome/Safari/Webkit */
 }
 
 .no-scrollbar {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none;  /* IE 10+ */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE 10+ */
+}
+
+@media all and (min-width: 769px) {
+  body {
+    overflow: hidden;
+  }
+
+}
+
+.grid {
+  grid-template-rows: auto 300px 300px auto var(--account-height);
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "ticker"
+    "markets"
+    "chart"
+    "sidebar"
+    "account";
+  grid-gap: 1px;
+  height: auto;
+  overflow: hidden;
 }
