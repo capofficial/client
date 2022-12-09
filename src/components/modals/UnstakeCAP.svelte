@@ -8,10 +8,13 @@
 	import { onMount } from 'svelte'
 
 	import { withdrawCAP } from '@api/cap'
+	import { formatCAPForDisplay } from '@lib/formatters'
 	import { CAPStake } from '@lib/stores'
 	import { focusInput, hideModal } from '@lib/ui'
 
 	let amount, isSubmitting;
+
+	$: formattedCAPStaked = formatCAPForDisplay($CAPStake);
 
 	async function submit() {
 
@@ -47,11 +50,10 @@
 				<Input label='Amount' bind:value={amount} />
 				<LabelValue
 					label="CAP Staked"
-					value={$CAPStake}
-					formatValue={true}
+					value={formattedCAPStaked}
 					isClickable={true}
 					hasSemiPadding={true}
-					on:click={() => { amount = $CAPStake; }}
+					on:click={() => { amount = formattedCAPStaked; }}
 				/>
 			</div>
 

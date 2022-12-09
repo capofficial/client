@@ -8,11 +8,14 @@
 
 	import { depositCAP, getCapWalletBalance } from '@api/cap'
 	import { approveAsset, getAllowance } from '@api/assets'
+	import { formatCAPForDisplay } from "@lib/formatters"
 	import { allowances } from '@lib/stores'
 	import { focusInput, hideModal } from '@lib/ui'
 	import LabelValue from '../layout/LabelValue.svelte'
 
-	let amount, isSubmitting, walletBalance = 0;
+	let amount, isSubmitting, walletBalance = "0.0";
+
+	$: formattedWalletBalance = formatCAPForDisplay(walletBalance);
 
 	async function submit() {
 
@@ -63,11 +66,10 @@
 				<Input label='Amount' bind:value={amount} />
 				<LabelValue
 					label="Wallet Balance"
-					value={walletBalance}
-					formatValue={true}
+					value={formattedWalletBalance}
 					isClickable={true}
 					hasSemiPadding={true}
-					on:click={() => { amount = walletBalance; }}
+					on:click={() => { amount = formattedWalletBalance; }}
 				/>
 			</div>
 

@@ -1,6 +1,6 @@
 import { get } from 'svelte/store'
 import { ethers } from 'ethers'
-import { ADDRESS_ZERO, BPS_DIVIDER } from './config'
+import { ADDRESS_ZERO, BPS_DIVIDER, MAX_CAP_DISPLAY_DECIMALS } from './config'
 import { locale } from './stores'
 import { getLabelForAsset } from './utils'
 
@@ -114,7 +114,19 @@ export function formatForDisplay(amount, fix) {
 
 export function numberWithCommas(amount) {   // Get Commafied Value 
 	let formattedAmount = formatForDisplay(amount) * 1;
-    return formattedAmount.toLocaleString(get(locale));
+	return formattedAmount.toLocaleString(get(locale));
+}
+
+export function formatCAPForDisplay(amountStr) {
+	const significand = amountStr.split(".")[1] ?? "0";
+	const digits = MAX_CAP_DISPLAY_DECIMALS;
+	const needsBump = Array.from(significand.slice(digits)).some(d => d !== "0");
+	let balance = ethers.FixedNumber.fromString(amountStr);
+	if (needsBump) {
+		const bump = ethers.FixedNumber.fromString(parseFloat(`5e-${digits + 1}`).toFixed(18));
+		balance = balance.addUnsafe(bump).round(digits);
+	}
+	return balance.toString();
 }
 
 export function formatOrderType(orderType) {
