@@ -89,12 +89,12 @@ export async function withdraw(_asset, _amount) {
 
 export async function getPoolStats() {
 
-	const pricesEndpoint = getChainData('pricesEndpoint');
+	const dataEndpoint = getChainData('dataEndpoint');
 	
 	const assets = getChainData('assets');
 
 	try {
-		const response = await fetch(`${pricesEndpoint}/pool-stats/all`);
+		const response = await fetch(`${dataEndpoint}/pool-stats/all`);
 		const data = await response.json(); // {asset => {daily, weekly}}
 
 		for (let asset in data) {

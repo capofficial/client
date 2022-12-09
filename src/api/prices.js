@@ -7,7 +7,7 @@ import { getChainData } from '@lib/utils'
 
 export async function getMarketPrices(markets) {
 	
-	const pricesEndpoint = getChainData('pricesEndpoint');
+	const dataEndpoint = getChainData('dataEndpoint');
 	const _selectedMarket = get(selectedMarket);
 	
 	if (!markets) {
@@ -20,7 +20,7 @@ export async function getMarketPrices(markets) {
 	}
 	
 	try {
-		const response = await fetch(`${pricesEndpoint}/price/${markets == 'all' ? 'all' : markets.join(',')}`);
+		const response = await fetch(`${dataEndpoint}/price/${markets == 'all' ? 'all' : markets.join(',')}`);
 		const json = await response.json();
 		// console.log('json', json);
 		// json: {market => [price, timestamp]}
@@ -56,9 +56,9 @@ export async function getMarketPrices(markets) {
 }
 
 export async function getMarketTickers() {
-	const pricesEndpoint = getChainData('pricesEndpoint');
+	const dataEndpoint = getChainData('dataEndpoint');
 	try {
-		const response = await fetch(`${pricesEndpoint}/ticker/all`);
+		const response = await fetch(`${dataEndpoint}/ticker/all`);
 		const json = await response.json();
 		for (const m in json) {
 			ohlc.update((x) => {
@@ -73,9 +73,9 @@ export async function getMarketTickers() {
 }
 
 export async function getMarketCandles(params) {
-	const pricesEndpoint = getChainData('pricesEndpoint');
+	const dataEndpoint = getChainData('dataEndpoint');
 	try {
-		const response = await fetch(`${pricesEndpoint}/candles/${params.market}?resolution=${params.resolution}&end=${params.end}`);
+		const response = await fetch(`${dataEndpoint}/candles/${params.market}?resolution=${params.resolution}&end=${params.end}`);
 		const json = await response.json();
 		return json;
 	} catch(e) {

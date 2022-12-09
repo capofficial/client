@@ -46,7 +46,7 @@ export const CHAINDATA = {
 		label: 'localhost',
 		explorer: 'http://localhost:8545',
 		rpc: 'http://127.0.0.1:8545/',
-		pricesEndpoint: 'http://localhost:3000/api',
+		dataEndpoint: 'http://localhost:3000/api',
 		dataStore: '0x19cEcCd6942ad38562Ee10bAfd44776ceB67e923',
 		cap: '0x6F6f570F45833E249e27022648a26F4076F48f78',
 		assets: {
@@ -58,7 +58,7 @@ export const CHAINDATA = {
 		label: 'arbitrum',
 		explorer: 'https://arbiscan.io',
 		rpc: 'https://arb1.arbitrum.io/rpc', // for walletconnect
-		pricesEndpoint: 'https://prices.cap.io/api',
+		dataEndpoint: 'https://data.cap.io/api',
 		dataStore: '0x360B0B2b3391FD65D8279E2231C80D9De767ad7b',
 		cap: '0x031d35296154279dc1984dcd93e392b1f946737b',
 		assets: {

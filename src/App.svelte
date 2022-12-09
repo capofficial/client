@@ -34,9 +34,9 @@
 		localStorage.setItem('betaKey', hashString(navigator.userAgent));
 
 		if (code) {
-			const pricesEndpoint = getChainData('pricesEndpoint');
+			const dataEndpoint = getChainData('dataEndpoint');
 			try {
-				const response = await fetch(`${pricesEndpoint}/check-code?code=${code}&key=${localStorage.getItem('betaKey')}`);
+				const response = await fetch(`${dataEndpoint}/check-code?code=${code}&key=${localStorage.getItem('betaKey')}`);
 				const json = await response.json();
 
 				if (json && json.success) {
