@@ -75,24 +75,3 @@ button {
   -ms-overflow-style: none;
   /* IE 10+ */
 }
-
-@media all and (min-width: 769px) {
-  body {
-    overflow: hidden;
-  }
-
-}
-
-.grid {
-  grid-template-rows: auto 300px 300px auto var(--account-height);
-  grid-template-columns: 1fr;
-  grid-template-areas:
-    "ticker"
-    "markets"
-    "chart"
-    "sidebar"
-    "account";
-  grid-gap: 1px;
-  height: auto;
-  overflow: hidden;
-}

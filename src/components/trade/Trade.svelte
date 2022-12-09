@@ -63,7 +63,7 @@
 			overflow: initial;
 		}
 	}
-
+	
 	.ticker {
 		grid-area: ticker;
 		background-color: var(--layer0);
