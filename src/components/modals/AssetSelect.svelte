@@ -3,7 +3,7 @@
 
 	import { onMount } from 'svelte'
 
-	import { formatForDisplay } from '@lib/formatters'
+	import { formatForDisplay, numberWithCommas } from '@lib/formatters'
 	import { CIRCLE, CIRCLE_INSET_FILLED, SMALL_CIRCLE_FILLED } from '@lib/icons'
 	import { selectedAsset, balances, address } from '@lib/stores'
 	import { getAssets, saveUserSetting } from '@lib/utils'
@@ -75,7 +75,7 @@
 				{asset}
 			</div>
 			<div class='value'>
-				{formatForDisplay($balances[asset])}
+				{numberWithCommas($balances[asset])}
 				<img src={`/asset-logos/${asset}.svg`} />
 			</div>
 		</div>

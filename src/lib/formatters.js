@@ -112,6 +112,11 @@ export function formatForDisplay(amount, fix) {
 
 }
 
+export function numberWithCommas(amount) {   // Get Commafied Value 
+	let formattedAmount = formatForDisplay(amount);
+    return formattedAmount.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+}
+
 export function formatOrderType(orderType) {
 	if (!orderType) return 'Market';
 	if (orderType == 1) return 'Limit';

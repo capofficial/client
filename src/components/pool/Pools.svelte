@@ -5,7 +5,7 @@
 	import { getPoolBalances, getUserPoolStakes, getPoolStats } from '@api/pool'
 	import { address, poolBalances, prices, weeklyPerformance, monthlyPerformance, yearlyPerformance, poolStakes } from '@lib/stores'
 	import { getAssets, getAmountInUsd, getTotalAmountInUsd,  } from '@lib/utils'
-	import { formatForDisplay } from '@lib/formatters'
+	import { formatForDisplay, numberWithCommas } from '@lib/formatters'
 	import { showModal } from '@lib/ui'
 
 	let assets = getAssets();
@@ -135,11 +135,11 @@
 			{#each assets as asset}
 			<div class='row'>
 				<div class='cell la'><img src={`/asset-logos/${asset}.svg`} /> {asset}</div>
-				<div class='cell'><span>{formatForDisplay($poolBalances[asset]) || 0}<br/><span class='grayed'>${formatForDisplay(getAmountInUsd(asset, $poolBalances[asset], $prices))}</span></span></div>
+				<div class='cell'><span>{numberWithCommas($poolBalances[asset]) || 0}<br/><span class='grayed'>${formatForDisplay(getAmountInUsd(asset, $poolBalances[asset], $prices))}</span></span></div>
 				<div class='cell'>{formatForDisplay($weeklyPerformance[asset] * 100) || 0}%</div>
 				<div class='cell'>{formatForDisplay($monthlyPerformance[asset] * 100) || 0}%</div>
 				<div class='cell'>{formatForDisplay($yearlyPerformance[asset] * 100) || 0}%</div>
-				<div class='cell highlighted'><span>{formatForDisplay($poolStakes[asset]) || 0}<br><span class='grayed'>${getAmountInUsd(asset, $poolStakes[asset], $prices)}</span></span></div>
+				<div class='cell highlighted'><span>{numberWithCommas($poolStakes[asset]) || 0}<br><span class='grayed'>${getAmountInUsd(asset, $poolStakes[asset], $prices)}</span></span></div>
 				<div class='cell highlighted'>{$poolBalances[asset] == 0 ? 'N/A' : formatForDisplay(($poolStakes[asset])/$poolBalances[asset]  *100 )+ '%'}</div>
 			</div>
 			{/each}
