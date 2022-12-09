@@ -9,6 +9,7 @@
 	export let noTooltip = false;
 	export let integersOnly = false;
 	export let nullValue = false;
+	export let showDots = true;
 
 	let sliderElem;
 	let progressPercent;
@@ -17,6 +18,7 @@
 	let progressPercentOnSliderGrab;
 
 	function snapProgress(percent) {
+		if(!showDots) return Math.round(percent);
 		if (percent <= 2) return 0;
 		if (percent >= 23 && percent <= 27) return 25;
 		if (percent >= 48 && percent <= 52) return 50;
@@ -198,8 +200,8 @@
 <svelte:window on:mousemove={handleMouseMove} on:mouseup={releaseSlider} on:mousedown={handleBlur} />
 
 <div class='slider-container' id='slider'>
-
 	<div class="slider" bind:this={sliderElem} on:mousedown={handleClick}>
+		{#if showDots}
 		<div class='slider-dot-overlay'>
 			<div class='slider-dot' class:active={true}></div>
 			<div class='slider-dot' class:active={progressPercent >= 25}></div>
@@ -207,8 +209,8 @@
 			<div class='slider-dot' class:active={progressPercent >= 75}></div>
 			<div class='slider-dot'></div>
 		</div>
+		{/if}
 		<div class='slider-handle' id='handle' data-value={`${progressPercent}%`} style={`left: ${progressPercent}%`} class:grabbed={sliderGrabbed} class:noTooltip={noTooltip}></div>
 		<div class='slider-progress' class:secondary={isSecondaryColor} style={`width: ${progressPercent}%`}></div>
 	</div>
-
 </div>

@@ -40,7 +40,7 @@
 
 		<div class='value'>{$leverage}×</div>
 
-		<Slider bind:value={$leverage} maxValue={$selectedMarketInfo.maxLeverage} noTooltip={true} integersOnly={true} />
+		<Slider bind:value={$leverage} maxValue={$selectedMarketInfo.maxLeverage} noTooltip={true} integersOnly={true} showDots={false}/>
 	
 	</div>
 
