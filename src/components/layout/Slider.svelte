@@ -18,6 +18,7 @@
 	let progressPercentOnSliderGrab;
 
 	function snapProgress(percent) {
+		if(!showDots) return Math.round(percent);
 		if (percent <= 2) return 0;
 		if (percent >= 23 && percent <= 27) return 25;
 		if (percent >= 48 && percent <= 52) return 50;
@@ -41,7 +42,7 @@
 		let progress = progressPercentOnSliderGrab + 100 * xDiff / sliderElem.offsetWidth;
 		if (progress < 0) progress = 0;
 		if (progress > 100) progress = 100;
-		showDots ? progressPercent = snapProgress(progress) : progressPercent = Math.round(progress);
+		progressPercent = snapProgress(progress);
 	}
 
 	function grabSlider(e) {
