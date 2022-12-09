@@ -18,6 +18,18 @@ export async function getUserCAPStake() {
 	CAPStake.set(formatUnits(balance));
 }
 
+export async function getTokenBalance(){
+
+	const usdc = ""
+
+	const _provider = get(provider);
+	const _signer = get(signer);
+	const dataStore = new ethers.Contract(usdcAddress, ABIS.DataStore, _provider);
+
+
+
+}
+
 export async function getClaimableRewardsCAP() {
 	if (!get(address)) return;
 	const contract = await getContract('Staking');
