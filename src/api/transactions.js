@@ -2,10 +2,10 @@ import { getChainData } from '@lib/utils'
 
 export async function getTransactions(queryString) {
 
-	const pricesEndpoint = getChainData('pricesEndpoint');
+	const dataEndpoint = getChainData('dataEndpoint');
 
 	try {
-		const response = await fetch(`${pricesEndpoint}/transactions?${queryString}`);
+		const response = await fetch(`${dataEndpoint}/transactions?${queryString}`);
 		return await response.json();
 	} catch(e) {
 		console.error('/transactions GET error', e);
