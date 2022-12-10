@@ -6,7 +6,7 @@
 	
 	import { onMount } from 'svelte'
 
-	import { depositCAP, getCapWalletBalance } from '@api/cap'
+	import { depositCAP, getCAPWalletBalance } from '@api/cap'
 	import { approveAsset, getAllowance } from '@api/assets'
 	import { formatCAPForDisplay } from "@lib/formatters"
 	import { allowances } from '@lib/stores'
@@ -39,7 +39,7 @@
 	}
 
 	async function getBalance() {
-		walletBalance = await getCapWalletBalance();
+		walletBalance = await getCAPWalletBalance();
 	}
 
 	checkAllowance();

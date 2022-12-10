@@ -18,7 +18,7 @@ export async function getUserCAPStake() {
 	CAPStake.set(formatUnits(balance));
 }
 
-export async function getCapWalletBalance() {
+export async function getCAPWalletBalance() {
 	if (!get(address)) return 0;
 	const contract = await getContract("CAP", true);
 	const balance = await contract.balanceOf(get(address));
