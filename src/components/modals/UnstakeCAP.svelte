@@ -3,13 +3,18 @@
 	import Modal from './Modal.svelte'
 	import Input from '@components/layout/Input.svelte'
 	import Button from '@components/layout/Button.svelte'
+	import LabelValue from '@components/layout/LabelValue.svelte'
 
 	import { onMount } from 'svelte'
 
 	import { withdrawCAP } from '@api/cap'
+	import { formatCAPForDisplay } from '@lib/formatters'
+	import { CAPStake } from '@lib/stores'
 	import { focusInput, hideModal } from '@lib/ui'
 
 	let amount, isSubmitting;
+
+	$: formattedCAPStaked = formatCAPForDisplay($CAPStake);
 
 	async function submit() {
 
@@ -43,6 +48,13 @@
 		<form on:submit|preventDefault={submit}>
 			<div class="group">
 				<Input label='Amount' bind:value={amount} />
+				<LabelValue
+					label="CAP Staked"
+					value={formattedCAPStaked}
+					isClickable={true}
+					hasSemiPadding={true}
+					on:click={() => { amount = formattedCAPStaked; }}
+				/>
 			</div>
 
 			<div>

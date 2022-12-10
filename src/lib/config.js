@@ -34,6 +34,8 @@ export const CURRENCY_DECIMALS = {
 	CAP: 18
 }
 
+export const MAX_CAP_DISPLAY_DECIMALS = 6;
+
 export const USD_CONVERSION_MARKETS = {
 	ETH: 'ETH-USD',
 	WBTC: 'BTC-USD'

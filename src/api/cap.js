@@ -18,6 +18,13 @@ export async function getUserCAPStake() {
 	CAPStake.set(formatUnits(balance));
 }
 
+export async function getCAPWalletBalance() {
+	if (!get(address)) return 0;
+	const contract = await getContract("CAP", true);
+	const balance = await contract.balanceOf(get(address));
+	return formatUnits(balance);
+}
+
 export async function getClaimableRewardsCAP() {
 	if (!get(address)) return;
 	const contract = await getContract('Staking');
