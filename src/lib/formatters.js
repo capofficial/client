@@ -113,8 +113,8 @@ export function formatForDisplay(amount, fix) {
 }
 
 export function numberWithCommas(amount) {   // Get Commafied Value 
-	let formattedAmount = formatForDisplay(amount);
-    return formattedAmount.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+	let formattedAmount = formatForDisplay(amount) * 1;
+    return formattedAmount.toLocaleString(get(locale));
 }
 
 export function formatOrderType(orderType) {
