@@ -10,7 +10,7 @@
 	import { getLabelForAsset } from '@lib/utils'
 
 	import { getTransactions } from '@api/transactions'
-	import { formatForDisplay, formatDate } from '@lib/formatters'
+	import { formatForDisplay, formatDate, numberWithCommas } from '@lib/formatters'
 
 	let isLoading = true;
 	let items = [];
@@ -132,9 +132,9 @@
 				<div class='cell la'><img src={`/asset-logos/${getLabelForAsset(item.asset)}.svg`} /> {getLabelForAsset(item.asset)}</div>
 				<div class='cell la'>{formatDate(item.timestamp)}</div>
 				<div class='cell la'>{item.type}</div>
-				<div class='cell'>{formatForDisplay(item.amount || item.poolFee)}</div>
-				<div class='cell'>{formatForDisplay(item.poolBalance)}</div>
-				<div class='cell'>{formatForDisplay(item.bufferBalance)}</div>
+				<div class='cell'>{numberWithCommas(item.amount || item.poolFee)}</div>
+				<div class='cell'>{numberWithCommas(item.poolBalance)}</div>
+				<div class='cell'>{numberWithCommas(item.bufferBalance)}</div>
 			</div>
 			{/each}
 		</div>
