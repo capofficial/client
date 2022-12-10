@@ -118,14 +118,12 @@ export function numberWithCommas(amount) {   // Get Commafied Value
 }
 
 export function formatCAPForDisplay(amountStr) {
+	const amount = amountStr * 1;
 	const digits = MAX_CAP_DISPLAY_DECIMALS;
-	const dust = parseInt((amountStr.split(".")[1] ?? "0").slice(digits), 10) || 0;
-	let balance = ethers.FixedNumber.fromString(amountStr);
-	if (dust > 0) {
-		const bump = ethers.FixedNumber.fromString(parseFloat(`5e-${digits+1}`).toFixed(18));
-		balance = balance.addUnsafe(bump).round(digits);
-	}
-	return balance.toString();
+	const minIncrement = 10**-digits;
+	if (!amount) return 0;
+	if (amount <= minIncrement) return minIncrement;
+	return Math.ceil(amount * 10**digits) / 10**digits;
 }
 
 export function formatOrderType(orderType) {
