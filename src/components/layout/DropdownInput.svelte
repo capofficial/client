@@ -11,6 +11,7 @@
 	export let isInvalid = false;
 	export let displaySizeOrMargin = false;
 	export let setDisplaySizeOrMargin;
+	export let onChangeValue;
 </script>
 
 <style>
@@ -109,5 +110,5 @@
 		<option>Size</option>
 		<option>Margin</option>
 	</select>
-	<input id={label} type='number' step="0.0000001" bind:value={value} min="0" max="10000000" maxlength="10" spellcheck="false" placeholder={placeholder || `0.0`} autocomplete="off" autocorrect="off" inputmode="decimal" lang="en" disabled={disabled}  class:secondaryColor={isSecondaryColor} class:highlighted={isHighlighted} >
+	<input id={label} type='number' step="0.0000001" value={value} on:change={newValue => onChangeValue(newValue.target.value)} min="0" max="10000000" maxlength="10" spellcheck="false" placeholder={placeholder || `0.0`} autocomplete="off" autocorrect="off" inputmode="decimal" lang="en" disabled={disabled}  class:secondaryColor={isSecondaryColor} class:highlighted={isHighlighted} >
 </div>

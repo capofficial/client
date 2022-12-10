@@ -18,7 +18,7 @@
 	import { CHEVRON_DOWN, XMARK_ICON, INFO_ICON_CIRCLE } from '@lib/icons'
 	import { formatForDisplay } from '@lib/formatters'
 	import { focusInput, showModal } from '@lib/ui'
-	import {getUserSetting, saveUserSetting} from '@lib/utils'
+	import {getUserSetting, saveUserSetting, getSize} from '@lib/utils'
 
 	import {
 		address,
@@ -301,7 +301,7 @@
 			{/if}
 
 			<div class='top-spacing bottom-spacing'>
-				<DDInput label='Size' setDisplaySizeOrMargin={setDisplaySizeOrMargin} displaySizeOrMargin={displaySizeOrMargin} bind:value={$size} isSecondaryColor={!$isLong} placeholder={`0.0 ${$selectedAsset}`} bind:isHighlighted={sizeHighlighted} isInvalid={$maxSize && $size > formatForDisplay($maxSize) * 1} />
+				<DDInput label='Size' setDisplaySizeOrMargin={setDisplaySizeOrMargin} displaySizeOrMargin={displaySizeOrMargin} value={displaySizeOrMargin == 'Margin' ? $margin : $size} onChangeValue={newValue => size.set(displaySizeOrMargin == 'Margin' ? getSize(newValue, $leverage) : newValue)} isSecondaryColor={!$isLong} placeholder={`0.0 ${$selectedAsset}`} bind:isHighlighted={sizeHighlighted} isInvalid={$maxSize && $size > formatForDisplay($maxSize) * 1} />
 			</div>
 			
 			<div class='slider-container bottom-spacing'>
@@ -378,7 +378,7 @@
 		</form>
 		
 		<div class='od'>
-			<OrderDetails market={$selectedMarket} asset={$selectedAsset} size={$size} />
+			<OrderDetails market={$selectedMarket} asset={$selectedAsset} size={$size} displaySizeOrMargin={displaySizeOrMargin}/>
 		</div>
 	
 	</div>
