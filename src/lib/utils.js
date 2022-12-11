@@ -135,7 +135,7 @@ export function getChainData(key) {
 }
 
 export function getMargin(size, leverage) {
-	return (Math.ceil(10**8 * (size || 0)) / (10**8 * leverage)).toFixed(4);
+	return Number(((size || 0) / leverage).toFixed(4));
 }
 export function getSize(margin, leverage) {
 	return Math.ceil(10**8 * (margin || 0) * leverage) / 10**8;
