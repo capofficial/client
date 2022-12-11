@@ -13,6 +13,7 @@
 	import { allowances, poolWithdrawalFees } from '@lib/stores'
 	import { focusInput, hideModal } from '@lib/ui'
 	import { getAssets } from '@lib/utils'
+	import { getUsdcBalance, getBalance, getWbtcBalance } from "@api/cap";
 
 	let amount, asset, depositFeeBps, isSubmitting;
 
@@ -35,6 +36,10 @@
 	}
 
 	let assets = getAssets();
+	let usdc_balance;
+	let wbtc_balance;
+  	let eth_bal;
+
 
 	async function checkAllowance(_asset) {
 		await getAllowance(_asset, 'FundStore');
@@ -46,9 +51,26 @@
 
 	$: checkAllowance(asset);
 
-	onMount(() => {
+	const setMax = (assetName) => {
+		switch (assetName) {
+		case "ETH":
+			amount = eth_bal;
+			break;
+		case "USDC":
+			amount = usdc_balance;
+			break;
+		case "WBTC":
+			amount = wbtc_balance;
+			break;
+		}
+  	};
+
+	onMount(async() => {
 		selectAsset('ETH');
 		focusInput('Amount');
+		usdc_balance = await getUsdcBalance();
+        wbtc_balance = await getWbtcBalance();
+        eth_bal = await getBalance();
 	});
 
 </script>
@@ -65,8 +87,27 @@
 		color: var(--text300);
 		line-height: 1.418;
 		font-size: 80%;
-		padding-bottom: 20px;
+		margin-bottom: 20px;
+    	margin-top: 20px;
 	}
+	.input-box {
+    	display: flex;
+    	flex-direction: column;
+    	margin-top: 1rem;
+	  }
+  .input-box div {
+    	display: grid;
+    	grid-template-columns: 50px 1fr;
+  }
+  .max {
+	    display: flex;
+    	flex-direction: column;
+    	align-items: center;
+    	justify-content: center;
+  }
+  .max p {
+    width: 100%;
+  }
 
 </style>
 
@@ -82,9 +123,37 @@
 			{/each}
 		</div>
 
-		<div class="group">
-			<Input label='Amount' bind:value={amount} />
-		</div>
+		<div>
+			{#if asset == "ETH"}
+			  <p>Balance: {eth_bal}</p>
+			{/if}
+		  </div>
+	
+		  <div>
+			{#if asset == "USDC"}
+			  <p>Balance: {usdc_balance}</p>
+			{/if}
+		  </div>
+	
+		  <div>
+			{#if asset == "WBTC"}
+			  <p>Balance: {wbtc_balance}</p>
+			{/if}
+		  </div>
+	
+		  <div class="input-box">
+			<div class="">
+			  <span
+				on:click={() => {
+				  setMax(asset);
+				}}
+				class="max"
+			  >
+				<p>MAX</p>
+			  </span>
+			  <span> <Input label="" bind:value={amount} /></span>
+			</div>
+		  </div>
 		
 		<div class='note'>There are no deposit fees.{#if $poolWithdrawalFees[asset]} The withdrawal fee is currently {$poolWithdrawalFees[asset]}%.{/if}</div>
 

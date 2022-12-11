@@ -34,6 +34,11 @@
 
 	}
 
+	const setMax = () => {
+	console.log(formatForDisplay($poolStakes[asset]));
+    amount = formatForDisplay($poolStakes[asset]);
+  };
+
 	let assets = getAssets();
 
 	onMount(() => {
@@ -57,6 +62,25 @@
 		font-size: 80%;
 		padding-bottom: 20px;
 	}
+	.max {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+	}
+	.max p {
+		width: 100%;
+	}
+	.input-box {
+		display: flex;
+		flex-direction: column;
+		margin-bottom: 1rem;
+	}
+
+	.input-box div {
+		display: grid;
+		grid-template-columns: 50px 1fr;
+	}
 
 </style>
 
@@ -70,16 +94,26 @@
 			{/each}
 		</div>
 
+		<div class="group">
+			<LabelValue label='Available' value={formatForDisplay($poolStakes[asset])} />
+		</div>
+
 		<form on:submit|preventDefault={submit}>
 
-			<div class="group">
-				<Input label='Amount' bind:value={amount} />
+			<div class="input-box">
+				<div class="">
+				  <span
+					on:click={() => {
+					  setMax($poolStakes[asset]);
+					}}
+					class="max"
+				  >
+					<p>MAX</p>
+				  </span>
+				  <span> <Input label="" bind:value={amount} /></span>
+				</div>
 			</div>
-
-			<div class="group">
-				<LabelValue label='Available' value={formatForDisplay($poolStakes[asset])} />
-			</div>
-
+		
 			{#if $poolWithdrawalFees[asset]}
 			<div class='note'>The withdrawal fee is currently {$poolWithdrawalFees[asset]}%.</div>
 			{/if}

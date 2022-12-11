@@ -2,9 +2,11 @@ import { get } from 'svelte/store'
 import { CURRENCY_DECIMALS } from '@lib/config'
 import { getContract } from '@lib/contracts'
 import { formatUnits, parseUnits } from '@lib/formatters'
-import { address, totalSupplyCAP, CAPStake, claimableRewardsCAP } from '@lib/stores'
+import { address, totalSupplyCAP, CAPStake, claimableRewardsCAP, provider } from '@lib/stores'
 import { getAssetAddresses, getLabelForAsset } from '@lib/utils'
 import { showToast, showError } from '@lib/ui'
+import { erc20ABI } from '@lib/abis'
+import { ethers } from 'ethers'
 
 export async function getTotalSupplyCAP() { // staked
 	const contract = await getContract('StakingStore');
@@ -38,6 +40,43 @@ export async function getClaimableRewardsCAP() {
 		i++;
 	}
 	claimableRewardsCAP.set(rewards);
+}
+
+export const getBalance = async () => {
+
+	const _provider = get(provider);
+	const balance = await _provider.getBalance(get(address));
+	const balanceInEth = await ethers.utils.formatEther(balance);
+	return balanceInEth;
+
+}
+
+export async function getUsdcBalance() {
+
+	try {
+		const usdc = "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8";
+		const _provider = get(provider);
+		const contract = new ethers.Contract(usdc, erc20ABI, _provider);
+		const balance = await contract.balanceOf(get(address))
+		return balance.toString();
+	} catch (e) {
+		console.log(e)
+	}
+
+}
+
+export async function getWbtcBalance() {
+
+	const wbtc = "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f";
+	try{
+		const _provider = get(provider);
+		const contract = new ethers.Contract(wbtc, erc20ABI, _provider);
+		const balance = await contract.balanceOf(get(address))
+		return balance.toString()
+	
+	} catch(e){
+		console.log(e);
+	}
 }
 
 export async function depositCAP(_amount) {
