@@ -3,7 +3,7 @@
 	import Button from '@components/layout/Button.svelte'
 
 	import { getClaimableRewardsCAP, collectAllCAPRewards } from '@api/cap'
-	import { formatForDisplay } from '@lib/formatters'
+	import { formatForDisplay, numberWithCommas } from '@lib/formatters'
 	import { address, claimableRewardsCAP, prices } from '@lib/stores'
 	import { showModal } from '@lib/ui'
 	import { getAssets, getAmountInUsd, getTotalAmountInUsd } from '@lib/utils'
@@ -140,7 +140,7 @@
 		<div class='table-body'>
 			<div class='row'>
 				{#each assets as asset}
-					<div class='cell'>{formatForDisplay($claimableRewardsCAP[asset]) || 0} (${getAmountInUsd(asset, $claimableRewardsCAP[asset], $prices)})</div>
+					<div class='cell'>{numberWithCommas($claimableRewardsCAP[asset]) || 0} (${getAmountInUsd(asset, $claimableRewardsCAP[asset], $prices)})</div>
 				{/each}
 				<div class='cell'>${getTotalAmountInUsd($claimableRewardsCAP, $prices)}</div>
 			</div>

@@ -4,7 +4,7 @@
 
 	import { getTotalSupplyCAP, getUserCAPStake } from '@api/cap'
 	import { getCAPPrice } from '@api/prices'
-	import { formatForDisplay } from '@lib/formatters'
+	import { formatForDisplay, numberWithCommas } from '@lib/formatters'
 	import { address, totalSupplyCAP, CAPPrice, CAPStake } from '@lib/stores'
 	import { showModal } from '@lib/ui'
 
@@ -134,8 +134,8 @@
 			<div class='row'>
 				<div class='cell la'>${formatForDisplay($CAPPrice)}</div>
 				<div class='cell'>100,000</div>
-				<div class='cell'>{formatForDisplay($totalSupplyCAP)}</div>
-				<div class='cell highlighted'>{formatForDisplay($CAPStake)}</div>
+				<div class='cell'>{numberWithCommas($totalSupplyCAP)}</div>
+				<div class='cell highlighted'>{numberWithCommas($CAPStake)}</div>
 				<div class='cell highlighted'>{$totalSupplyCAP == 0 ? 'N/A' : formatForDisplay(($CAPStake/$totalSupplyCAP *100))+'%'}</div>
 			</div>
 		</div>

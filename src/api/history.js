@@ -6,7 +6,7 @@ import { getLabelForAsset, getChainData } from '@lib/utils'
 
 export async function getUserHistory(params) {
 
-	const pricesEndpoint = getChainData('pricesEndpoint');
+	const dataEndpoint = getChainData('dataEndpoint');
 	
 	let _address = get(address);
 	if (!_address) return;
@@ -32,7 +32,7 @@ export async function getUserHistory(params) {
 	let sortDirection = 'desc';
 
 	try {
-		const response = await fetch(`${pricesEndpoint}/history/${_address}?limit=${first}&skip=${skip}&sortBy=${sortBy}&sortDirection=${sortDirection}&status=${statusesToShow.join(',')}`);
+		const response = await fetch(`${dataEndpoint}/history/${_address}?limit=${first}&skip=${skip}&sortBy=${sortBy}&sortDirection=${sortDirection}&status=${statusesToShow.join(',')}`);
 		const orders = await response.json() || [];
 
 		lastHistoryItemsCount.set(orders.length);

@@ -36,7 +36,7 @@ export async function getRebateParams() {
 
 export async function getUserFeesSaved() {
 
-	const pricesEndpoint = getChainData('pricesEndpoint');
+	const dataEndpoint = getChainData('dataEndpoint');
 	
 	let _address = get(address);
 	if (!_address) return;
@@ -44,7 +44,7 @@ export async function getUserFeesSaved() {
 	_address = _address.toLowerCase();
 
 	try {
-		const response = await fetch(`${pricesEndpoint}/fees/${_address}`);
+		const response = await fetch(`${dataEndpoint}/fees/${_address}`);
 		const stats = await response.json() || {};
 
 		// console.log('stats', stats);
