@@ -46,7 +46,7 @@ export async function depositCAP(_amount) {
 			return true;
 		}
 		return false;
-	} catch (e) {
+	} catch(e) {
 		showError(e);
 	}
 }
@@ -64,7 +64,7 @@ export async function withdrawCAP(_amount) {
 			return true;
 		}
 		return false;
-	} catch (e) {
+	} catch(e) {
 		showError(e);
 	}
 }
@@ -81,7 +81,7 @@ export async function collectAllCAPRewards() {
 			return true;
 		}
 		return false;
-	} catch (e) {
+	} catch(e) {
 		showError(e);
 	}
 }
