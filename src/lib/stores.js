@@ -3,7 +3,7 @@ import { writable, derived } from 'svelte/store'
 
 import { DEFAULT_LOCALE, DEFAULT_MARKET, DEFAULT_CURRENCY, DEFAULT_LEVERAGE, BPS_DIVIDER, DEFAULT_MARKETS_SORT_KEY, DEFAULT_ORDERS_SORT_KEY, DEFAULT_POSITIONS_SORT_KEY, DEFAULT_HISTORY_SORT_KEY } from './config'
 import { formatPoolStat } from './formatters'
-import { getUserSetting, calculateLiquidationPrice } from './utils'
+import { getUserSetting, calculateLiquidationPrice, getMargin } from './utils'
 
 // Language
 export const locale = writable(getUserSetting('locale') || DEFAULT_LOCALE);
@@ -300,7 +300,7 @@ export const maxSize = derived([balances, leverage, currentFeeRebate, selectedMa
 
 export const margin = derived([size, leverage], ([$size, $leverage]) => {
 	if (!$size || !$leverage) return 0;
-	const margin = Math.ceil(10**8 * ($size || 0)) / (10**8 * $leverage);
+	const margin = getMargin($size, $leverage)
 	return margin;
 }, 0);
 export const sizeInUsd = derived([size, selectedAsset, prices], ([$size, $selectedAsset, $prices]) => {

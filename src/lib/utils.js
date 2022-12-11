@@ -133,3 +133,10 @@ export function getChainData(key) {
 	if (!_chainId || !CHAINDATA[_chainId]) return;
 	return CHAINDATA[_chainId][key];
 }
+
+export function getMargin(size, leverage) {
+	return Number(((size || 0) / leverage).toFixed(4));
+}
+export function getSize(margin, leverage) {
+	return Math.ceil(10**8 * (margin || 0) * leverage) / 10**8;
+}
