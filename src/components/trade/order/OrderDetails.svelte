@@ -23,6 +23,7 @@
 	// $: console.log('size', size);
 
 	let t2, decimals, oi = 0, maxOI = 0, poolAvailable = 0, marketProfitTracker = 0, marketProfitLimit = 0, poolProfitTracker = 0, poolProfitLimit = 0;
+	export let displaySizeOrMargin;
 
 	let profitLimit = 0, availableLiquidity = 0;
 	async function fetchRiskData() {
@@ -109,8 +110,8 @@
 
 		<div class='row'>
 			<LabelValue 
-				label='Margin' 
-				value={`${size > 0 ? `${formatForDisplay($margin)} ${asset}` : '-'}`}
+				label={displaySizeOrMargin == 'Margin' ? 'Size' : 'Margin'}
+				value={`${size > 0 ? `${formatForDisplay(displaySizeOrMargin == 'Margin' ? size : $margin)} ${asset}` : '-'}`}
 			/>
 		</div>
 
