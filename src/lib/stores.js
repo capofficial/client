@@ -70,9 +70,9 @@ function getPoolPerformance(stats, latestIndex, oldestIndex) {
 		// startingBalance allows you to calculate performance
 		let startingBalance = oldestStat.startingBalance;
 		let latestStat = formatPoolStat(data[latestIndex]);
-		let totalDeposits = data.reduce((sum, item) => sum + (item.deposits || 0), 0);
-		let totalWithdrawals = data.reduce((sum, item) => sum + (item.withdrawals || 0), 0);
-		perf[assetLabel] = latestStat.balance == 0 ? 0 : (latestStat.balance - startingBalance - (totalDeposits || 0) + (totalWithdrawals || 0)) / latestStat.balance;
+		let totalDeposits = data.reduce((sum, item) => sum + item.deposits, 0);
+		let totalWithdrawals = data.reduce((sum, item) => sum + item.withdrawals, 0);
+		perf[assetLabel] = latestStat.balance == 0 ? 0 : (latestStat.balance - startingBalance - totalDeposits + totalWithdrawals) / latestStat.balance;
 	}
 	return perf;
 }
