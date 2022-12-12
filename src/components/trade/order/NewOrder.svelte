@@ -3,6 +3,7 @@
 	import { onMount, onDestroy } from 'svelte'
 
 	import Input from '@components/layout/Input.svelte'
+	import DDInput from '@components/layout/DropdownInput.svelte'
 	import Checkbox from '@components/layout/Checkbox.svelte'
 	import Button from '@components/layout/Button.svelte'
 	import LabelValue from '@components/layout/LabelValue.svelte'
@@ -17,6 +18,7 @@
 	import { CHEVRON_DOWN, XMARK_ICON, INFO_ICON_CIRCLE } from '@lib/icons'
 	import { formatForDisplay } from '@lib/formatters'
 	import { focusInput, showModal } from '@lib/ui'
+	import {getUserSetting, saveUserSetting, getSize} from '@lib/utils'
 
 	import {
 		address,
@@ -48,6 +50,18 @@
 	import { submitOrder } from '@api/orders'
 
 	let showAdvanced = false;
+	let displaySizeOrMargin = 'Size';
+
+	onMount(() => {
+		displaySizeOrMargin = getUserSetting('displaySizeOrMargin');
+		if (!displaySizeOrMargin) saveUserSetting('displaySizeOrMargin', 'Size')
+	})
+
+	function setDisplaySizeOrMargin(sizeOrMargin) {
+		displaySizeOrMargin = sizeOrMargin;
+		saveUserSetting('displaySizeOrMargin', sizeOrMargin)
+	}
+	
 	function clearAdvanced(_showAdvanced) {
 		if (_showAdvanced) return;
 		tpPrice.set();
@@ -287,7 +301,7 @@
 			{/if}
 
 			<div class='top-spacing bottom-spacing'>
-				<Input label='Size' bind:value={$size} isSecondaryColor={!$isLong} placeholder={`0.0 ${$selectedAsset}`} bind:isHighlighted={sizeHighlighted} isInvalid={$maxSize && $size > formatForDisplay($maxSize) * 1} />
+				<DDInput label='Size' setDisplaySizeOrMargin={setDisplaySizeOrMargin} displaySizeOrMargin={displaySizeOrMargin} value={displaySizeOrMargin == 'Margin' ? $margin : $size} onChangeValue={newValue => size.set(displaySizeOrMargin == 'Margin' ? getSize(newValue, $leverage) : newValue)} isSecondaryColor={!$isLong} placeholder={`0.0 ${$selectedAsset}`} bind:isHighlighted={sizeHighlighted} isInvalid={$maxSize && $size > formatForDisplay($maxSize) * 1} />
 			</div>
 			
 			<div class='slider-container bottom-spacing'>
@@ -364,7 +378,7 @@
 		</form>
 		
 		<div class='od'>
-			<OrderDetails market={$selectedMarket} asset={$selectedAsset} size={$size} />
+			<OrderDetails market={$selectedMarket} asset={$selectedAsset} size={$size} displaySizeOrMargin={displaySizeOrMargin}/>
 		</div>
 	
 	</div>
