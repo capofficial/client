@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "alchemy-sdk": "^2.2.3",
+    "dom-to-image": "^2.6.0",
     "lightweight-charts": "^3.8.0",
     "reconnecting-websocket": "^4.4.0",
     "sirv-cli": "^2.0.2"
