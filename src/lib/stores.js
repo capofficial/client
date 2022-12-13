@@ -3,6 +3,7 @@ import { writable, derived } from 'svelte/store'
 
 import { DEFAULT_LOCALE, DEFAULT_MARKET, DEFAULT_CURRENCY, DEFAULT_LEVERAGE, BPS_DIVIDER, DEFAULT_MARKETS_SORT_KEY, DEFAULT_ORDERS_SORT_KEY, DEFAULT_POSITIONS_SORT_KEY, DEFAULT_HISTORY_SORT_KEY } from './config'
 import { formatPoolStat } from './formatters'
+import { getPoolsPerformance } from './stats';
 import { getUserSetting, calculateLiquidationPrice, getMargin } from './utils'
 
 // Language
@@ -57,35 +58,17 @@ export const totalSupplyCAP = writable(0);
 export const CAPStake = writable(0);
 
 // Pool performance stats (including fees)
-function getPoolPerformance(stats, latestIndex, oldestIndex) {
-	if (!stats) return;
-	let perf = {};
-	for (const assetLabel in stats) {
-		let data = stats[assetLabel]; // array
-		if (!data.length) continue;
-		if (oldestIndex >= data.length) {
-			oldestIndex = data.length - 1;
-		}
-		let oldestStat = formatPoolStat(data[oldestIndex]);
-		// startingBalance allows you to calculate performance
-		let startingBalance = oldestStat.startingBalance;
-		let latestStat = formatPoolStat(data[latestIndex]);
-		let totalDeposits = data.reduce((sum, item) => sum + item.deposits, 0);
-		let totalWithdrawals = data.reduce((sum, item) => sum + item.withdrawals, 0);
-		perf[assetLabel] = latestStat.balance == 0 ? 0 : (latestStat.balance - startingBalance - totalDeposits + totalWithdrawals) / latestStat.balance;
-	}
-	return perf;
-}
 export const poolStatsDaily = writable({}); // asset => [stats]
 export const poolStatsWeekly = writable({}); // asset => [stats]
 export const weeklyPerformance = derived([poolStatsDaily], ([$poolStatsDaily]) => {
-	return getPoolPerformance($poolStatsDaily, 0, 6);
+	return getPoolsPerformance($poolStatsDaily, 0, 6);
 }, {}); // asset => %
 export const monthlyPerformance = derived([poolStatsDaily], ([$poolStatsDaily]) => {
-	return getPoolPerformance($poolStatsDaily, 0, 29);
+	return getPoolsPerformance($poolStatsDaily, 0, 29);
 }, {}); // asset => %
-export const yearlyPerformance = derived([poolStatsWeekly], ([$poolStatsWeekly]) => {
-	return getPoolPerformance($poolStatsWeekly, 0, 51);
+// TODO: Change back to use poolStatsWeekly once issue #56 is resolved
+export const yearlyPerformance = derived([poolStatsDaily], ([$poolStatsDaily]) => {
+	return getPoolsPerformance($poolStatsDaily, 0, 364);
 }, {}); // asset => %
 
 // Rebates
