@@ -75,6 +75,6 @@
 <MarketInfo data={$activeModal.data} />
 {/if}
 
-{#if $activeModal && $activeModal.name == 'SharePosition'}
+{#if $activeModal && ($activeModal.name == 'SharePosition' || $activeModal.name == 'ShareTrade')}
 <TradeShare data={$activeModal.data} />
 {/if}

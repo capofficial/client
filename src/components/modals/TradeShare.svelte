@@ -4,13 +4,14 @@
     import domtoimage from 'dom-to-image';
 	import { LOADING_ICON } from '@lib/icons'
     import {getUPL} from '@lib/utils'
-	import { prices, referralCode } from '@lib/stores'
+	import { prices, referralCode, activeModal } from '@lib/stores'
 	import { formatPnl, formatForDisplay } from '@lib/formatters'
 	import { getReferralCode } from '@api/referrals'
 	import { DOWNLOAD_ICON } from '@lib/icons'
     
     export let data;
     let imageData;
+    let pnl;
     onMount(async () => {
         await getReferralCode();
 		let script = document.createElement('script');
@@ -34,6 +35,13 @@
                 document.getElementById('download-icon').style.display = 'flex'
             })
         };
+
+        if ($activeModal.name == 'ShareTrade') {
+            data.isLong = !data.isLong;
+            pnl = 100 * data.pnl / data.margin
+        } else {
+            pnl = getUPL(data, $prices[data.market]) / (data.margin * 0.01)
+        }
 	})
 
     const downloadIcon = () => {
@@ -47,9 +55,8 @@
         })
         .catch(console.error);
     }
-    let pnl = getUPL(data, $prices[data.market]) / (data.margin * 0.01)
 </script>
-<Modal title='Share Position' width={screen.height / 2 + 50}>
+<Modal title={$activeModal.name} width={screen.height / 2 + 50}>
     <body>
         <div id="canvas">
             <div class="container" id="canvas-content">
@@ -98,11 +105,11 @@
                     <div class="position-price-container">
                         <div>
                             <div class="price-heading">Entry Price</div>
-                            <div class="price">{formatForDisplay(data.price)}</div>
+                            <div class="price">{formatForDisplay($activeModal.name == 'SharePosition' ? data.price : data.entryPrice)}</div>
                         </div>
                         <div style="margin-left: 1.5em">
-                            <div class="price-heading">Mark Price</div>
-                            <div class="price">{formatForDisplay($prices[data.market])}</div>
+                            <div class="price-heading">{$activeModal.name == 'SharePosition' ? 'Mark' : 'Close'} Price</div>
+                            <div class="price">{$activeModal.name == 'SharePosition' ? formatForDisplay($prices[data.market]) : data.price}</div>
                         </div>
                     </div>
                 </div>

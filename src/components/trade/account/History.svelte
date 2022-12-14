@@ -6,7 +6,8 @@
 	import Cell from '@components/layout/table/Cell.svelte'
 
 	import { onMount, onDestroy } from 'svelte'
-	import { LOADING_ICON } from '@lib/icons'
+	import { SHARE_ICON } from '@lib/icons'
+	import tooltip from '@lib/tooltip'
 
 	import { DEFAULT_HISTORY_COUNT, DEFAULT_HISTORY_SORT_KEY } from '@lib/config'
 	import { 
@@ -18,7 +19,7 @@
 		formatDate,
 		formatMarketName
 	} from '@lib/formatters'
-	import { address, historySortKey, historySorted, historyColumnsToShow, lastHistoryItemsCount, orders } from '@lib/stores'
+	import { address, historySortKey, historySorted, historyColumnsToShow, lastHistoryItemsCount } from '@lib/stores'
 	import { showModal } from '@lib/ui'
 	import { saveUserSetting } from '@lib/utils'
 
@@ -114,6 +115,13 @@
 			return 'failed';
 		}
 		return item.status;
+	}
+
+	function onClickShare(position) {
+		// this is not completely accurate
+		let entryPrice = position.price - (position.isLong ? -1 : 1) * (position.pnl + position.fundingFee) * position.price / position.size
+		position.entryPrice = entryPrice
+		showModal('ShareTrade', JSON.parse(JSON.stringify(position)))
 	}
 
 </script>
@@ -298,10 +306,15 @@
 			{/if}
 
 			{#if $historyColumnsToShow.includes('pnl')}
-				{#if !item.pnl}
-					<Cell>-</Cell>
+				{#if !item.pnl && item.pnl != 0}
+					<Cell>
+						-
+					</Cell>
 				{:else}
-					<Cell hasClass={item.pnl * 1 >= 0 ? 'green' : 'red'}>{@html formatPnl(item.pnl)} ({@html formatPnl(100*item.pnl/item.margin, true)})</Cell>
+					<Cell isTools hasClass={item.pnl * 1 >= 0 ? 'green' : 'red'}>
+						{@html formatPnl(item.pnl)} ({@html formatPnl(100*item.pnl/item.margin, true)})
+						<a use:tooltip={{content: 'Share'}} on:click|stopPropagation={() => { onClickShare(item) }}>{@html SHARE_ICON}</a>
+					</Cell>
 				{/if}
 			{/if}
 
