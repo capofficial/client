@@ -5,7 +5,7 @@
 	import { LOADING_ICON } from '@lib/icons'
     import {getUPL} from '@lib/utils'
 	import { prices, referralCode } from '@lib/stores'
-	import { formatPnl } from '@lib/formatters'
+	import { formatPnl, formatForDisplay } from '@lib/formatters'
 	import { getReferralCode } from '@api/referrals'
 	import { DOWNLOAD_ICON } from '@lib/icons'
     
@@ -19,7 +19,7 @@
 
         script.onload = function() {
             new QRCode(document.getElementById("qrcode"), {
-                text: `https://cap.io/?r=${$referralCode}`,
+                text: `https://cap.io/${$referralCode ? `?r=${$referralCode}` : ''}`,
                 width: 150,
                 height: 150
             });		
@@ -98,11 +98,11 @@
                     <div class="position-price-container">
                         <div>
                             <div class="price-heading">Entry Price</div>
-                            <div class="price">{data.price}</div>
+                            <div class="price">{formatForDisplay(data.price)}</div>
                         </div>
                         <div style="margin-left: 1.5em">
                             <div class="price-heading">Mark Price</div>
-                            <div class="price">{$prices[data.market]}</div>
+                            <div class="price">{formatForDisplay($prices[data.market])}</div>
                         </div>
                     </div>
                 </div>
@@ -113,9 +113,11 @@
                         </div>
                     </div>
                     <div class="ref-p-container">
-                        <p class="ref-p">
-                            Referral code <span class="ref-code">{$referralCode}</span>
-                        </p>
+                        {#if $referralCode}
+                            <p class="ref-p">
+                                Referral code <span class="ref-code">{$referralCode}</span>
+                            </p>
+                        {/if}
                         <p class="ref-p">
                             Join CAP Protocol & make greater fortune!
                         </p>
