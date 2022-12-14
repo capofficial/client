@@ -150,8 +150,6 @@
     #canvas {
         width: 948px;
         position: relative;
-        /* background-image: url("a.jpg"); */
-        background-repeat: no-repeat;
         display: flex;
         z-index: -1;
         justify-content: center;
@@ -164,7 +162,9 @@
         flex: 0 0 100%;
         flex-direction: column;
         justify-content: space-between;
-        background-color: black;
+        background-image: url(./im/banner-background.jpg);
+        background-size: cover;
+        background-repeat: no-repeat;
         margin-right: -150px;
     }
     .cap-logo {
