@@ -19,7 +19,7 @@
 		if (done) isLoading = false;
 		// t = setTimeout(fetchData, 30 * 1000);
 	}
-	fetchData($address);
+	$: fetchData($address);
 
 	onDestroy(() => {
 		clearTimeout(t);
