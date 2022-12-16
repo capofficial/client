@@ -10,7 +10,7 @@
 
 
 	import { onDestroy } from 'svelte'
-	import { XMARK_ICON, PENCIL_ICON } from '@lib/icons'
+	import { XMARK_ICON, PENCIL_ICON, SHARE_ICON } from '@lib/icons'
 
 	import { DEFAULT_POSITIONS_SORT_KEY, BPS_DIVIDER } from '@lib/config'
 	import { 
@@ -316,6 +316,7 @@
 			<Cell isTools={true}>
 				<a use:tooltip={{content: 'Edit'}} on:click|stopPropagation={() => { showModal('EditMargin', position) }}>{@html PENCIL_ICON}</a>
 				<a use:tooltip={{content: 'Close'}} on:click|stopPropagation={() => { showModal('ClosePosition', position) }}>{@html XMARK_ICON}</a>
+				<a use:tooltip={{content: 'Share'}} on:click|stopPropagation={() => { showModal('SharePosition', position) }}>{@html SHARE_ICON}</a>
 			</Cell>
 
 		</Row>
