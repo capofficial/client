@@ -7,7 +7,8 @@
     "build": "rollup -c",
     "dev": "rollup -c -w",
     "start": "sirv build --single",
-    "deploy-ipfs": "npm run build && npx ipfs-deploy build"
+    "deploy-ipfs": "npm run build && npx ipfs-deploy build",
+    "postinstall": "patch-package"
   },
   "repository": {
     "type": "git",
@@ -26,6 +27,7 @@
     "@rollup/plugin-replace": "^4.0.0",
     "chart.js": "^3.9.1",
     "ethers": "^5.7.1",
+    "patch-package": "^6.5.0",
     "rollup": "^2.79.0",
     "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-css-only": "^3.1.0",
