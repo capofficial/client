@@ -90,11 +90,15 @@
 
 	.prefix {
 		position: absolute;
+		background-color: var(--layer50);
+		padding-left: 14px;
+		padding-right: 14px;
+		margin-left: 1px;
 		top: 50%;
 		transform: translateY(-50%);
 		pointer-events: none;
 		white-space: nowrap;
-		left: 14px;
+		left: 0px;
 		display: flex;
 		align-items: center;
 		text-transform: uppercase;
