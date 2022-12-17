@@ -12,7 +12,7 @@
 	export let showDots = true;
 
 	let sliderElem;
-	let progressPercent;
+	let progressPercent = 0;
 	let sliderGrabbed = false;
 	let mouseXOnSliderGrab;
 	let progressPercentOnSliderGrab;
