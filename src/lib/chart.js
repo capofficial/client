@@ -3,8 +3,9 @@ import { createChart, ColorType, LineStyle } from 'lightweight-charts'
 
 import { CURRENCY_DECIMALS } from './config'
 import { formatUnits, formatOrder, formatPosition, formatForDisplay } from './formatters'
-import { selectedMarket, orders, positions, chartResolution, chartLoading, showOrdersOnChart, showPositionsOnChart, showLiquidationPriceOnChart,hoveredOHLC } from './stores'
+import { selectedMarket, orders, positions, chartResolution, chartLoading, showOrdersOnChart, showPositionsOnChart, showLiquidationPriceOnChart, hoveredOHLC } from './stores'
 import { saveUserSetting, getPrecision } from './utils'
+import { calculateLiquidationPrice } from '@lib/utils'
 
 import { getMarketCandles } from '@api/prices'
 
@@ -142,6 +143,10 @@ export function initChart(cb) {
 	showPositionsOnChart.subscribe(() => {
 		loadPositionLines();
 	});
+	showLiquidationPriceOnChart.subscribe(()=>{
+		loadLiquidationLines();
+	})
+
 
 	chart.subscribeCrosshairMove(param => {
 		if (!param?.seriesPrices || param?.seriesPrices.size == 0) {
@@ -272,6 +277,7 @@ export async function loadCandles(_end) {
 	// redraw order and position lines
 	loadOrderLines();
 	loadPositionLines();
+	loadLiquidationLines();
 
 
 	chartLoading.set(false);
@@ -324,6 +330,7 @@ export function onNewPrice(price) {
 
 let orderLines = [];
 let positionLines = [];
+let liquidationLines = [];
 
 function loadOrderLines(_orders) {
 
@@ -420,6 +427,53 @@ function loadPositionLines(_positions) {
 
 }
 
+function loadLiquidationLines(_positions){
+
+	if (!get(showLiquidationPriceOnChart)) return;
+
+	if (!_positions) _positions = get(positions);
+
+	if (!candlestickSeries) {
+		setTimeout(() => {
+			loadLiquidationLines(_positions);
+		}, 2000);
+		return;
+	}
+
+	clearLiquidationPriceLines();
+
+	if (!get(showLiquidationPriceOnChart)) return;
+
+	let markers = [];
+
+	for (let _position of _positions) {
+
+		_position = formatPosition(_position);
+
+		if (_position.market != get(selectedMarket)) continue;
+
+		let liqPrice = calculateLiquidationPrice({
+				liqThreshold: _marketInfos[_position.market].liqThreshold,
+				price: _position.price * 1,
+				leverage: _position.leverage * 1,
+				isLong: +_position.isLong,
+				funding: fundings[`${_position.asset}:${_position.market}`]
+		})
+
+		liquidationLines.push(
+			candlestickSeries.createPriceLine({
+			    price: liqPrice,
+			    color: _position.isLong ? '#00D604' : '#FF5000',
+			    lineWidth: 1,
+			    lineStyle: LineStyle.Solid,
+			    axisLabelVisible: true,
+			    title: `${_position.isLong ? '▲' : '▼'} ${formatForDisplay(_position.size)} ${_position.asset}`,
+			})
+		);
+	
+	}
+}
+
 function clearOrderLines() {
 	for (const priceline of orderLines) {
 		candlestickSeries.removePriceLine(priceline);
@@ -433,4 +487,12 @@ function clearPositionLines() {
 	}
 	candlestickSeries.setMarkers([]);
 	positionLines = [];
+}
+
+function clearLiquidationPriceLines() {
+	for (const priceline of liquidationLines) {
+		candlestickSeries.removePriceLine(priceline);
+	}
+	candlestickSeries.setMarkers([]);
+	liquidationLines = [];
 }
