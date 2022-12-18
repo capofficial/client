@@ -3,7 +3,7 @@ import { createChart, ColorType, LineStyle } from 'lightweight-charts'
 
 import { CURRENCY_DECIMALS } from './config'
 import { formatUnits, formatOrder, formatPosition, formatForDisplay } from './formatters'
-import { selectedMarket, orders, positions, chartResolution, chartLoading, showOrdersOnChart, showPositionsOnChart, hoveredOHLC } from './stores'
+import { selectedMarket, orders, positions, chartResolution, chartLoading, showOrdersOnChart, showPositionsOnChart, showLiquidationPriceOnChart,hoveredOHLC } from './stores'
 import { saveUserSetting, getPrecision } from './utils'
 
 import { getMarketCandles } from '@api/prices'

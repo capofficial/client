@@ -22,6 +22,7 @@ export const activeError = writable();
 export const showOrdersOnChart = writable(getUserSetting('showOrdersOnChart') == undefined ? false : getUserSetting('showOrdersOnChart'));
 export const showPositionsOnChart = writable(getUserSetting('showPositionsOnChart') == undefined ? false : getUserSetting('showPositionsOnChart'));
 export const showTooltips = writable(getUserSetting('showTooltips') == undefined ? true : getUserSetting('showTooltips'));
+export const showLiquidationPriceOnChart = writable(getUserSetting('showLiquidationPriceOnChart') == undefined ? true : getUserSetting('showLiquidationPriceOnChart'));
 
 // Contracts
 export const provider = writable();

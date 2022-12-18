@@ -4,7 +4,7 @@
 	import LabelValue from '@components/layout/LabelValue.svelte'
 	import Checkbox from '@components/layout/Checkbox.svelte'
 
-	import { showOrdersOnChart, showPositionsOnChart, showTooltips } from '@lib/stores'
+	import { showOrdersOnChart, showPositionsOnChart, showTooltips, showLiquidationPriceOnChart} from '@lib/stores'
 	import { showToast } from '@lib/ui'
 	import { saveUserSetting } from '@lib/utils'
 
@@ -18,6 +18,7 @@
 		saveUserSetting('showOrdersOnChart', soc);
 		saveUserSetting('showPositionsOnChart', spc);
 		saveUserSetting('showTooltips', st);
+		saveSettings('showLiquidationPriceOnChart', st)
 	}
 
 	$: saveSettings($showOrdersOnChart, $showPositionsOnChart, $showTooltips);
@@ -40,6 +41,9 @@
 	</div>
 	<div class='row'>
 		<Checkbox hasPadding={true} label='Tooltips' bind:value={$showTooltips} />
+	</div>
+	<div class='row'>
+		<Checkbox hasPadding={true} label='Liquidation price on chart' bind:value={$showLiquidationPriceOnChart} />
 	</div>
 	<LabelValue 
 		label='Reset Preferences' 
