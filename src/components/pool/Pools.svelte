@@ -4,22 +4,26 @@
 
 	import { getPoolBalances, getUserPoolStakes, getPoolStats } from '@api/pool'
 	import { address, poolBalances, prices, weeklyPerformance, monthlyPerformance, yearlyPerformance, poolStakes } from '@lib/stores'
-	import { getAssets, getAmountInUsd, getTotalAmountInUsd,  } from '@lib/utils'
+	import { getAssets, getAmountInUsd, getTotalAmountInUsd, getBufferBalances  } from '@lib/utils'
+	import { getTransactions } from '@api/transactions'
 	import { formatForDisplay, numberWithCommas } from '@lib/formatters'
 	import { showModal } from '@lib/ui'
 
 	let assets = getAssets();
 
+	let bufferBalances = [];
 	let isLoading = true, t;
 	async function fetchData() {
 		clearTimeout(t);
 		const done = await getPoolBalances();
 		getUserPoolStakes();
 		getPoolStats();
+		let items = await getTransactions('type=pool-payin,pool-payout,pool-deposit,pool-withdrawal,fee');
+		bufferBalances = getBufferBalances(items);
 		if (done) isLoading = false;
 		// t = setTimeout(fetchData, 30 * 1000);
 	}
-	fetchData($address);
+	$: fetchData($address);
 
 	onDestroy(() => {
 		clearTimeout(t);
@@ -30,7 +34,7 @@
 <style>
 
 	.table {
-		--grid-template: repeat(7, 1fr);
+		--grid-template: repeat(8, 1fr);
 	}
 
 	.header {
@@ -128,6 +132,7 @@
 			<div class='cell'>1W Return</div>
 			<div class='cell'>1M Return</div>
 			<div class='cell'>1Y Return</div>
+			<div class='cell'>Buffer Balance</div>
 			<div class='cell highlighted'>Your Balance</div>
 			<div class='cell highlighted'>% of Pool</div>
 		</div>
@@ -139,6 +144,7 @@
 				<div class='cell'>{formatForDisplay($weeklyPerformance[asset] * 100) || 0}%</div>
 				<div class='cell'>{formatForDisplay($monthlyPerformance[asset] * 100) || 0}%</div>
 				<div class='cell'>{formatForDisplay($yearlyPerformance[asset] * 100) || 0}%</div>
+				<div class='cell'>{numberWithCommas(bufferBalances[asset])}</div>
 				<div class='cell highlighted'><span>{numberWithCommas($poolStakes[asset]) || 0}<br><span class='grayed'>${getAmountInUsd(asset, $poolStakes[asset], $prices)}</span></span></div>
 				<div class='cell highlighted'>{$poolBalances[asset] == 0 ? 'N/A' : formatForDisplay(($poolStakes[asset])/$poolBalances[asset]  *100 )+ '%'}</div>
 			</div>
@@ -146,6 +152,7 @@
 			<div class='row'>
 				<div class='cell la'>Total</div>
 				<div class='cell'>${getTotalAmountInUsd($poolBalances, $prices)}</div>
+				<div class='cell'>-</div>
 				<div class='cell'>-</div>
 				<div class='cell'>-</div>
 				<div class='cell'>-</div>

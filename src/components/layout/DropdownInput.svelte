@@ -1,5 +1,8 @@
 
 <script>
+
+	import tooltip from '@lib/tooltip'
+
 	export let label;
 	export let value = '';
 	export let disabled = false;
@@ -10,6 +13,20 @@
 	export let displaySizeOrMargin = false;
 	export let setDisplaySizeOrMargin;
 	export let onChangeValue;
+
+	function sizeOrMarginToggle() {
+
+		if (displaySizeOrMargin == "Size")
+		{
+			setDisplaySizeOrMargin("Margin")
+		}
+		else
+		{
+			setDisplaySizeOrMargin("Size")
+		}
+
+	}
+
 </script>
 
 <style>
@@ -32,12 +49,6 @@
 		height: 42px;
 		position: relative;
 		font-size: 85%;
-		display: flex;
-		justify-content: flex-end;
-		background-color: var(--layer50);
-		border: 1px solid var(--layer200);
-		caret-color: var(--primary);
-		border-radius: 6px;
 	}
 	.input-wrapper.invalid {
 		animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
@@ -45,12 +56,19 @@
 
 	input {
 		height: 100%;
-		width: 75%;
+		width: 100%;
 		box-sizing: border-box;
 		text-align: right;
 		padding-right: 14px;
 		font-size: inherit;
 		font-weight: 600;
+		display: flex;
+		justify-content: flex-end;
+		background-color: var(--layer50);
+		border: 1px solid var(--layer200);
+		border-color: var(--layer200);
+		caret-color: var(--primary);
+		border-radius: 6px;
 		/*transition: padding 200ms ease-in-out;*/
 	}
 	input:hover {
@@ -83,17 +101,26 @@
 
 	.prefix {
 		position: absolute;
-		top: 50%;
-		transform: translateY(-50%);
+		width: 60px;
+		margin-top: 2px;
+		padding-top: 11px;
+		margin-bottom: 1px;
+		margin-left: 2px;
+		padding-bottom: 11px;
+		padding-left: 14px;
+		padding-right: 14px;
 		white-space: nowrap;
-		left: 14px;
-		display: flex;
+		left: 0px;
+		text-align: center;
 		align-items: center;
 		text-transform: uppercase;
 		letter-spacing: 0.05rem;
 		font-weight: 500;
 		border: none;
-		background-color: var(--layer50);
+		border-radius: 4px;
+		background-color: var(--layer100);
+		user-select: none;
+		cursor: pointer;
 		outline: none;
 	}
 	.prefix:active, .prefix:focus {
@@ -101,12 +128,15 @@
 		outline: none;
 	}
 
+	.prefix:hover {
+		background-color: var(--layer200);
+	}
+
 </style>
 
 <div class='input-wrapper' class:invalid={isInvalid} on:click|stopPropagation>
-	<select class='prefix' title="Size/Margin" on:change={(e) => setDisplaySizeOrMargin(e.target.value)} value={displaySizeOrMargin}>
-		<option>Size</option>
-		<option>Margin</option>
-	</select>
-	<input id={label} type='number' step="0.0000001" value={value} on:change={newValue => onChangeValue(newValue.target.value)} min="0" max="10000000" maxlength="10" spellcheck="false" placeholder={placeholder || `0.0`} autocomplete="off" autocorrect="off" inputmode="decimal" lang="en" disabled={disabled}  class:secondaryColor={isSecondaryColor} class:highlighted={isHighlighted} >
+	<div class='prefix' on:click={sizeOrMarginToggle} use:tooltip={{content: 'Size/Margin'}} value={displaySizeOrMargin}>
+	{displaySizeOrMargin}
+	</div>
+	<input id={label} type='number' step="0.0000001" value={value} on:input={newValue => onChangeValue(newValue.target.value)} min="0" max="10000000" maxlength="10" spellcheck="false" placeholder={placeholder || `0.0`} autocomplete="off" autocorrect="off" inputmode="decimal" lang="en" disabled={disabled}  class:secondaryColor={isSecondaryColor} class:highlighted={isHighlighted} >
 </div>

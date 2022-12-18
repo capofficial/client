@@ -39,6 +39,7 @@
 		grid-gap: 1px;
 		height: calc(100vh - 80px);
 		background-color: var(--layer100);
+		overflow: hidden; /* overflow fix */
 	}
 
 	/*@media all and (max-height: 800px) {
@@ -59,9 +60,10 @@
 				"account";
 			grid-gap: 1px;
 			height: auto;
+			overflow: initial; /* overflow fix */
 		}
 	}
-
+	
 	.ticker {
 		grid-area: ticker;
 		background-color: var(--layer0);
