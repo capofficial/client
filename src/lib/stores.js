@@ -99,6 +99,7 @@ export const rebateParams = writable([]);
 // Funding rates
 export const fundingTrackers = writable({});
 export const fundingRate = writable(); // for selected asset
+export const fundingRate24h = writable(); //for selected asset
 
 // Toasts
 export const toasts = writable([]);
