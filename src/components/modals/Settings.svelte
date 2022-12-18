@@ -18,7 +18,7 @@
 		saveUserSetting('showOrdersOnChart', soc);
 		saveUserSetting('showPositionsOnChart', spc);
 		saveUserSetting('showTooltips', st);
-		saveSettings('showLiquidationPriceOnChart', st)
+		saveUserSetting('showLiquidationPriceOnChart', st)
 	}
 
 	$: saveSettings($showOrdersOnChart, $showPositionsOnChart, $showTooltips);
