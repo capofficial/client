@@ -80,8 +80,9 @@
 			if ($orderType == 2) return focusInput('Stop Price');
 		}
 		if ($hasTPSL && !$tpPrice && !$slPrice) return focusInput('TP Price');
-		submitOrder();
 		highlightedPriceButton = null;
+		await submitOrder();
+		fetchData()
 	}
 
 	let isApproving = false;
