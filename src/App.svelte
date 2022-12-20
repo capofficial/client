@@ -20,8 +20,8 @@
 
 	let interval1;
 
-	let checkingCode = false;
-	let codeValid = true;
+	let checkingCode = true;
+	let codeValid = false;
 	let error = false;
 	let code = localStorage.getItem('betaCode');
 
