@@ -93,6 +93,7 @@ export const trailing30dayVolume = writable();
 export const currentFeeRebate = writable();
 export const feeRebateFromVolume = writable();
 export const feeRebateFromStaking = writable();
+export const feeRebateFromReferral = writable(0);
 export const totalFeesSaved = writable({});
 export const rebateParams = writable([]);
 

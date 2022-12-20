@@ -2,7 +2,7 @@ import { get } from 'svelte/store'
 import { BPS_DIVIDER } from '@lib/config'
 import { getContract } from '@lib/contracts'
 import { formatUnits, parseUnits, formatFeeStat } from '@lib/formatters'
-import { address, trailing30dayVolume, currentFeeRebate, feeRebateFromVolume, feeRebateFromStaking, rebateParams, totalFeesSaved } from '@lib/stores'
+import { address, trailing30dayVolume, currentFeeRebate, feeRebateFromVolume, feeRebateFromStaking, rebateParams, totalFeesSaved, feeRebateFromReferral } from '@lib/stores'
 import { getChainData, getLabelForAsset } from '@lib/utils'
 import { showToast, showError } from '@lib/ui'
 
@@ -27,6 +27,14 @@ export async function getUserStakingRebate() {
 	if (!get(address)) return 0;
 	const contract = await getContract('RebateStore');
 	feeRebateFromStaking.set(await contract.getStakingRebate(get(address)) / BPS_DIVIDER);
+}
+
+export async function getReferralRebate() {
+	const contract = await getContract('ReferralStore');
+	const _address = get(address);
+	if (!_address) return 0;
+	const rebate = await contract.getRebateForUser(_address);
+	feeRebateFromReferral.set((rebate / BPS_DIVIDER));
 }
 
 export async function getRebateParams() {
