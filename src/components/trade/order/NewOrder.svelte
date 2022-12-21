@@ -301,7 +301,7 @@
 			{/if}
 
 			<div class='top-spacing bottom-spacing'>
-				<DDInput label='Size' setDisplaySizeOrMargin={setDisplaySizeOrMargin} displaySizeOrMargin={displaySizeOrMargin} value={displaySizeOrMargin == 'Margin' ? $margin : $size} onChangeValue={newValue => size.set(displaySizeOrMargin == 'Margin' ? getSize(newValue, $leverage) : newValue)} isSecondaryColor={!$isLong} placeholder={`0.0 ${$selectedAsset}`} isInvalid={$maxSize && $size > formatForDisplay($maxSize) * 1} />
+				<DDInput label='Size' setDisplaySizeOrMargin={setDisplaySizeOrMargin} displaySizeOrMargin={displaySizeOrMargin} value={displaySizeOrMargin == 'Margin' ? ($margin.toFixed(4)) : $size} onChangeValue={newValue => size.set(displaySizeOrMargin == 'Margin' ? getSize(newValue, $leverage) : newValue)} isSecondaryColor={!$isLong} placeholder={`0.0 ${$selectedAsset}`} isInvalid={$maxSize && $size > formatForDisplay($maxSize) * 1} />
 			</div>
 			
 			<div class='slider-container bottom-spacing'>
