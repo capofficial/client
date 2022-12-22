@@ -162,7 +162,10 @@ export const historySorted = derived([history, historySortKey], ([$history, $his
 	return sorter($history, $historySortKey);
 }, []);
 export const lastHistoryItemsCount = writable(0); // how many items were fetched on the last history page requested (used for infinite scroll)
-export const historyOrderStatusToShow = writable(getUserSetting('historyOrderStatusToShow') || ['cancelled', 'executed', 'liquidated'])
+export const historyOrderStatusToShow = writable(getUserSetting('historyOrderStatusToShow') || ['cancelled', 'executed', 'liquidated']);
+
+//Liquidation price line
+export const liqpriceLines = writable([]);
 
 // Markets
 export const marketSearchQuery = writable();
