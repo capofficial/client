@@ -18,10 +18,13 @@
 	export let isHighlighted = false;
 	export let isInvalid = false;
 
-	function valueChecker(number) {
+	function valueChecker() {
 
-		value = Number(parseFloat(number).toFixed(7))
-		
+		if (Number(parseFloat(value)) > 0)
+		{
+			value = Number(parseFloat(value).toFixed(7))
+		}
+
 		if (value > 10000000)
 		{
 			value = 10000000
