@@ -8,7 +8,7 @@
 	import LabelValue from '@components/layout/LabelValue.svelte'
 
 	import { ADDRESS_ZERO } from '@lib/config'
-
+	import { formatForDisplay } from '@lib/formatters'
 	import { approveAsset, getAllowance } from '@api/assets'
 	import { addMargin, removeMargin } from '@api/positions'
 	import { focusInput, hideModal } from '@lib/ui'
@@ -50,6 +50,63 @@
 		focusInput('Margin');
 	}
 
+
+	let newLiqPrice = data.liqprice;
+	let newMargin = 0;
+	function calculateNewLiquidationPrice(marginDelta, mode) {
+
+		if (mode == 'add')
+		{
+			newMargin = ((data.margin*1 + data.funding*1) + marginDelta);
+
+			if (data.isLong)
+			{
+				newLiqPrice = data.price * 1 - newMargin * data.price / data.size;
+			} 
+			else 
+			{
+				newLiqPrice = data.price * 1 + newMargin * data.price / data.size;
+			}
+
+			if (newLiqPrice < 0)
+			{
+				newLiqPrice = 0.00;
+			}
+		}
+		else
+		{
+
+			if (marginDelta >= (data.margin*1 + data.funding*1))
+			{
+				newMargin = 0;
+				margin = (data.margin*1 + data.funding*1);
+			}
+			else
+			{
+				newMargin = ((data.margin*1 + data.funding*1) - marginDelta);
+			}
+
+			if (data.isLong)
+			{
+				newLiqPrice = data.price * 1 - ((data.margin*1 + data.funding*1) - marginDelta) * data.price / data.size;
+			} 
+			else 
+			{
+				newLiqPrice = data.price * 1 + ((data.margin*1 + data.funding*1 - marginDelta)) * data.price / data.size;
+			}
+			
+		}
+
+		calculateNewLeverage()
+	}
+
+	let newLeverage = 0;
+	function calculateNewLeverage() {
+			newLeverage = data.size / newMargin;
+	}
+
+	$: calculateNewLiquidationPrice(margin, selected)
+
 	let isApproving = false;
 	async function _approveAsset() {
 		isApproving = true;
@@ -84,6 +141,33 @@
 		padding-bottom: var(--base-padding);
 	}
 
+	.datacontainer {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		font-size: 85%;
+	}
+
+	.margindata {
+		display: flex;
+		flex-direction: row;
+	}
+
+	.datalabel {
+		flex-grow: 1;
+		align-self: center;
+		margin-top: 2px;
+		font-size: 110%;
+	}
+
+	.currentvalue {
+		opacity: 0.25;
+	}
+
+	.newvalue {
+		font-size: 150%;
+	}
+
 </style>
 
 <Modal title='Edit Margin' width={280}>
@@ -103,6 +187,21 @@
 				
 				<div class='group'>
 					<Input asset={data.asset} label='Margin' bind:value={margin} />
+				</div>
+
+				<div class='datacontainer pb'>					
+					<div class='margindata'>
+						<div class='datalabel'>Liq. Price</div>
+						<div><span class='currentvalue'>{formatForDisplay(data.liqprice)} 🠞</span> <span class='newvalue'>{formatForDisplay(newLiqPrice)}</span></div>
+					</div>
+					<div class='margindata'>
+						<div class='datalabel'>Leverage</div>
+						<div><span class='currentvalue'>{formatForDisplay(data.leverage)}x 🠞</span> <span class='newvalue'>{formatForDisplay(newLeverage)}x</span></div>
+					</div>
+					<div class='margindata'>
+						<div class='datalabel'>Margin</div>
+						<div><span class='currentvalue'>{formatForDisplay(data.margin)} 🠞</span> <span class='newvalue'>{formatForDisplay(newMargin)}</span></div>
+					</div>
 				</div>
 
 				{#if selected == 'remove'}<div class='note pb'>Margin removal is available only for Chainlink-supported markets.</div>{/if}

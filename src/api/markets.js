@@ -1,7 +1,7 @@
 import { get } from 'svelte/store'
 import { BPS_DIVIDER, EXCLUDED_MARKETS } from '@lib/config'
 import { getContract } from '@lib/contracts'
-import { marketInfos, selectedAsset, selectedMarket, fundingRate, leverage, riskParams, oi, fundingTrackers } from '@lib/stores'
+import { marketInfos, selectedAsset, selectedMarket, fundingRate, fundingRate24h, leverage, riskParams, oi, fundingTrackers } from '@lib/stores'
 import { getAssetAddress, getUserSetting, setLeverageForSelectedMarket } from '@lib/utils'
 
 export async function getMarketInfo(market) {
@@ -42,6 +42,16 @@ export async function getFundingRate(asset, market) {
 	const assetAddress = getAssetAddress(asset);
 	const fr = await contract.getAccruedFunding(assetAddress, market, 30 * 24) / (30 * 24 * BPS_DIVIDER);
 	fundingRate.set(fr);
+}
+
+
+export async function getFundingRate24h(asset, market) {
+	if (!asset) asset = get(selectedAsset);
+	if (!market) market = get(selectedMarket);
+	const contract = await getContract('Funding');
+	const assetAddress = getAssetAddress(asset);
+	const fr = await contract.getAccruedFunding(assetAddress, market, 30 * 24 * 24) / (30 * 24 * BPS_DIVIDER);
+	fundingRate24h.set(fr);
 }
 
 export async function getFundingTracker(asset, market) {

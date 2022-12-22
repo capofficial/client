@@ -7,9 +7,9 @@
 	import LabelValue from '@components/layout/LabelValue.svelte'
 
 	import { formatForDisplay, letterify } from '@lib/formatters'
-	import { getUserVolume, getUserRebate, getUserVolumeRebate, getUserStakingRebate, getRebateParams, getUserFeesSaved } from '@api/discounts'
+	import { getUserVolume, getUserRebate, getUserVolumeRebate, getUserStakingRebate, getRebateParams, getUserFeesSaved, getReferralRebate } from '@api/discounts'
 	import { getUserCAPStake } from '@api/cap'
-	import { address, CAPStake, trailing30dayVolume, currentFeeRebate, feeRebateFromVolume, feeRebateFromStaking, totalFeesSaved, rebateParams } from '@lib/stores'
+	import { address, CAPStake, trailing30dayVolume, currentFeeRebate, feeRebateFromVolume, feeRebateFromStaking, totalFeesSaved, rebateParams, feeRebateFromReferral } from '@lib/stores'
 	import { getAssets } from '@lib/utils'
 
 	let assets = getAssets();
@@ -25,6 +25,7 @@
 		getUserFeesSaved();
 		getRebateParams();
 		getUserCAPStake();
+		getReferralRebate();
 		t = setTimeout(fetchData, 60 * 1000);
 	}
 	$: fetchData($address);
@@ -68,6 +69,10 @@
 	<div class='row nb'><LabelValue hasPadding={true} label='CAP Staked' value={`${formatForDisplay($CAPStake)}`} /></div>
 	<div class='row nb hasNote'><LabelValue hasPadding={true} label='Discount from CAP Staking' value={`${100 * $feeRebateFromStaking}%`} /></div>
 	<div class='note b'>Discount starts at <strong>{formatForDisplay($rebateParams[6]/100)}%</strong> for <strong>{$rebateParams[4]}</strong> CAP staked and increases up to <strong>{formatForDisplay($rebateParams[7]/100)}%</strong> for <strong>{$rebateParams[5]}</strong> CAP staked.</div>
+
+	<div class='row nb hasNote'><LabelValue hasPadding={true} label='Discount from Referral Code' value={`${100 * $feeRebateFromReferral}%`} /></div>
+	<div class='note b'>Use a referral code to get a <strong>10%</strong> discount on your fees.</div>
+
 
 	{#each assets as asset}
 		<div class='row nb'><LabelValue hasPadding={true} label={`Total Fees Saved (${asset})`} value={formatForDisplay($totalFeesSaved[asset]) || 0} /></div>
