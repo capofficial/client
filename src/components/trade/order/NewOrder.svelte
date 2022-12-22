@@ -340,7 +340,7 @@
 				<div class='semi-padding-bottom row tpsl-header'>
 					<Checkbox label='Take-Profit / Stop-Loss' bind:value={$hasTPSL} isSecondaryColor={!$isLong} />
 					{#if $hasTPSL}
-					<a class='tpsl-help-button' on:click|stopPropagation={() => {showModal('AdvancedTPSL')}}>Help</a>
+					<a class='tpsl-help-button' on:click|stopPropagation={() => {showModal('AdvancedTPSL')}}>Details</a>
 					{/if}
 				</div>
 

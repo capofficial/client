@@ -199,10 +199,10 @@ function onBlur() { percentageInput = false; }
         gap: 10px;
     }
     .input-tpsl-width {
-        flex-basis: 65%;
+        flex-basis: 60%;
     }
     .input-gainloss-width {
-        flex-basis: 35%;
+        flex-basis: 40%;
     }
     .bottom-spacing {
 		padding-bottom: 16px;
@@ -225,7 +225,7 @@ function onBlur() { percentageInput = false; }
 		width: 100%;
 		box-sizing: border-box;
 		text-align: right;
-		padding-right: 14px;
+		padding-right: 28px;
 		border-radius: 6px;
 		background-color: var(--layer50);
 		border: 1px solid var(--layer200);
@@ -272,6 +272,24 @@ function onBlur() { percentageInput = false; }
 		letter-spacing: 0.05rem;
 		font-weight: 500;
 	}
+
+    .suffix {
+		position: absolute;
+		background-color: var(--layer50);
+		padding-left: 2px;
+		padding-right: 14px;
+		margin-right: 1px;
+		top: 50%;
+		transform: translateY(-50%);
+		pointer-events: none;
+		white-space: nowrap;
+		right: 0px;
+		display: flex;
+		align-items: center;
+		text-transform: uppercase;
+		letter-spacing: 0.05rem;
+		font-weight: 500;
+	}
     
 
 </style>
@@ -293,6 +311,9 @@ function onBlur() { percentageInput = false; }
                     Gain
                 </label>
                 <input id='Gain' type='number' step="0.0000001" bind:value={displayTPProfit} min="0" max="10000000" maxlength="10" spellcheck="false" placeholder={`0.0`} autocomplete="off" autocorrect="off" inputmode="decimal" lang="en" on:focus={onFocus} on:blur={onBlur} >
+                <label for='Gain' class='suffix'>
+                    %
+                </label>
             </div>
         </div>
     </div>
@@ -316,6 +337,9 @@ function onBlur() { percentageInput = false; }
                     Loss
                 </label>
                 <input id='Loss'  type='number' step="0.0000001" bind:value={displaySLLoss} min="0" max="10000000" maxlength="10" spellcheck="false" placeholder={`0.0`} autocomplete="off" autocorrect="off" inputmode="decimal" lang="en" on:focus={onFocus} on:blur={onBlur} >
+                <label for='Loss' class='suffix'>
+                    %
+                </label>
             </div>
         </div>
     </div>
