@@ -89,24 +89,7 @@
 		margin-bottom: 20px;
     	margin-top: 20px;
 	}
-	.input-box {
-    	display: flex;
-    	flex-direction: column;
-	}
-  	.input-box div {
-    	display: grid;
-    	grid-template-columns: 50px 1fr;
-  	}
-	.max {
-	    display: flex;
-    	flex-direction: column;
-    	align-items: center;
-    	justify-content: center;
-  	}
-  	.max p {
-    	width: 100%;
-  	}
-
+	
 </style>
 
 <Modal title='Pool Deposit' width={280}>
@@ -121,44 +104,34 @@
 			{/each}
 		</div>
 
+		<div class="group">
+			<Input label='Amount' bind:value={amount} />
+		</div>
+
 		{#if asset == "ETH"}
-			<div class="group">
-				{#if $balances[asset] != undefined}
-				<LabelValue label='Available' value={formatForDisplay($balances[asset])} />
-				{/if}
+			<div class="">
+				<!-- {#if $balances[asset] != undefined} -->
+				<LabelValue label='Max' value={formatForDisplay($balances[asset])} on:click={() => {setMax(asset);}} isClickable={true}/>
+				<!-- {/if} -->
 			</div>
 		{/if}
 
 		{#if asset == "USDC"}
-			<div class="group">
-				{#if $balances[asset] != undefined}
-				<LabelValue label='Available' value={formatForDisplay($balances[asset])} />
-				{/if}
+			<div class="">
+				<!-- {#if $balances[asset] != undefined} -->
+				<LabelValue label='Max' value={formatForDisplay($balances[asset])} on:click={() => {setMax(asset);}} isClickable={true}/>
+				<!-- {/if} -->
 			</div>
 		{/if}
 
 		{#if asset == "WBTC"}
-			<div class="group">
-				{#if $balances[asset] != undefined}
-				<LabelValue label='Available' value={formatForDisplay($balances[asset])} />
-				{/if}
+			<div class="">
+				<!-- {#if $balances[asset] != undefined} -->
+				<LabelValue label='Max' value={formatForDisplay($balances[asset])} on:click={() => {setMax(asset);}} isClickable={true}/>
+				<!-- {/if} -->
 			</div>
 		{/if}
 
-		  <div class="input-box">
-			<div class="">
-			  <span
-				on:click={() => {
-				  setMax(asset);
-				}}
-				class="max"
-			  >
-				<p>Max</p>
-			  </span>
-			  <span> <Input label="" bind:value={amount} /></span>
-			</div>
-		  </div>
-		
 		<div class='note'>There are no deposit fees.{#if $poolWithdrawalFees[asset]} The withdrawal fee is currently {$poolWithdrawalFees[asset]}%.{/if}</div>
 
 		<div>

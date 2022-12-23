@@ -93,26 +93,16 @@
 			{/each}
 		</div>
 
-		<div class="group">
-			<LabelValue label='Available' value={formatForDisplay($poolStakes[asset])} />
-		</div>
-
 		<form on:submit|preventDefault={submit}>
 
-			<div class="input-box">
-				<div class="">
-				  <span
-					on:click={() => {
-					  setMax($poolStakes[asset]);
-					}}
-					class="max"
-				  >
-					<p>Max</p>
-				  </span>
-				  <span> <Input label="" bind:value={amount} /></span>
-				</div>
+			<div class="group">
+				<Input label='Amount' bind:value={amount} />
 			</div>
 		
+			<div class="group">
+				<LabelValue label='Max' value={formatForDisplay($poolStakes[asset])} on:click={() => {setMax($poolStakes[asset]);}} isClickable={true}/>
+			</div>
+	
 			{#if $poolWithdrawalFees[asset]}
 			<div class='note'>The withdrawal fee is currently {$poolWithdrawalFees[asset]}%.</div>
 			{/if}
