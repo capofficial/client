@@ -107,7 +107,7 @@
 					}}
 					class="max"
 				  >
-					<p>MAX</p>
+					<p>Max</p>
 				  </span>
 				  <span> <Input label="" bind:value={amount} /></span>
 				</div>
