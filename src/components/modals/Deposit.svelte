@@ -9,9 +9,10 @@
 
 	import { BPS_DIVIDER } from '@lib/config'
 	import { deposit, getPoolWithdrawalFee } from '@api/pool'
-	import { approveAsset, getAllowance } from '@api/assets'
-	import { allowances, poolWithdrawalFees } from '@lib/stores'
+	import { approveAsset, getAllowance, getUserAssetBalances } from '@api/assets'
+	import { allowances, poolWithdrawalFees, balances, address } from '@lib/stores'
 	import { focusInput, hideModal } from '@lib/ui'
+	import { formatForDisplay } from '@lib/formatters'
 	import { getAssets } from '@lib/utils'
 
 	let amount, asset, depositFeeBps, isSubmitting;
@@ -20,6 +21,11 @@
 		asset = _asset;
 		getPoolWithdrawalFee(_asset);
 	}
+
+	async function fetchData() {
+		await getUserAssetBalances();
+	}
+	$: fetchData($address);
 
 	async function submit() {
 
@@ -46,9 +52,24 @@
 
 	$: checkAllowance(asset);
 
-	onMount(() => {
+	const setMax = (_asset) => {
+		switch (_asset) {
+		case "ETH":
+			amount = $balances[_asset];
+			break;
+		case "USDC":
+			amount = $balances[_asset];
+			break;
+		case "WBTC":
+			amount = $balances[_asset];
+			break;
+		}
+  	};
+
+	onMount(async() => {
 		selectAsset('ETH');
 		focusInput('Amount');
+
 	});
 
 </script>
@@ -65,9 +86,10 @@
 		color: var(--text300);
 		line-height: 1.418;
 		font-size: 80%;
-		padding-bottom: 20px;
+		margin-bottom: 20px;
+    	margin-top: 20px;
 	}
-
+	
 </style>
 
 <Modal title='Pool Deposit' width={280}>
@@ -85,7 +107,31 @@
 		<div class="group">
 			<Input label='Amount' bind:value={amount} />
 		</div>
-		
+
+		{#if asset == "ETH"}
+			<div class="">
+				<!-- {#if $balances[asset] != undefined} -->
+				<LabelValue label='Max' value={formatForDisplay($balances[asset])} on:click={() => {setMax(asset);}} isClickable={true}/>
+				<!-- {/if} -->
+			</div>
+		{/if}
+
+		{#if asset == "USDC"}
+			<div class="">
+				<!-- {#if $balances[asset] != undefined} -->
+				<LabelValue label='Max' value={formatForDisplay($balances[asset])} on:click={() => {setMax(asset);}} isClickable={true}/>
+				<!-- {/if} -->
+			</div>
+		{/if}
+
+		{#if asset == "WBTC"}
+			<div class="">
+				<!-- {#if $balances[asset] != undefined} -->
+				<LabelValue label='Max' value={formatForDisplay($balances[asset])} on:click={() => {setMax(asset);}} isClickable={true}/>
+				<!-- {/if} -->
+			</div>
+		{/if}
+
 		<div class='note'>There are no deposit fees.{#if $poolWithdrawalFees[asset]} The withdrawal fee is currently {$poolWithdrawalFees[asset]}%.{/if}</div>
 
 		<div>

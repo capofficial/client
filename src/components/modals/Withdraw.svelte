@@ -34,6 +34,10 @@
 
 	}
 
+	const setMax = () => {
+	    amount = formatForDisplay($poolStakes[asset]);
+	};
+
 	let assets = getAssets();
 
 	onMount(() => {
@@ -57,6 +61,25 @@
 		font-size: 80%;
 		padding-bottom: 20px;
 	}
+	.max {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+	}
+	.max p {
+		width: 100%;
+	}
+	.input-box {
+		display: flex;
+		flex-direction: column;
+		margin-bottom: 1rem;
+	}
+
+	.input-box div {
+		display: grid;
+		grid-template-columns: 50px 1fr;
+	}
 
 </style>
 
@@ -75,11 +98,11 @@
 			<div class="group">
 				<Input label='Amount' bind:value={amount} />
 			</div>
-
+		
 			<div class="group">
-				<LabelValue label='Available' value={formatForDisplay($poolStakes[asset])} />
+				<LabelValue label='Max' value={formatForDisplay($poolStakes[asset])} on:click={() => {setMax($poolStakes[asset]);}} isClickable={true}/>
 			</div>
-
+	
 			{#if $poolWithdrawalFees[asset]}
 			<div class='note'>The withdrawal fee is currently {$poolWithdrawalFees[asset]}%.</div>
 			{/if}
