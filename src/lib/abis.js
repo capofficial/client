@@ -28,7 +28,7 @@ const marketTuple = `tuple(
 	bool isReduceOnly
 )`;
 
-export const erc20ABI = [
+const erc20ABI = [
 	"function totalSupply() view returns (uint256)",
 	"function decimals() view returns (uint8)",
 	"function balanceOf(address account) view returns (uint256)",

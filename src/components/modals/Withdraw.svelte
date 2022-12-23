@@ -35,9 +35,8 @@
 	}
 
 	const setMax = () => {
-	console.log(formatForDisplay($poolStakes[asset]));
-    amount = formatForDisplay($poolStakes[asset]);
-  };
+	    amount = formatForDisplay($poolStakes[asset]);
+	};
 
 	let assets = getAssets();
 

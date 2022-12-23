@@ -9,11 +9,11 @@
 
 	import { BPS_DIVIDER } from '@lib/config'
 	import { deposit, getPoolWithdrawalFee } from '@api/pool'
-	import { approveAsset, getAllowance } from '@api/assets'
-	import { allowances, poolWithdrawalFees } from '@lib/stores'
+	import { approveAsset, getAllowance, getUserAssetBalances } from '@api/assets'
+	import { allowances, poolWithdrawalFees, balances, address } from '@lib/stores'
 	import { focusInput, hideModal } from '@lib/ui'
+	import { formatForDisplay } from '@lib/formatters'
 	import { getAssets } from '@lib/utils'
-	import { getUsdcBalance, getBalance, getWbtcBalance } from "@api/cap";
 
 	let amount, asset, depositFeeBps, isSubmitting;
 
@@ -21,6 +21,11 @@
 		asset = _asset;
 		getPoolWithdrawalFee(_asset);
 	}
+
+	async function fetchData() {
+		await getUserAssetBalances();
+	}
+	$: fetchData($address);
 
 	async function submit() {
 
@@ -36,10 +41,6 @@
 	}
 
 	let assets = getAssets();
-	let usdc_balance;
-	let wbtc_balance;
-  	let eth_bal;
-
 
 	async function checkAllowance(_asset) {
 		await getAllowance(_asset, 'FundStore');
@@ -51,16 +52,16 @@
 
 	$: checkAllowance(asset);
 
-	const setMax = (assetName) => {
-		switch (assetName) {
+	const setMax = (_asset) => {
+		switch (_asset) {
 		case "ETH":
-			amount = eth_bal;
+			amount = $balances[_asset];
 			break;
 		case "USDC":
-			amount = usdc_balance;
+			amount = $balances[_asset];
 			break;
 		case "WBTC":
-			amount = wbtc_balance;
+			amount = $balances[_asset];
 			break;
 		}
   	};
@@ -68,9 +69,7 @@
 	onMount(async() => {
 		selectAsset('ETH');
 		focusInput('Amount');
-		usdc_balance = await getUsdcBalance();
-        wbtc_balance = await getWbtcBalance();
-        eth_bal = await getBalance();
+
 	});
 
 </script>
@@ -93,21 +92,20 @@
 	.input-box {
     	display: flex;
     	flex-direction: column;
-    	margin-top: 1rem;
-	  }
-  .input-box div {
+	}
+  	.input-box div {
     	display: grid;
     	grid-template-columns: 50px 1fr;
-  }
-  .max {
+  	}
+	.max {
 	    display: flex;
     	flex-direction: column;
     	align-items: center;
     	justify-content: center;
-  }
-  .max p {
-    width: 100%;
-  }
+  	}
+  	.max p {
+    	width: 100%;
+  	}
 
 </style>
 
@@ -123,24 +121,30 @@
 			{/each}
 		</div>
 
-		<div>
-			{#if asset == "ETH"}
-			  <p>Balance: {eth_bal}</p>
-			{/if}
-		  </div>
-	
-		  <div>
-			{#if asset == "USDC"}
-			  <p>Balance: {usdc_balance}</p>
-			{/if}
-		  </div>
-	
-		  <div>
-			{#if asset == "WBTC"}
-			  <p>Balance: {wbtc_balance}</p>
-			{/if}
-		  </div>
-	
+		{#if asset == "ETH"}
+			<div class="group">
+				{#if $balances[asset] != undefined}
+				<LabelValue label='Available' value={formatForDisplay($balances[asset])} />
+				{/if}
+			</div>
+		{/if}
+
+		{#if asset == "USDC"}
+			<div class="group">
+				{#if $balances[asset] != undefined}
+				<LabelValue label='Available' value={formatForDisplay($balances[asset])} />
+				{/if}
+			</div>
+		{/if}
+
+		{#if asset == "WBTC"}
+			<div class="group">
+				{#if $balances[asset] != undefined}
+				<LabelValue label='Available' value={formatForDisplay($balances[asset])} />
+				{/if}
+			</div>
+		{/if}
+
 		  <div class="input-box">
 			<div class="">
 			  <span
@@ -149,7 +153,7 @@
 				}}
 				class="max"
 			  >
-				<p>MAX</p>
+				<p>Max</p>
 			  </span>
 			  <span> <Input label="" bind:value={amount} /></span>
 			</div>
