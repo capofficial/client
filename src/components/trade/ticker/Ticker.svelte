@@ -6,12 +6,12 @@
 	import ColoredPrice from '@components/layout/ColoredPrice.svelte'
 
 	import { formatForDisplay, formatPnl, formatMarketName } from '@lib/formatters'
-	import { selectedAsset, selectedMarket, selectedMarketInfo, chainlinkPrice, ohlc, fundingRate, lastDayChange, prices } from '@lib/stores'
+	import { selectedAsset, selectedMarket, selectedMarketInfo, chainlinkPrice, ohlc, fundingRate, fundingRate24h, lastDayChange, prices } from '@lib/stores'
 
 	import { MOON_CIRCLE, INFO_ICON_CIRCLE } from '@lib/icons'
 
 	import { getChainlinkPrice } from '@api/chainlink'
-	import { getFundingRate } from '@api/markets'
+	import { getFundingRate, getFundingRate24h } from '@api/markets'
 	import { getMarketTickers, getMarketPrices } from '@api/prices'
 
 	import { showModal } from '@lib/ui'
@@ -29,6 +29,7 @@
 	async function fetchFundingData() {
 		clearTimeout(t2);
 		getFundingRate();
+		getFundingRate24h();
 		getMarketTickers();
 		t1 = setTimeout(fetchFundingData, 1800*1000);
 	}
@@ -169,7 +170,7 @@
 				{formatForDisplay($chainlinkPrice) || '-'}
 			</div>
 		</div>
-		<div class='box'>
+		<div class='box' use:tooltip={{content: `24h: ${formatForDisplay($fundingRate24h*100) || 0}%`}}>
 			<div class='label'>Funding / 1h</div>
 			<div class='value'>
 				{formatForDisplay($fundingRate*100) || 0}%

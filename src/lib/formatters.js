@@ -249,7 +249,7 @@ export function formatOrder(order) {
 	return order;
 }
 
-export function formatPosition(position) {
+export function formatPosition(position, preProcessing) {
 	if (!position) return;
 	position = Object.assign({}, position);
 	const asset = getLabelForAsset(position.asset);
@@ -259,7 +259,12 @@ export function formatPosition(position) {
 	position.margin = formatUnits(position.margin, units);
 	position.size = formatUnits(position.size, units);
 	position.price = formatUnits(position.price);
+
+	if (preProcessing)
+	{
 	position.leverage = Math.ceil(position.size * 1000 / position.margin)/1000;
+	}
+	
 	return position;
 }
 

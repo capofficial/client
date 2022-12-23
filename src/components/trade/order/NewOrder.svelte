@@ -50,11 +50,11 @@
 	import { submitOrder } from '@api/orders'
 
 	let showAdvanced = false;
-	let displaySizeOrMargin = 'Size';
+	let displaySizeOrMargin;
 
 	onMount(() => {
 		displaySizeOrMargin = getUserSetting('displaySizeOrMargin');
-		if (!displaySizeOrMargin) saveUserSetting('displaySizeOrMargin', 'Size')
+		if (!displaySizeOrMargin) setDisplaySizeOrMargin('Margin')
 	})
 
 	function setDisplaySizeOrMargin(sizeOrMargin) {
@@ -258,6 +258,20 @@
 		color: var(--error);
 		font-size: 80%;
 	}
+	.tpsl-header {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+	}
+	.tpsl-help-button {
+		padding: 6px 12px;
+		background-color: var(--layer100);
+		border-radius: var(--base-radius);
+	}
+	.tpsl-help-button:hover {
+		background-color: var(--layer200);
+	}
+
 </style>
 
 <div class='new-order'>
@@ -301,7 +315,7 @@
 			{/if}
 
 			<div class='top-spacing bottom-spacing'>
-				<DDInput label='Size' setDisplaySizeOrMargin={setDisplaySizeOrMargin} displaySizeOrMargin={displaySizeOrMargin} value={displaySizeOrMargin == 'Margin' ? $margin : $size} onChangeValue={newValue => size.set(displaySizeOrMargin == 'Margin' ? getSize(newValue, $leverage) : newValue)} isSecondaryColor={!$isLong} placeholder={`0.0 ${$selectedAsset}`} isInvalid={$maxSize && $size > formatForDisplay($maxSize) * 1} />
+				<DDInput label='Size' setDisplaySizeOrMargin={setDisplaySizeOrMargin} displaySizeOrMargin={displaySizeOrMargin} value={displaySizeOrMargin == 'Margin' ? ($margin.toFixed(4)) : $size} onChangeValue={newValue => size.set(displaySizeOrMargin == 'Margin' ? getSize(newValue, $leverage) : newValue)} isSecondaryColor={!$isLong} placeholder={`0.0 ${$selectedAsset}`} isInvalid={$maxSize && $size > formatForDisplay($maxSize) * 1} />
 			</div>
 			
 			<div class='slider-container bottom-spacing'>
@@ -323,13 +337,15 @@
 			{#if showAdvanced}
 			<div class='bottom-spacing'>
 
-				<div class='semi-padding-bottom row'>
+				<div class='semi-padding-bottom row tpsl-header'>
 					<Checkbox label='Take-Profit / Stop-Loss' bind:value={$hasTPSL} isSecondaryColor={!$isLong} />
+					{#if $hasTPSL}
+					<a class='tpsl-help-button' on:click|stopPropagation={() => {showModal('AdvancedTPSL')}}>Details</a>
+					{/if}
 				</div>
 
 				{#if $hasTPSL}
 					<div>
-
 						<div class='semi-padding-bottom'>
 							<Input label='TP Price' bind:value={$tpPrice} isSecondaryColor={!$isLong} />
 						</div>

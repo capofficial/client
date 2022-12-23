@@ -93,12 +93,14 @@ export const trailing30dayVolume = writable();
 export const currentFeeRebate = writable();
 export const feeRebateFromVolume = writable();
 export const feeRebateFromStaking = writable();
+export const feeRebateFromReferral = writable(0);
 export const totalFeesSaved = writable({});
 export const rebateParams = writable([]);
 
 // Funding rates
 export const fundingTrackers = writable({});
 export const fundingRate = writable(); // for selected asset
+export const fundingRate24h = writable(); //for selected asset
 
 // Toasts
 export const toasts = writable([]);
