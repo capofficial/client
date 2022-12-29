@@ -68,6 +68,9 @@
 		}
 		value = formatForDisplay(progressPercent * maxValue / 100);
 		if (integersOnly) {
+			if(value < 1){
+				value = 1; // min leverage
+			}
 			value = Math.round(value);
 		}
 	}
