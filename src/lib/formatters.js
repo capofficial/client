@@ -193,10 +193,10 @@ export function formatPoolStat(stat) {
 	if (!stat) return;
 	const asset = getLabelForAsset(stat.asset);
 	return {
-		startingBalance: stat.startingBalance,
-		balance: stat.balance,
-		deposits: stat.deposits,
-		withdrawals: stat.withdrawals,
+		startingBalance: stat.startingBalance ?? 0,
+		balance: stat.balance ?? 0,
+		deposits: stat.deposits ?? 0,
+		withdrawals: stat.withdrawals ?? 0,
 		asset: stat.asset,
 		assetLabel: asset,
 		timestamp: stat.timestamp,

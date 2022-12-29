@@ -1,7 +1,7 @@
 import { get } from 'svelte/store'
 import { CURRENCY_DECIMALS, BPS_DIVIDER } from '@lib/config'
 import { getContract } from '@lib/contracts'
-import { formatUnits, parseUnits } from '@lib/formatters'
+import { formatPoolStat, formatUnits, parseUnits } from '@lib/formatters'
 import { address, poolBalances, poolStakes, poolStatsDaily, poolStatsWeekly, poolWithdrawalFees } from '@lib/stores'
 import { getAssetAddress, getAssetAddresses, getLabelForAsset, getChainData } from '@lib/utils'
 import { showToast, showError } from '@lib/ui'
@@ -101,11 +101,11 @@ export async function getPoolStats() {
 			const assetLabel = getLabelForAsset(asset);
 			const assetData = data[asset];
 			poolStatsDaily.update((psd) => {
-				psd[assetLabel] = assetData.daily;
+				psd[assetLabel] = assetData.daily.map(formatPoolStat);
 				return psd;
 			});
 			poolStatsWeekly.update((psw) => {
-				psw[assetLabel] = assetData.weekly;
+				psw[assetLabel] = assetData.weekly.map(formatPoolStat);
 				return psw;
 			});
 		}
