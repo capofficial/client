@@ -30,9 +30,6 @@ export const signer = writable();
 export const address = writable();
 export const unsupportedNetwork = writable();
 
-// Refer
-export const referralCode = writable();
-
 // Chart
 export const chartHeight = writable(getUserSetting('chartHeight') || 320);
 export const chartResolution = writable(getUserSetting('chartResolution') || 900)
@@ -50,6 +47,7 @@ export const CAPPrice = writable();
 
 // Pool
 export const poolBalances = writable({});
+export const bufferBalances = writable({});
 export const poolStakes = writable({});
 export const poolWithdrawalFees = writable({});
 export const claimableRewardsCAP = writable({});
@@ -87,15 +85,6 @@ export const monthlyPerformance = derived([poolStatsDaily], ([$poolStatsDaily]) 
 export const yearlyPerformance = derived([poolStatsWeekly], ([$poolStatsWeekly]) => {
 	return getPoolPerformance($poolStatsWeekly, 0, 51);
 }, {}); // asset => %
-
-// Rebates
-export const trailing30dayVolume = writable();
-export const currentFeeRebate = writable();
-export const feeRebateFromVolume = writable();
-export const feeRebateFromStaking = writable();
-export const feeRebateFromReferral = writable(0);
-export const totalFeesSaved = writable({});
-export const rebateParams = writable([]);
 
 // Funding rates
 export const fundingTrackers = writable({});
@@ -280,12 +269,8 @@ export const buyingPower = derived([balances, leverage, selectedAsset], ([$balan
 	return $balances[$selectedAsset] * $leverage;
 }, 0);
 
-export const maxSize = derived([balances, leverage, currentFeeRebate, selectedMarketInfo, selectedAsset], ([$balances, $leverage, $currentFeeRebate, $selectedMarketInfo, $selectedAsset]) => {
+export const maxSize = derived([balances, leverage, selectedMarketInfo, selectedAsset], ([$balances, $leverage, $selectedMarketInfo, $selectedAsset]) => {
 	if (!$balances[$selectedAsset] || !$selectedMarketInfo) return 0;
-	if (!$currentFeeRebate) $currentFeeRebate = 0;
-
-	// console.log('maxSize recalc', $balances[$selectedAsset], $leverage, $currentFeeRebate, $selectedMarketInfo, $selectedAsset);
-	// console.log('$leverage', $leverage);
 	
 	let gasFee = 0;
 	if ($selectedAsset == 'ETH') gasFee = 0.002;

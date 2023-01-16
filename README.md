@@ -1,6 +1,6 @@
 # CAP UI Web Client
 
-This repository contains the CAP v4 web client which includes the trading dashboard, pool page, CAP token staking page, and referrals page.
+This repository contains the CAP v4 web client which includes the trading dashboard, pool page, and CAP token staking page.
 
 CAP v4 is currently in private beta. We're looking for talented devs to help us fix bugs, add some features, and bulletproof the product for public release. Please read on to see how you can get involved!
 

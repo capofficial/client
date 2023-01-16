@@ -42,7 +42,6 @@
 	<a class:active={$pageName == 'Trade'} href='/trade'>Trade</a>
 	<a class:active={$pageName == 'Pool'} href='/pool'>Pool</a>
 	<a class:active={$pageName == 'Stake'} href='/stake'>Stake</a>
-	<a class:active={$pageName == 'Refer'} href='/refer'>Refer</a>
 	<a href='/docs'>Docs</a>
 </div>
 

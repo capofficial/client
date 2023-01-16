@@ -5,7 +5,6 @@
 	import LeverageSelect from '../modals/LeverageSelect.svelte'
 	import Connect from '../modals/Connect.svelte'
 	import CustomizeColumns from '../modals/CustomizeColumns.svelte'
-	import FeeDiscounts from '../modals/FeeDiscounts.svelte'
 	import ClosePosition from '../modals/ClosePosition.svelte'
 	import EditMargin from '../modals/EditMargin.svelte'
 	import Deposit from '../modals/Deposit.svelte'
@@ -33,10 +32,6 @@
 
 {#if $activeModal && $activeModal.name == 'Connect'}
 <Connect />
-{/if}
-
-{#if $activeModal && $activeModal.name == 'FeeDiscounts'}
-<FeeDiscounts />
 {/if}
 
 {#if $activeModal && $activeModal.name == 'CustomizeColumns'}

@@ -134,27 +134,6 @@ export function getChainData(key) {
 	return CHAINDATA[_chainId][key];
 }
 
-export function getBufferBalances(items) {
-	let balances = [];
-	let ethBuffers = [];
-	let usdcBuffers = [];
-	let btcBuffers = [];
-	let i;
-	for (i=0; i<items.length; i++) {
-		if(getLabelForAsset(items[i].asset) == "ETH"){
-			ethBuffers.push(items[i].bufferBalance);
-		}else if(getLabelForAsset(items[i].asset) == "USDC"){
-			usdcBuffers.push(items[i].bufferBalance);
-		}else if(getLabelForAsset(items[i].asset) == "WBTC"){
-			btcBuffers.push(items[i].bufferBalance);
-		}
-	}
-	balances["ETH"] = ethBuffers[0];
-	balances["USDC"] = usdcBuffers[0];
-	balances["WBTC"] = btcBuffers[0];
-	return balances;
-}
-
 export function getMargin(size, leverage) {
 	return Number(((size || 0) / leverage).toFixed(4));
 }

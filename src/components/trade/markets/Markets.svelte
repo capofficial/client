@@ -168,7 +168,7 @@
 		<a on:click={() => filterMarkets('all')} class:active={$marketsFilter == 'all'}>All</a>
 		<a on:click={() => filterMarkets('crypto')} class:active={$marketsFilter == 'crypto'}>Crypto</a>
 		<a on:click={() => filterMarkets('fx')} class:active={$marketsFilter == 'fx'}>FX</a>
-		<a on:click={() => filterMarkets('indices')} class:active={$marketsFilter == 'indices'}>Index</a>
+		<!-- <a on:click={() => filterMarkets('indices')} class:active={$marketsFilter == 'indices'}>Index</a> -->
 		<a on:click={() => filterMarkets('commodities')} class:active={$marketsFilter == 'commodities'}>Comm</a>
 	</div>
 	<div class='table-wrapper'>

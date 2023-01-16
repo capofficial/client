@@ -10,7 +10,7 @@
 
 	import { USD_CONVERSION_MARKETS } from '@lib/config'
 	import { loadRoute, catchLinks, navigateTo } from '@lib/routing'
-	import { component, address } from '@lib/stores'
+	import { component, address, pageName } from '@lib/stores'
 	import { hidePopoversOnKeydown, hidePopoversOnClick } from '@lib/ui'
 	import { runAndInterval, hashString, getChainData } from '@lib/utils'
 
@@ -279,10 +279,12 @@
 
 {#if codeValid}
 
+{#if $pageName != 'Home'}
 <Errors />
 <Modals />
 <Toasts />
 <Header />
+{/if}
 
 <svelte:component this={$component}/>
 

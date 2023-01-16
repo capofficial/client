@@ -1,7 +1,6 @@
 <script>
 
 	import Pools from './Pools.svelte'
-	import Transactions from './Transactions.svelte'
 
 </script>
 
@@ -16,6 +15,5 @@
 <div class='wrapper'>
 
 	<Pools />
-	<Transactions />
 
 </div>
