@@ -15,6 +15,7 @@ const orderTuple = `tuple(
 	uint256 cancelOrderId
 )`;
 
+// TODO: add uint256 fundingFactor, when contracts get upgraded
 const marketTuple = `tuple(
 	string name,
 	string category,
@@ -149,10 +150,9 @@ export const EVENT_ABIS = [
 	    address indexed asset,
 	    string market,
 	    uint256 fee,
-	    uint256 originalFee,
 	    uint256 poolFee,
 	    uint256 stakingFee,
-	    uint256 referrerFee,
+	    uint256 treasuryFee,
 	    uint256 oracleFee,
 	    bool isLiquidation
 	)`,
@@ -215,6 +215,7 @@ export const ABIS = {
 	].concat(EVENT_ABIS),
 	PoolStore: [
 		`function getBalances(address[] _assets) view returns(uint256[] memory)`,
+		`function getBufferBalances(address[] _assets) view returns(uint256[] memory)`,
 		`function getUserBalances(address[] _assets, address account) external view returns(uint256[] memory)`,
 		`function getWithdrawalFee(address asset) external view returns(uint256)`
 	],
@@ -228,17 +229,6 @@ export const ABIS = {
 		`function getMarketList() view returns(string[])`,
 		`function get(string _market) view returns(${marketTuple})`,
 		`function getMany(string[] _markets) view returns(${marketTuple}[])`,
-	],
-	RebateStore: [
-		`function getUserRebate(address user) view returns(uint256)`,
-		`function getUserVolume(address user) view returns(uint256)`,
-		`function getVolumeRebate(address user) view returns(uint256)`,
-		`function getStakingRebate(address user) view returns(uint256)`,
-		`function getParams() external view returns(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)`
-	],
-	ReferralStore: [
-		`function setReferralCode(string memory code) external`,
-		`function getReferralCode(address user) external view returns(string memory)`
 	],
 	RiskStore: [
 		`function getParams(address asset, string memory market) external view returns(uint256,uint256,int256,uint256,int256,uint256)`

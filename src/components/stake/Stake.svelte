@@ -2,7 +2,6 @@
 
 	import StakeCAP from './StakeCAP.svelte'
 	import Rewards from './Rewards.svelte'
-	import Payments from './Payments.svelte'
 
 </script>
 
@@ -18,6 +17,5 @@
 
 	<StakeCAP />
 	<Rewards />
-	<Payments />
 
 </div>

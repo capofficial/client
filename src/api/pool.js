@@ -2,7 +2,7 @@ import { get } from 'svelte/store'
 import { CURRENCY_DECIMALS, BPS_DIVIDER } from '@lib/config'
 import { getContract } from '@lib/contracts'
 import { formatUnits, parseUnits } from '@lib/formatters'
-import { address, poolBalances, poolStakes, poolStatsDaily, poolStatsWeekly, poolWithdrawalFees } from '@lib/stores'
+import { address, poolBalances, bufferBalances, poolStakes, poolStatsDaily, poolStatsWeekly, poolWithdrawalFees } from '@lib/stores'
 import { getAssetAddress, getAssetAddresses, getLabelForAsset, getChainData } from '@lib/utils'
 import { showToast, showError } from '@lib/ui'
 
@@ -18,6 +18,22 @@ export async function getPoolBalances() {
 		i++;
 	}
 	poolBalances.set(_poolBalances);
+	return true;
+}
+
+// In new contracts only
+export async function getBufferBalances() {
+	const contract = await getContract('PoolStore');
+	const assetAddresses = getAssetAddresses();
+	const balances = await contract.getBufferBalances(assetAddresses);
+	let _bufferBalances = {};
+	let i = 0;
+	for (const bal of balances) {
+		const asset = getLabelForAsset(assetAddresses[i]);
+		_bufferBalances[asset] = formatUnits(balances[i], CURRENCY_DECIMALS[asset]);
+		i++;
+	}
+	bufferBalances.set(_bufferBalances);
 	return true;
 }
 

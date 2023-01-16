@@ -3,7 +3,6 @@
 	import { onMount, onDestroy } from 'svelte'
 
 	import Input from '@components/layout/Input.svelte'
-	import DDInput from '@components/layout/DropdownInput.svelte'
 	import Checkbox from '@components/layout/Checkbox.svelte'
 	import Button from '@components/layout/Button.svelte'
 	import LabelValue from '@components/layout/LabelValue.svelte'
@@ -50,17 +49,6 @@
 	import { submitOrder } from '@api/orders'
 
 	let showAdvanced = false;
-	let displaySizeOrMargin;
-
-	onMount(() => {
-		displaySizeOrMargin = getUserSetting('displaySizeOrMargin');
-		if (!displaySizeOrMargin) setDisplaySizeOrMargin('Margin')
-	})
-
-	function setDisplaySizeOrMargin(sizeOrMargin) {
-		displaySizeOrMargin = sizeOrMargin;
-		saveUserSetting('displaySizeOrMargin', sizeOrMargin)
-	}
 	
 	function clearAdvanced(_showAdvanced) {
 		if (_showAdvanced) return;
@@ -315,7 +303,7 @@
 			{/if}
 
 			<div class='top-spacing bottom-spacing'>
-				<DDInput label='Size' setDisplaySizeOrMargin={setDisplaySizeOrMargin} displaySizeOrMargin={displaySizeOrMargin} value={displaySizeOrMargin == 'Margin' ? ($margin.toFixed(4)) : $size} onChangeValue={newValue => size.set(displaySizeOrMargin == 'Margin' ? getSize(newValue, $leverage) : newValue)} isSecondaryColor={!$isLong} placeholder={`0.0 ${$selectedAsset}`} isInvalid={$maxSize && $size > formatForDisplay($maxSize) * 1} />
+				<Input label='Size' bind:value={$size} isSecondaryColor={!$isLong} placeholder={`0.0 ${$selectedAsset}`} isInvalid={$maxSize && $size > formatForDisplay($maxSize) * 1} />
 			</div>
 			
 			<div class='slider-container bottom-spacing'>
@@ -331,7 +319,7 @@
 			</div>
 
 			<div class='top-spacing bottom-spacing advanced-handle' on:click={() => showAdvanced = !showAdvanced}>
-				Advanced {#if showAdvanced}{@html XMARK_ICON}{:else}{@html CHEVRON_DOWN}{/if}
+				Options {#if showAdvanced}{@html XMARK_ICON}{:else}{@html CHEVRON_DOWN}{/if}
 			</div>
 
 			{#if showAdvanced}
@@ -394,7 +382,7 @@
 		</form>
 		
 		<div class='od'>
-			<OrderDetails market={$selectedMarket} asset={$selectedAsset} size={$size} displaySizeOrMargin={displaySizeOrMargin}/>
+			<OrderDetails market={$selectedMarket} asset={$selectedAsset} size={$size} />
 		</div>
 	
 	</div>

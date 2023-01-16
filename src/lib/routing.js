@@ -3,7 +3,6 @@ import { writable, derived, get } from 'svelte/store'
 import Trade from '@components/trade/Trade.svelte'
 import Pool from '@components/pool/Pool.svelte'
 import Stake from '@components/stake/Stake.svelte'
-import Refer from '@components/refer/Refer.svelte'
 
 import { formatUnits } from './formatters'
 import { component, pageName, selectedMarket, selectedMarketInfo, leverage } from './stores'
@@ -22,10 +21,6 @@ const PAGES = {
 	'Stake': {
 		component: Stake,
 		paths: ['stake']
-	},
-	'Refer': {
-		component: Refer,
-		paths: ['refer']
 	}
 };
 
