@@ -25,7 +25,7 @@ export const DEFAULT_HISTORY_SORT_KEY = ['timestamp', true];
 
 export const DEFAULT_HISTORY_COUNT = 50;
 
-export const EXCLUDED_MARKETS = ['HSI', 'KOSPI'];
+export const EXCLUDED_MARKETS = ['HSI', 'KOSPI', 'USD-CNY', 'USD-JPY', 'USD-KRW', 'WTI-USD', 'XBR-USD', 'SPX500', 'DJI', 'NASDAQ', 'FTSE', 'DAX', 'NIKKEI', 'ASX200']; // dead and non chainlink markets, in private beta only
 
 export const CURRENCY_DECIMALS = {
 	ETH: 18,
