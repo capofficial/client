@@ -53,6 +53,17 @@
 
 <div class='order-info'>
 
+	{#if !isClose}
+
+		<div class='row'>
+			<LabelValue 
+				label={'Total'}
+				value={`${formatForDisplay(size)} ${asset}`}
+			/>
+		</div>
+
+	{/if}
+
 	<div class='row'>
 		<Fee
 			market={market}
@@ -73,6 +84,18 @@
 			/>
 		</div>
 
+	{/if}	
+
+
+	{#if !isClose}
+
+		<div class='row'>
+			<LabelValue 
+				label='Size in USD' 
+				value={`$${formatForDisplay($sizeInUsd)}`}
+			/>
+			
+		</div>
 	{/if}
 
 </div>

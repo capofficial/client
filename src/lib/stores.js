@@ -295,11 +295,6 @@ export const size = derived([margin, leverage], ([$margin, $leverage]) => {
 	return $margin * $leverage;
 }, 0);
 
-export const maxMargin = derived([maxSize, leverage], ([$maxSize, $leverage]) => {
-	if (!$maxSize || !$leverage) return 0;
-	return ($maxSize / $leverage).toFixed(4);
-}, 0);
-
 // export const margin = derived([size, leverage], ([$size, $leverage]) => {
 // 	if (!$size || !$leverage) return 0;
 // 	const margin = getMargin($size, $leverage)
