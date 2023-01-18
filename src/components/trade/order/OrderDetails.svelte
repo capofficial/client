@@ -87,20 +87,17 @@
 		</div>
 
 	{/if}	
-	
-	{#if showMore}
 
-		{#if !isClose}
 
-			<div class='row'>
-				<LabelValue 
-					label='Size in USD' 
-					value={`$${formatForDisplay($sizeInUsd)}`}
-				/>
-				
-			</div>
-		{/if}
+	{#if !isClose}
 
+		<div class='row'>
+			<LabelValue 
+				label='Size in USD' 
+				value={`$${formatForDisplay($sizeInUsd)}`}
+			/>
+			
+		</div>
 	{/if}
 
 	<div class='show-more' on:click={() => {showMore = !showMore}}>Show {#if showMore}Less{:else}More{/if}</div>

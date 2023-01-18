@@ -45,6 +45,9 @@ export const chainlinkPrice = writable(); // for current market
 export const chainlinkAssetPrices = writable({}); // for assets
 export const CAPPrice = writable();
 
+// Leaderboard
+export const leaderboard = writable([]);
+
 // Pool
 export const poolBalances = writable({});
 export const bufferBalances = writable({});

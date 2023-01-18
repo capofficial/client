@@ -40,6 +40,7 @@
 
 <div class='nav'>
 	<a class:active={$pageName == 'Trade'} href='/trade'>Trade</a>
+	<a class:active={$pageName == 'Leaderboard'} href='/leaderboard'>Leaderboard</a>
 	<a class:active={$pageName == 'Pool'} href='/pool'>Pool</a>
 	<a class:active={$pageName == 'Stake'} href='/stake'>Stake</a>
 	<a href='/docs'>Docs</a>
