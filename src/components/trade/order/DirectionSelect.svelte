@@ -4,16 +4,13 @@
 
 <style>
 	.direction-select {
-		flex: 1 1 auto;
 		display: flex;
 		align-items: center;
 		overflow: hidden;
 	}
 	a {
-		flex: 1 1 auto;
 		padding: 27px 20px;
 		box-sizing: border-box;
-		text-align: center;
 	}
 	a:not(.active):hover {
 		color: var(--text100);

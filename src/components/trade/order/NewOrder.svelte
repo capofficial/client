@@ -30,7 +30,6 @@
 		buyingPower,
 		price,
 		hasTPSL,
-		hasLimitStop,
 		tpPrice,
 		slPrice,
 		leverage,
@@ -39,7 +38,6 @@
 		margin,
 		sizeInUsd,
 		liquidationPrice,
-		selectedMarketInfo,
 		isProtectedOrder,
 		balances,
 		maxSize,
@@ -136,7 +134,7 @@
 	function resetOrderFields() {
 		highlightedPriceButton = null;
     		price.set();
-    		margin.set();
+    		size.set();
     		tpPrice.set();
     		slPrice.set();
     		hasTPSL.set(false);
@@ -145,12 +143,6 @@
 	}
 	
 	$: resetOrderFields($selectedMarket)
-
-	function saveLeverage() {
-		saveUserSetting(`leverage-${$selectedMarket}`, $leverage);
-	}
-
-	$: saveLeverage($leverage);
 	
 </script>
 
@@ -166,8 +158,12 @@
 	}
 
 	.header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
 		height: 70px;
 		background-color: var(--layer0);
+		padding-right: 25px;
 	}
 
 	.body {
@@ -270,33 +266,56 @@
 
 	<div class='header'>
 		<DirectionSelect />
+		<AssetLeverageSelect />
 	</div>
 
 	<div class='body'>
 
+		<div class='order-type'>
+			<OrderTypeSelect />
+			<div class='info-icon'>{@html INFO_ICON_CIRCLE}</div>
+		</div>
+
 		<form on:submit|preventDefault={submit}>
 
-			<div class='input-wrapper'>
-				<div class='margin-input'>
-					<div class='top-row'>
-						<div class='label'>Margin</div>
-						<div class='value' on:click={margin.set($balances[$selectedAsset])}>{$balances[$selectedAsset]}</div>
-					</div>
-					<div class='bottom-row'>
-						<input id='Margin' type='number' step="0.0000001" bind:value={$margin} min="0" max="10000000" maxlength="10" spellcheck="false" placeholder={`0.0`} autocomplete="off" autocorrect="off" inputmode="decimal" lang="en" >
-						<a class='suffix'on:click|stopPropagation={() => {showModal('AssetSelect')}}>{$selectedAsset}</a>
-					</div>
+			{#if $orderType == 1 || $orderType == 2}
+				<div class='top-spacing'>
+					<Input label={$orderType == 1 ? 'Limit Price' : 'Stop Price'} bind:value={$price} isSecondaryColor={!$isLong} on:click={() => {highlightedPriceButton = null}} />
 				</div>
-				<div class='separator'>×</div>
-				<div class='leverage-input'>
-					<div class='top-row'>
-						<div class='label'>Leverage</div>
-						<div class='value'>Max: {$selectedMarketInfo.maxLeverage || "-"}</div>
+				<div class='top-spacing bottom-border'>
+					<div class='price-buttons bottom-spacing'>
+						{#if $orderType == 1 && !$isLong || $orderType == 2 && $isLong}
+							<a on:click={() => {setPrice(2)}} class:highlighted={highlightedPriceButton == 2}>2%↑</a>
+							<a on:click={() => {setPrice(5)}} class:highlighted={highlightedPriceButton == 5}>5%↑</a>
+							<a on:click={() => {setPrice(10)}} class:highlighted={highlightedPriceButton == 10}>10%↑</a>
+							<a on:click={() => {setPrice(20)}} class:highlighted={highlightedPriceButton == 20}>20%↑</a>
+						{:else}
+							<a on:click={() => {setPrice(-2)}} class:highlighted={highlightedPriceButton == -2}>2%↓</a>
+							<a on:click={() => {setPrice(-5)}} class:highlighted={highlightedPriceButton == -5}>5%↓</a>
+							<a on:click={() => {setPrice(-10)}} class:highlighted={highlightedPriceButton == -10}>10%↓</a>
+							<a on:click={() => {setPrice(-20)}} class:highlighted={highlightedPriceButton == -20}>20%↓</a>
+						{/if}
 					</div>
-					<div class='bottom-row'>
-						<input id='Leverage' type='number' step="0.5" bind:value={$leverage} min="1" max={$selectedMarketInfo.maxLeverage} maxlength="4" spellcheck="false" autocomplete="off" autocorrect="off" inputmode="decimal" lang="en" >
-					</div>
+					{#if showPriceExecutionWarning}
+					<div class='warning bottom-spacing'>This order could execute immediately at the current market price.</div>
+					{/if}
 				</div>
+			{/if}
+
+			<div class='top-spacing bottom-spacing'>
+				<Input label='Size' bind:value={$size} isSecondaryColor={!$isLong} placeholder={`0.0 ${$selectedAsset}`} isInvalid={$maxSize && $size > formatForDisplay($maxSize) * 1} />
+			</div>
+			
+			<div class='slider-container bottom-spacing'>
+				<Slider bind:value={$size} maxValue={$maxSize} bind:isActive={sizeHighlighted} isSecondaryColor={!$isLong} nullValue={true} />
+			</div>
+
+			<div class='bottom-spacing bottom-border'>
+				<LabelValue 
+					label={`${$isLong ? 'Buying Power' : 'Selling Power'}`}
+					value={`${formatForDisplay($maxSize)} ${$selectedAsset}`}
+					on:click={size.set(formatForDisplay($maxSize))}
+				/>
 			</div>
 
 			<div class='top-spacing bottom-spacing advanced-handle' on:click={() => showAdvanced = !showAdvanced}>
@@ -305,21 +324,6 @@
 
 			{#if showAdvanced}
 			<div class='bottom-spacing'>
-
-				<div class='semi-padding-bottom row tpsl-header'>
-					<Checkbox label='Limit / Stop' bind:value={$hasLimitStop} isSecondaryColor={!$isLong} />
-				</div>
-
-				{#if $hasLimitStop}
-					<div class='top-spacing'>
-						<Input label='Trigger Price' bind:value={$price} isSecondaryColor={!$isLong} on:click={() => {highlightedPriceButton = null}} />
-					</div>
-					<div class='top-spacing bottom-border'>
-						{#if showPriceExecutionWarning}
-						<div class='warning bottom-spacing'>This order could execute immediately at the current market price.</div>
-						{/if}
-					</div>
-				{/if}
 
 				<div class='semi-padding-bottom row tpsl-header'>
 					<Checkbox label='Take-Profit / Stop-Loss' bind:value={$hasTPSL} isSecondaryColor={!$isLong} />

@@ -25,4 +25,5 @@
 
 <div class='select'>
 	<a use:tooltip={{content: 'Collateral'}} on:click|stopPropagation={() => {showModal('AssetSelect')}}>{$selectedAsset}</a>
+	<a use:tooltip={{content: 'Leverage'}} on:click|stopPropagation={() => {showModal('LeverageSelect')}}>{$leverage}×</a>
 </div>
