@@ -11,7 +11,6 @@
 	export let asset;
 	export let size;
 	export let isClose = false;
-	export let clickableFee = true;
 
 	// $: console.log('size', size);
 
@@ -51,15 +50,15 @@
 	}
 </style>
 
-{#if size > 0}
+
 <div class='order-info'>
 
 	{#if !isClose}
 
 		<div class='row'>
 			<LabelValue 
-				label={'Margin'}
-				value={`${formatForDisplay($margin)} ${asset}`}
+				label={'Total'}
+				value={`${formatForDisplay(size)} ${asset}`}
 			/>
 		</div>
 
@@ -73,7 +72,6 @@
 			isSecondaryColor={!isClose && !$isLong}
 			hasTP={!isClose && $tpPrice * 1 > 0}
 			hasSL={!isClose && $slPrice * 1 > 0}
-			clickable={clickableFee}
 		/>
 	</div>
 
@@ -100,7 +98,4 @@
 		</div>
 	{/if}
 
-	<div class='show-more' on:click={() => {showMore = !showMore}}>Show {#if showMore}Less{:else}More{/if}</div>
-
 </div>
-{/if}

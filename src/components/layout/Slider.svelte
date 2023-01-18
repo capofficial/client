@@ -57,7 +57,8 @@
 	}
 
 	function setValue() {
-		if (!maxValue || progressPercent == undefined) return;
+		// console.log('setValue', progressPercent, maxValue);
+		if (!maxValue || !progressPercent) return;
 		if (progressPercent == 0) {
 			if (nullValue) {
 				value = null;
@@ -73,6 +74,7 @@
 	}
 
 	function setProgressPercent() {
+		// console.log('setProgressPercent', value);
 		if (!maxValue) return;
 		progressPercent = Math.min(100, Math.round(100 * value / maxValue));
 	}

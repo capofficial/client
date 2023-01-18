@@ -253,11 +253,13 @@ export const selectedAsset = writable(getUserSetting('selectedAsset') || DEFAULT
 // New Order
 export const isLong = writable(true);
 export const orderType = writable(0);
-export const size = writable();
+// export const size = writable();
+export const margin = writable();
 export const price = writable();
 export const tpPrice = writable();
 export const slPrice = writable();
 export const hasTPSL = writable(false);
+export const hasLimitStop = writable(false);
 export const leverage = writable(DEFAULT_LEVERAGE);
 export const priceAsset = writable('USD');
 export const isReduceOnly = writable(false);
@@ -288,11 +290,16 @@ export const maxSize = derived([balances, leverage, selectedMarketInfo, selected
 
 }, 0);
 
-export const margin = derived([size, leverage], ([$size, $leverage]) => {
-	if (!$size || !$leverage) return 0;
-	const margin = getMargin($size, $leverage)
-	return margin;
+export const size = derived([margin, leverage], ([$margin, $leverage]) => {
+	if (!$margin || !$leverage) return 0;
+	return $margin * $leverage;
 }, 0);
+
+// export const margin = derived([size, leverage], ([$size, $leverage]) => {
+// 	if (!$size || !$leverage) return 0;
+// 	const margin = getMargin($size, $leverage)
+// 	return margin;
+// }, 0);
 export const sizeInUsd = derived([size, selectedAsset, prices], ([$size, $selectedAsset, $prices]) => {
 	if (!$prices || !$selectedAsset || !$size) return 0;
 	if ($selectedAsset == 'USDC') return $size;

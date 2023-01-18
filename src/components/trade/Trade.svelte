@@ -30,7 +30,7 @@
 	.grid {
 		display: grid;
 		grid-template-rows: 70px 1fr 1fr var(--account-height);
-		grid-template-columns: 320px 1fr 1fr 310px;
+		grid-template-columns: 320px 1fr 1fr 380px;
 		grid-template-areas: 
 			"ticker ticker ticker sidebar"
 			"markets chart chart sidebar"
