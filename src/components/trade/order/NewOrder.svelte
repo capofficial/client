@@ -43,6 +43,7 @@
 		isProtectedOrder,
 		balances,
 		maxSize,
+		maxMargin,
 		prices,
 		submittingOrder
 	} from '@lib/stores'
@@ -65,6 +66,15 @@
 	let highlightedPriceButton;
 	async function submit() {
 		if (!$size) return focusInput('Size');
+		// Set order type based on current price
+		if ($hasLimitStop && $price * 1 > 0) {
+			const currentPrice = $prices[$selectedMarket] * 1;
+			if ($isLong && $price <= currentPrice || !$isLong && $price >= currentPrice) {
+				orderType.set(1); // limit
+			} else {
+				orderType.set(2); // stop
+			}
+		}
 		if ($orderType != 0 && !$price || $isProtectedOrder && !$price) {
 			if ($orderType == 1) return focusInput('Limit Price');
 			if ($orderType == 2) return focusInput('Stop Price');
@@ -211,7 +221,6 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		font-size: 90%;
 	}
 	.advanced-handle :global(svg) {
 		fill: currentColor;
@@ -277,8 +286,8 @@
 
 	.input-wrapper {
 		display: grid;
-		grid-template-columns: 1fr 36px 100px;
-		background-color: var(--layer50);
+		grid-template-columns: 1fr 36px 80px;
+		background-color: var(--layer100);
 		padding: 10px;
 		padding-bottom: 0;
 		border-radius: 5px;
@@ -296,6 +305,7 @@
 		font-size: 22px;
 		font-weight: 600;
 		text-align: center;
+		color: var(--text400);
 	}
 
 	.separator .top-row {
@@ -311,6 +321,10 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+		font-size: 90%;
+	}
+	.top-row .value {
+		cursor: pointer;
 	}
 
 	.bottom-row {
@@ -320,6 +334,7 @@
 	}
 
 	input {
+		max-width: 175px;
 		height: 56px;
 		caret-color: var(--primary);
 		font-size: 22px;
@@ -329,7 +344,7 @@
 	.suffix {
 		position: absolute;
 		top: 50%;
-		background-color: var(--layer100);
+		background-color: var(--layer200);
 		padding: 6px 12px;
 		transform: translateY(-50%);
 		white-space: nowrap;
@@ -341,6 +356,7 @@
 		cursor: pointer;
 		z-index: 100;
 		border-radius: 5px;
+		font-weight: 600;
 	}
 
 </style>
@@ -359,7 +375,7 @@
 				<div class='margin-input'>
 					<div class='top-row'>
 						<div class='label'>Amount</div>
-						<div class='value' on:click={margin.set($balances[$selectedAsset])}>{$balances[$selectedAsset]}</div>
+						<div class='value' on:click={margin.set($maxMargin)}>Max: {formatForDisplay($maxMargin)}</div>
 					</div>
 					<div class='bottom-row'>
 						<input id='Margin' type='number' step="0.0000001" bind:value={$margin} min="0" max="10000000" maxlength="10" spellcheck="false" placeholder={`0.0`} autocomplete="off" autocorrect="off" inputmode="decimal" lang="en" >
@@ -372,12 +388,19 @@
 				</div>
 				<div class='leverage-input'>
 					<div class='top-row'>
-						<div class='label'>Lev</div>
+						<div class='label'>Leverage</div>
 					</div>
 					<div class='bottom-row'>
 						<input id='Leverage' type='number' step="0.5" bind:value={$leverage} min="1" max={$selectedMarketInfo.maxLeverage} maxlength="4" spellcheck="false" autocomplete="off" autocorrect="off" inputmode="decimal" lang="en" on:change={() => {checkLeverage(true)}} on:keyup={() => {checkLeverage(false)}} >
 					</div>
 				</div>
+			</div>
+
+			<div class='top-spacing'>
+				<LabelValue 
+					label={'Total'}
+					value={`${formatForDisplay($size)} ${$selectedAsset} ($${formatForDisplay($sizeInUsd)})`}
+				/>
 			</div>
 
 			<div class='top-spacing bottom-spacing advanced-handle' on:click={() => showAdvanced = !showAdvanced}>
@@ -387,22 +410,17 @@
 			{#if showAdvanced}
 			<div class='bottom-spacing'>
 
-				<div class='semi-padding-bottom row tpsl-header'>
+				<div class='semi-padding-bottom tpsl-header'>
 					<Checkbox label='Limit / Stop' bind:value={$hasLimitStop} isSecondaryColor={!$isLong} />
 				</div>
 
 				{#if $hasLimitStop}
-					<div class='top-spacing'>
-						<Input label='Trigger Price' bind:value={$price} isSecondaryColor={!$isLong} on:click={() => {highlightedPriceButton = null}} />
-					</div>
-					<div class='top-spacing bottom-border'>
-						{#if showPriceExecutionWarning}
-						<div class='warning bottom-spacing'>This order could execute immediately at the current market price.</div>
-						{/if}
+					<div class='semi-padding-bottom'>
+						<Input label='Trigger Price' bind:value={$price} isSecondaryColor={!$isLong} />
 					</div>
 				{/if}
 
-				<div class='semi-padding-bottom row tpsl-header'>
+				<div class='semi-padding-bottom tpsl-header'>
 					<Checkbox label='Take-Profit / Stop-Loss' bind:value={$hasTPSL} isSecondaryColor={!$isLong} />
 					{#if $hasTPSL}
 					<a class='tpsl-help-button' on:click|stopPropagation={() => {showModal('AdvancedTPSL')}}>Details</a>
@@ -424,12 +442,12 @@
 
 				{#if !$hasTPSL}
 
-					<div class='semi-padding-bottom row'>
+					<div class='semi-padding-bottom'>
 						<Checkbox label='Reduce-Only' bind:value={$isReduceOnly} isSecondaryColor={!$isLong} />
 					</div>
 
-					{#if $orderType == 0}
-						<div class='row semi-padding-bottom'>
+					{#if $orderType == 0 && !$hasLimitStop}
+						<div class='semi-padding-bottom'>
 							<Checkbox label='Protected Order' bind:value={$isProtectedOrder} isSecondaryColor={!$isLong} />
 						</div>
 

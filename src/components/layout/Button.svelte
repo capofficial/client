@@ -20,7 +20,6 @@
 		color: var(--primary-darkest);
 		background-color: var(--primary);
 		white-space: nowrap;
-		font-size: 95%;
 	}
 	button:hover:not(:active) {
 		background-color: var(--primary-hover);
