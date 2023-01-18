@@ -288,39 +288,24 @@
 		display: grid;
 		grid-template-columns: 1fr 36px 80px;
 		background-color: var(--layer100);
+		padding: 10px;
+		padding-bottom: 0;
 		border-radius: 5px;
 	}
 
 	.margin-input {
-		padding: 10px;
-		padding-bottom: 0;
-		padding-right: 0;
+
 	}
 
 	.leverage-input {
-		padding: 10px;
-		padding-left: 0;
-		padding-bottom: 0;
+
 	}
 
 	.separator {
-		font-size: 32px;
+		font-size: 22px;
 		font-weight: 600;
 		text-align: center;
 		color: var(--text400);
-		position: relative;
-		padding-top: 10px;
-		padding-bottom: 0;
-	}
-
-	.line {
-		position: absolute;
-		top: 0;
-		bottom: 0; 
-		width: 1px;
-		border-right: 1px solid var(--text400);
-		right: calc(50% - 1px);
-		display: none;
 	}
 
 	.separator .top-row {
@@ -328,7 +313,7 @@
 	}
 
 	.separator .bottom-row {
-		line-height: 58px;
+		line-height: 56px;
 		justify-content: center;
 	}
 
@@ -400,7 +385,6 @@
 				<div class='separator'>
 					<div class='top-row'></div>
 					<div class='bottom-row'>×</div>
-					<div class='line'></div>
 				</div>
 				<div class='leverage-input'>
 					<div class='top-row'>
