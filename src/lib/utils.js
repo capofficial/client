@@ -56,6 +56,8 @@ export function setLeverageForSelectedMarket() {
 
 	if (!marketInfo.maxLeverage) return;
 
+	console.log('savedLeverage', savedLeverage);
+
 	if (savedLeverage && savedLeverage * 1 <= marketInfo.maxLeverage * 1) {
 		leverage.set(savedLeverage);
 	} else {

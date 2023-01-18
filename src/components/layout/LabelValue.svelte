@@ -30,7 +30,6 @@
 		justify-content: space-between;
 		color: var(--text0);
 		flex: 1 1 auto;
-		font-size: 90%;
 	}
 	.flex-row.padded {
 		padding: var(--base-padding);
@@ -46,7 +45,7 @@
 	.label {
 		cursor: default;
 		text-transform: capitalize;
-		color: var(--text400);
+		color: var(--text300);
 	}
 	.label.hasNote {
 		cursor: help;

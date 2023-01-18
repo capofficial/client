@@ -147,10 +147,21 @@
 	$: resetOrderFields($selectedMarket)
 
 	function saveLeverage() {
+		console.log('saving leverage', $leverage);
+		if ($leverage == null || $leverage * 1 < 1) return;
 		saveUserSetting(`leverage-${$selectedMarket}`, $leverage);
 	}
 
 	$: saveLeverage($leverage);
+
+	function checkLeverage(onChange) {
+		console.log('$leverage', $leverage, onChange);
+		if ($leverage * 1 > $selectedMarketInfo.maxLeverage) {
+			leverage.set($selectedMarketInfo.maxLeverage);
+		} else if (onChange && $leverage == undefined || $leverage * 1 < 1 && $leverage != undefined) {
+			leverage.set(1);
+		}
+	}
 	
 </script>
 
@@ -264,6 +275,74 @@
 		background-color: var(--layer200);
 	}
 
+	.input-wrapper {
+		display: grid;
+		grid-template-columns: 1fr 36px 100px;
+		background-color: var(--layer50);
+		padding: 10px;
+		padding-bottom: 0;
+		border-radius: 5px;
+	}
+
+	.margin-input {
+
+	}
+
+	.leverage-input {
+
+	}
+
+	.separator {
+		font-size: 22px;
+		font-weight: 600;
+		text-align: center;
+	}
+
+	.separator .top-row {
+		height: 18.5px;
+	}
+
+	.separator .bottom-row {
+		line-height: 56px;
+		justify-content: center;
+	}
+
+	.top-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.bottom-row {
+		display: flex;
+		align-items: center;
+		position: relative;
+	}
+
+	input {
+		height: 56px;
+		caret-color: var(--primary);
+		font-size: 22px;
+		font-weight: 600;
+	}
+
+	.suffix {
+		position: absolute;
+		top: 50%;
+		background-color: var(--layer100);
+		padding: 6px 12px;
+		transform: translateY(-50%);
+		white-space: nowrap;
+		right: 0px;
+		display: flex;
+		align-items: center;
+		text-transform: uppercase;
+		letter-spacing: 0.05rem;
+		cursor: pointer;
+		z-index: 100;
+		border-radius: 5px;
+	}
+
 </style>
 
 <div class='new-order'>
@@ -279,22 +358,24 @@
 			<div class='input-wrapper'>
 				<div class='margin-input'>
 					<div class='top-row'>
-						<div class='label'>Margin</div>
+						<div class='label'>Amount</div>
 						<div class='value' on:click={margin.set($balances[$selectedAsset])}>{$balances[$selectedAsset]}</div>
 					</div>
 					<div class='bottom-row'>
 						<input id='Margin' type='number' step="0.0000001" bind:value={$margin} min="0" max="10000000" maxlength="10" spellcheck="false" placeholder={`0.0`} autocomplete="off" autocorrect="off" inputmode="decimal" lang="en" >
-						<a class='suffix'on:click|stopPropagation={() => {showModal('AssetSelect')}}>{$selectedAsset}</a>
+						<a class='suffix' on:click|stopPropagation={() => {showModal('AssetSelect')}}>{$selectedAsset}</a>
 					</div>
 				</div>
-				<div class='separator'>×</div>
+				<div class='separator'>
+					<div class='top-row'></div>
+					<div class='bottom-row'>×</div>
+				</div>
 				<div class='leverage-input'>
 					<div class='top-row'>
-						<div class='label'>Leverage</div>
-						<div class='value'>Max: {$selectedMarketInfo.maxLeverage || "-"}</div>
+						<div class='label'>Lev</div>
 					</div>
 					<div class='bottom-row'>
-						<input id='Leverage' type='number' step="0.5" bind:value={$leverage} min="1" max={$selectedMarketInfo.maxLeverage} maxlength="4" spellcheck="false" autocomplete="off" autocorrect="off" inputmode="decimal" lang="en" >
+						<input id='Leverage' type='number' step="0.5" bind:value={$leverage} min="1" max={$selectedMarketInfo.maxLeverage} maxlength="4" spellcheck="false" autocomplete="off" autocorrect="off" inputmode="decimal" lang="en" on:change={() => {checkLeverage(true)}} on:keyup={() => {checkLeverage(false)}} >
 					</div>
 				</div>
 			</div>
