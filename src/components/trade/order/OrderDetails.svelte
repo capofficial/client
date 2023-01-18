@@ -24,7 +24,7 @@
 	.row {
 		display: flex;
 		align-items: center;
-		height: 30px;
+		height: 26px;
 		justify-content: space-between;
 	}
 	.small {
