@@ -151,6 +151,18 @@
 		height: 16px;
 	}
 
+	.count {
+		font-size: 80%;
+		margin-left: 4px;
+		padding: 3px 6px;
+		border-radius: 5px;
+		background-color: var(--layer100);
+		color: var(--text0);
+	}
+	.active .count {
+	 	color: var(--primary);
+		background-color: var(--primary-highlighted);
+	}
 	
 </style>
 
@@ -160,8 +172,8 @@
 
 	<div class='account-nav'>
 		<div class='nav'>
-			<a class:active={panel == 'positions'} on:click={() => {panel = 'positions'}}>Positions{#if $positionsSorted.length}<span class='count'>({$positionsSorted.length})</span>{/if}</a>
-			<a class:active={panel == 'orders'} on:click={() => {panel = 'orders'}}>Orders{#if $ordersSorted.length}<span class='count'>({$ordersSorted.length})</span>{/if}</a>
+			<a class:active={panel == 'positions'} on:click={() => {panel = 'positions'}}>Positions{#if $positionsSorted.length}<span class='count'>{$positionsSorted.length}</span>{/if}</a>
+			<a class:active={panel == 'orders'} on:click={() => {panel = 'orders'}}>Orders{#if $ordersSorted.length}<span class='count'>{$ordersSorted.length}</span>{/if}</a>
 			<a class:active={panel == 'history'} on:click={() => {panel = 'history'}}>History</a>
 		</div>
 		<div class='tools'>

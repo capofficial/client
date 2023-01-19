@@ -9,10 +9,8 @@
 	import { showModal } from '@lib/ui'
 
 	export let label;
-	export let asset = false;
 	export let value = '';
 	export let disabled = false;
-	export let assetSelect = false;
 	export let isSecondaryColor = false;
 	export let placeholder = false;
 	export let isHighlighted = false;

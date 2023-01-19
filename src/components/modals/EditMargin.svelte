@@ -132,40 +132,15 @@
 		color: var(--primary);
 	}
 
-	.note {
-		color: var(--text1);
-		line-height: 1.418;
-		font-size: 85%;
-	}
-	.pb {
-		padding-bottom: var(--base-padding);
-	}
-
-	.datacontainer {
+	.row {
 		display: flex;
-		flex-direction: column;
+		align-items: center;
+		height: 26px;
 		justify-content: space-between;
-		font-size: 85%;
 	}
 
-	.margindata {
-		display: flex;
-		flex-direction: row;
-	}
-
-	.datalabel {
-		flex-grow: 1;
-		align-self: center;
-		margin-top: 2px;
-		font-size: 110%;
-	}
-
-	.currentvalue {
-		opacity: 0.25;
-	}
-
-	.newvalue {
-		font-size: 150%;
+	.button {
+		margin-top: 20px;
 	}
 
 </style>
@@ -179,42 +154,33 @@
 			<a class:active={selected=='remove'} on:click={() => {select('remove')}}>Remove</a>
 		</div>
 
-		{#if selected == 'remove' && $selectedMarketInfo?.chainlinkFeed == ADDRESS_ZERO}
-			<div class='note'>Margin removal is available only for Chainlink-supported markets.</div>
-		{:else}
+		<form on:submit|preventDefault={selected == 'add' ? _addMargin : _removeMargin}>
+			
+			<div class='group'>
+				<Input asset={data.asset} label={`${selected == 'add' ? 'Add' : 'Remove'} ${data.asset}`} bind:value={margin} />
+			</div>
 
-			<form on:submit|preventDefault={selected == 'add' ? _addMargin : _removeMargin}>
-				
-				<div class='group'>
-					<Input asset={data.asset} label='Margin' bind:value={margin} />
-				</div>
+			<div class='row'>
+				<LabelValue label='New Liq. Price' value={`${formatForDisplay(newLiqPrice) || "-"}`} />
+			</div>
 
-				<div class='datacontainer pb'>					
-					<div class='margindata'>
-						<div class='datalabel'>Liq. Price</div>
-						<div><span class='currentvalue'>{formatForDisplay(data.liqprice)} 🠞</span> <span class='newvalue'>{formatForDisplay(newLiqPrice)}</span></div>
-					</div>
-					<div class='margindata'>
-						<div class='datalabel'>Leverage</div>
-						<div><span class='currentvalue'>{formatForDisplay(data.leverage)}x 🠞</span> <span class='newvalue'>{formatForDisplay(newLeverage)}x</span></div>
-					</div>
-					<div class='margindata'>
-						<div class='datalabel'>Margin</div>
-						<div><span class='currentvalue'>{formatForDisplay(data.margin)} 🠞</span> <span class='newvalue'>{formatForDisplay(newMargin)}</span></div>
-					</div>
-				</div>
+			<div class='row'>
+				<LabelValue label='New Leverage' value={`${formatForDisplay(newLeverage) || "-"}`} />
+			</div>
 
-				{#if selected == 'remove'}<div class='note pb'>Margin removal is available only for Chainlink-supported markets.</div>{/if}
+			<div class='row'>
+				<LabelValue label='New Margin' value={`${formatForDisplay(newMargin) || "-"}`} />
+			</div>
 
+			<div class='button'>
 				{#if data.asset != 'ETH' && $allowances[data.asset]?.['FundStore'] * 1 <= margin * 1}
 				<Button noSubmit={true} isLoading={isApproving} label={`Approve ${data.asset}`} on:click={_approveAsset} />
 				{:else}
 				<Button isSmall={true} isLoading={isSubmitting} label={selected == 'add' ? 'Add Margin' : 'Remove Margin'} />
 				{/if}
-				
-			</form>
-
-		{/if}
+			</div>
+			
+		</form>
 
 	</div>
 
