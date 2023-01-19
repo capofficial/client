@@ -152,7 +152,7 @@
 					{month} {year}
 				{/if}
 			</div>
-			<div class='subtitle'>Rank and win prizes monthly based on your trading P/L.</div>
+			<div class='subtitle'>Win prizes every month based on your trading P/L.</div>
 		</div>
 		<div class='right buttons'>
 			<a class:active={showPreviousLeaderboard == false} on:click={() => {loadLeaderboard()}}>Current Month</a> | 
@@ -165,7 +165,7 @@
 			<div class='cell la'>Rank</div>
 			<div class='cell la'>User</div>
 			<div class='cell'>P/L</div>
-			<div class='cell highlighted'>Prize</div>
+			<div class='cell highlighted'>Prize ($)</div>
 		</div>
 		<div class='table-body'>
 			{#each $leaderboard as { user, pnlUsd }, i }
@@ -173,7 +173,7 @@
 				<div class='cell la'>{i+1}</div>
 				<div class='cell la'>{user}</div>
 				<div class='cell'>{pnlUsd}</div>
-				<div class='cell'>{getPrize(i+1)}</div>
+				<div class='cell'>{getPrize(i+1) || "-"}</div>
 			</div>
 			{/each}
 		</div>
