@@ -2,7 +2,7 @@ import { get } from 'svelte/store'
 import { ADDRESS_ZERO, BPS_DIVIDER, CURRENCY_DECIMALS } from '@lib/config'
 import { getContract } from '@lib/contracts'
 import { parseUnits, createOrderTuple } from '@lib/formatters'
-import { address, marketInfos, orders, selectedMarket, selectedMarketInfo, selectedAsset, margin, size, price, orderType, isReduceOnly, isLong, isProtectedOrder, hasTPSL, tpPrice, slPrice, submittingOrder } from '@lib/stores'
+import { address, marketInfos, orders, selectedMarket, selectedMarketInfo, selectedAsset, margin, size, price, orderType, isReduceOnly, isLong, isProtectedOrder, tpPrice, slPrice, submittingOrder, hasTP, hasSL } from '@lib/stores'
 import { showToast, showError, hideModal } from '@lib/ui'
 import { getLabelForAsset, getAssetAddress } from '@lib/utils'
 
@@ -46,7 +46,8 @@ export function orderSubmitted() {
 	tpPrice.set();
 	slPrice.set();
 	isReduceOnly.set(false);
-	hasTPSL.set(false);
+	hasTP.set(false);
+	hasSL.set(false);
 	isProtectedOrder.set(false);
 }
 
@@ -87,7 +88,6 @@ export async function submitOrder() {
 	let _price = parseUnits(get(price));
 	const _orderType = get(orderType);
 	const _isReduceOnly = get(isReduceOnly);
-	let _hasTPSL = get(hasTPSL);
 	const _isProtectedOrder = get(isProtectedOrder);
 
 	if (_orderType == 0 && !_isProtectedOrder) {
@@ -100,8 +100,8 @@ export async function submitOrder() {
 
 	let refCode = localStorage.getItem('refCode') || '';
 
-	const _tpPrice = _hasTPSL ? parseUnits(get(tpPrice)) : 0;
-	const _slPrice = _hasTPSL ? parseUnits(get(slPrice)) : 0;
+	const _tpPrice = parseUnits(get(tpPrice)) || 0;
+	const _slPrice = parseUnits(get(slPrice)) || 0;
 
 	let value = '';
 	if (_asset == 'ETH') {

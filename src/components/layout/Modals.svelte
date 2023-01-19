@@ -14,7 +14,6 @@
 	import UnstakeCAP from '../modals/UnstakeCAP.svelte'
 	import HistoryOrderStatus from '../modals/HistoryOrderStatus.svelte'
 	import Settings from '../modals/Settings.svelte'
-	import AdvancedTPSL from '../modals/AdvancedTPSL.svelte'
 
 </script>
 
@@ -68,8 +67,4 @@
 
 {#if $activeModal && $activeModal.name == 'MarketInfo'}
 <MarketInfo data={$activeModal.data} />
-{/if}
-
-{#if $activeModal && $activeModal.name == 'AdvancedTPSL'}
-<AdvancedTPSL />
 {/if}
