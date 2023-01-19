@@ -11,7 +11,6 @@
 	export let asset;
 	export let size;
 	export let isClose = false;
-	export let clickableFee = true;
 
 	// $: console.log('size', size);
 
@@ -25,33 +24,11 @@
 	.row {
 		display: flex;
 		align-items: center;
-		height: 26px;
+		height: 30px;
 		justify-content: space-between;
-	}
-	.small {
-		font-size: 90%;
-	}
-
-	.label {
-		cursor: default;
-		text-transform: capitalize;
-		color: var(--text400);
-	}
-
-	.value :global(svg) {
-		fill: var(--text1);
-		width: 12px;
-		margin-right: 4px;
-	}
-	.show-more {
-		color: var(--primary);
-		font-size: 90%;
-		padding-top: 6px;
-		cursor: pointer;
 	}
 </style>
 
-{#if size > 0}
 <div class='order-info'>
 
 	{#if !isClose}
@@ -73,7 +50,6 @@
 			isSecondaryColor={!isClose && !$isLong}
 			hasTP={!isClose && $tpPrice * 1 > 0}
 			hasSL={!isClose && $slPrice * 1 > 0}
-			clickable={clickableFee}
 		/>
 	</div>
 
@@ -93,14 +69,11 @@
 
 		<div class='row'>
 			<LabelValue 
-				label='Size in USD' 
+				label='Size (USD)' 
 				value={`$${formatForDisplay($sizeInUsd)}`}
 			/>
 			
 		</div>
 	{/if}
 
-	<div class='show-more' on:click={() => {showMore = !showMore}}>Show {#if showMore}Less{:else}More{/if}</div>
-
 </div>
-{/if}

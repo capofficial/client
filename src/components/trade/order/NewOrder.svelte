@@ -196,18 +196,14 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		font-size: 90%;
 	}
 	.advanced-handle :global(svg) {
 		fill: currentColor;
-		width: 10px;
+		width: 12px;
 	}
 	
-	.group {
-		padding-bottom: 25px;
-	}
 	.row {
-		font-size: 90%;
+
 	}
 
 	.bottom-border {
@@ -245,6 +241,7 @@
 	.warning {
 		color: var(--error);
 		font-size: 80%;
+		line-height: 1.318;
 	}
 	.tpsl-header {
 		display: flex;
@@ -297,13 +294,13 @@
 						{/if}
 					</div>
 					{#if showPriceExecutionWarning}
-					<div class='warning bottom-spacing'>This order could execute immediately at the current market price.</div>
+					<div class='warning bottom-spacing'>This price is beyond the current market price. Order might execute immediately.</div>
 					{/if}
 				</div>
 			{/if}
 
 			<div class='top-spacing bottom-spacing'>
-				<Input label='Size' bind:value={$size} isSecondaryColor={!$isLong} placeholder={`0.0 ${$selectedAsset}`} isInvalid={$maxSize && $size > formatForDisplay($maxSize) * 1} />
+				<Input label={`Size (${$selectedAsset})`} bind:value={$size} isSecondaryColor={!$isLong} placeholder={`0.0`} isInvalid={$maxSize && $size > formatForDisplay($maxSize) * 1} />
 			</div>
 			
 			<div class='slider-container bottom-spacing'>

@@ -14,13 +14,12 @@
 
 	button {
 		padding: 0 var(--base-padding);
-		height: 42px;
+		height: 48px;
 		border-radius: var(--base-radius);
 		font-weight: 600;
 		color: var(--primary-darkest);
 		background-color: var(--primary);
 		white-space: nowrap;
-		font-size: 95%;
 	}
 	button:hover:not(:active) {
 		background-color: var(--primary-hover);
