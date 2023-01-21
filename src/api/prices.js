@@ -5,16 +5,17 @@ import { prices, priceTimestamps, selectedMarket, marketInfos, ohlc, CAPPrice, p
 import { setPageTitle } from '@lib/ui'
 import { getChainData } from '@lib/utils'
 
-export async function getMarketTickers(type) {
+export async function getMarketTickers(market, type) {
 
 	const dataEndpoint = getChainData('dataEndpoint');
 	try {
-		const response = await fetch(`${dataEndpoint}/ticker/all?type=${type}`);
+		const response = await fetch(`${dataEndpoint}/ticker/${market}?type=${type}`);
 		const json = await response.json();
 
-		// console.log('type', type);
-		// console.log('json', json);
-		// json: {market => {o,h,l,c,t}}
+		console.log('type', type);
+		console.log('json', json);
+		// if market = all, json: {market => {o,h,l,c,t}}
+		// if market, json: {o,h,l,c,t}
 
 		if (type == 'latest') {
 			for (const m in json) {
@@ -35,9 +36,16 @@ export async function getMarketTickers(type) {
 				});
 			}
 		} else {
-			for (const m in json) {
+			if (market == 'all') {
+				for (const m in json) {
+					ohlc.update((x) => {
+						x[m] = json[m];
+						return x;
+					});
+				}
+			} else {
 				ohlc.update((x) => {
-					x[m] = json[m];
+					x = json;
 					return x;
 				});
 			}

@@ -30,14 +30,24 @@
 		clearTimeout(t2);
 		getFundingRate();
 		getFundingRate24h();
-		getMarketTickers();
 		t1 = setTimeout(fetchFundingData, 1800*1000);
 	}
 	$: fetchFundingData($selectedMarket, $selectedAsset);
 
+	let t3;
+	async function fetchTickers() {
+		clearTimeout(t3);
+		getMarketTickers('all');
+		t3 = setTimeout(fetchTickers, 1800*1000);
+	}
+
+	$: fetchTickers();
+
+
 	onDestroy(() => {
 		clearTimeout(t1);
 		clearTimeout(t2);
+		clearTimeout(t3);
 	});
 
 </script>
