@@ -112,6 +112,15 @@ export function formatForDisplay(amount, fix) {
 
 }
 
+export function formatPriceForDisplay(price) {
+	if (!price || isNaN(price)) return 0;
+	if (price * 1 < 10) {
+		return (price * 1).toFixed(5);
+	} else {
+		return (price * 1).toFixed(2);
+	}
+}
+
 export function numberWithCommas(amount) {   // Get Commafied Value 
 	let formattedAmount = formatForDisplay(amount) * 1;
 	return formattedAmount.toLocaleString(get(locale));

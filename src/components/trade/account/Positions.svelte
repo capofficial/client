@@ -19,7 +19,8 @@
 		formatForDisplay, 
 		formatSide, 
 		formatDate,
-		formatMarketName
+		formatMarketName,
+		formatPriceForDisplay
 	} from '@lib/formatters'
 	import { address, positionsSortKey, positionsSorted, positionsColumnsToShow, prices, marketInfos, fundingTrackers } from '@lib/stores'
 	import { showModal } from '@lib/ui'
@@ -282,7 +283,7 @@
 			{/if}
 
 			{#if $positionsColumnsToShow.includes('price')}
-				<Cell>{formatForDisplay(position.price)}</Cell>
+				<Cell>{formatPriceForDisplay(position.price)}</Cell>
 			{/if}
 
 			{#if $positionsColumnsToShow.includes('size')}
@@ -310,7 +311,7 @@
 			{/if}
 
 			{#if $positionsColumnsToShow.includes('liqprice')}
-				<Cell>{formatForDisplay(liqPrices[`${position.asset}:${position.market}`])}</Cell>
+				<Cell>{formatPriceForDisplay(liqPrices[`${position.asset}:${position.market}`])}</Cell>
 			{/if}
 
 			<Cell isTools={true}>
