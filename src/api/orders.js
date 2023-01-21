@@ -98,11 +98,6 @@ export async function submitOrder() {
 		_margin = parseUnits(0);
 	}
 
-	let refCode = localStorage.getItem('refCode') || '';
-
-	const _tpPrice = parseUnits(get(tpPrice)) || 0;
-	const _slPrice = parseUnits(get(slPrice)) || 0;
-
 	let value = '';
 	if (_asset == 'ETH') {
 		// Send value equal to margin + fee
@@ -110,13 +105,12 @@ export async function submitOrder() {
 		const feeAmount = _size.mul(marketInfo.fee).div(BPS_DIVIDER);
 		console.log('marketInfo.fee', marketInfo.fee);
 		console.log('feeAmount', feeAmount.toString());
-		console.log(_tpPrice,_slPrice);
 
 		value = _margin.add(feeAmount);
-		if (_tpPrice) {
+		if (get(tpPrice)) {
 			value = value.add(feeAmount);
 		}
-		if (_slPrice) {
+		if (get(slPrice)) {
 			value = value.add(feeAmount);
 		}
 	}
@@ -136,9 +130,9 @@ export async function submitOrder() {
 			isReduceOnly: _isReduceOnly
 		});
 
-		console.log('orderTuple', orderTuple, _tpPrice, _slPrice, refCode, value);
+		console.log('orderTuple', orderTuple, get(tpPrice), get(slPrice), value);
 
-		tx = await contract.submitOrder(orderTuple, _tpPrice, _slPrice, refCode, {value: value});
+		tx = await contract.submitOrder(orderTuple, parseUnits(get(tpPrice)), parseUnits(get(slPrice)), {value: value});
 
 		receipt = await tx.wait();
 
