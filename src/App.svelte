@@ -78,10 +78,6 @@
 		// For back button functionality
 		window.onpopstate = () => loadRoute();
 
-		// Always available price data for currency conversion
-		interval1 = setInterval(() => {
-			getMarketTickers();
-		}, 2 * 60 * 1000);
 	}
 
 	onMount(async () => {

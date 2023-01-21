@@ -30,7 +30,7 @@
 	$: fetchData();
 
 	onMount(() => {
-		getMarketTickers();
+		getMarketTickers('latest');
 	});
 
 	let columns = [
