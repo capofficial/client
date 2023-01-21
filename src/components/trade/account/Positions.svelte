@@ -20,7 +20,8 @@
 		formatSide, 
 		formatDate,
 		formatMarketName,
-		formatPriceForDisplay
+		formatPriceForDisplay,
+		formatUnits
 	} from '@lib/formatters'
 	import { address, positionsSortKey, positionsSorted, positionsColumnsToShow, prices, marketInfos, fundingTrackers } from '@lib/stores'
 	import { showModal } from '@lib/ui'
@@ -79,11 +80,15 @@
 
 	function calculateFundings(_positions, _fundingTrackers) {
 		for (const position of _positions) {
-			const ft = _fundingTrackers[position.asset]?.[position.market];
+
+			let ft = _fundingTrackers[position.asset]?.[position.market]; // funding tracker is in UNIT * bps
 			if (!ft) continue;
+
+			ft = formatUnits(ft);
+			const pft = formatUnits(position.fundingTracker);
 			// funding negative means it's been charged
 			// for a long, is fundingTracker > position.fundingTracker, that means it was charged funding (ftDiff < 0)
-			let ftDiff = ft * 1 - position.fundingTracker * 1;
+			let ftDiff = ft * 1 - pft * 1;
 			if (position.isLong) ftDiff = -1 * ftDiff;
 			fundings[`${position.asset}:${position.market}`] = position.size * ftDiff / BPS_DIVIDER || 0;
 		}

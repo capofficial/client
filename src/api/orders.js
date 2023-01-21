@@ -197,7 +197,6 @@ export async function submitCloseOrder(params) {
 			}),
 			0,
 			0,
-			'',
 			{value: value}
 		);
 
