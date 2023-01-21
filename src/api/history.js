@@ -32,7 +32,7 @@ export async function getUserHistory(params) {
 	let sortDirection = 'desc';
 
 	try {
-		const response = await fetch(`${dataEndpoint}/history/${_address}?limit=${first}&skip=${skip}&sortBy=${sortBy}&sortDirection=${sortDirection}&status=${statusesToShow.join(',')}`);
+		const response = await fetch(`${dataEndpoint}/history/${_address}?chain=arbitrum&limit=${first}&skip=${skip}&sortBy=${sortBy}&sortDirection=${sortDirection}&status=${statusesToShow.join(',')}`);
 		const orders = await response.json() || [];
 
 		lastHistoryItemsCount.set(orders.length);

@@ -163,10 +163,9 @@
 	<div class='search-bar'><Search /></div>
 	<div class='nav'>
 		<a on:click={() => filterMarkets('starred')} class:active={$marketsFilter == 'starred'} class='star-icon'>{@html STAR_ICON}</a>
-		<a on:click={() => filterMarkets('open')} class:active={$marketsFilter == 'open'}>Open</a>
 		<a on:click={() => filterMarkets('all')} class:active={$marketsFilter == 'all'}>All</a>
 		<a on:click={() => filterMarkets('crypto')} class:active={$marketsFilter == 'crypto'}>Crypto</a>
-		<a on:click={() => filterMarkets('fx')} class:active={$marketsFilter == 'fx'}>FX</a>
+		<a on:click={() => filterMarkets('fx')} class:active={$marketsFilter == 'fx'}>Forex</a>
 		<!-- <a on:click={() => filterMarkets('indices')} class:active={$marketsFilter == 'indices'}>Index</a> -->
 		<a on:click={() => filterMarkets('commodities')} class:active={$marketsFilter == 'commodities'}>Metals</a>
 	</div>
@@ -181,15 +180,10 @@
 			
 			{#each $marketsSorted as market}
 
-				<a class='market-row' href={`/trade/${market.market}`} class:selected={market.market == $selectedMarket} class:closed={$marketInfos[market.market]?.isClosed}>
+				<a class='market-row' href={`/trade/${market.market}`} class:selected={market.market == $selectedMarket} >
 					<Cell>
 						<div class='star-icon mr' class:active={$starredMarkets[market.market]} on:click|stopPropagation|preventDefault={() => {starMarket(market.market)}}>{@html STAR_ICON}</div>
 						{@html formatMarketName(market.market, true)}
-						{#if $marketInfos[market.market]?.isClosed}
-						<div class='moon-icon' use:tooltip={{content: 'Market Closed'}}>{@html MOON_CIRCLE}</div>
-						{:else}
-						<!-- <span class='leverage'>{$marketInfos[market.market]?.maxLeverage}×</span> -->
-						{/if}
 					</Cell>
 					<Cell rightAlign={true}><ColoredPrice price={market.price} /></Cell>
 					<Cell rightAlign={true}>

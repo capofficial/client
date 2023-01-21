@@ -7,7 +7,7 @@ import { getContract } from '@lib/contracts'
 import { address } from '@lib/stores'
 import { getUserOrders, orderSubmitted, closeOrderSubmitted } from '@api/orders'
 import { getUserPositions } from '@api/positions'
-import { getPoolBalances, getUserPoolStakes, getPoolStats } from '@api/pool'
+import { getPoolBalances, getUserPoolStakes } from '@api/pool'
 import { showToast } from '@lib/ui'
 
 let eventCache = {};
@@ -94,13 +94,11 @@ export async function listenToEvents() {
 		if (inCache(log)) return;
 		getPoolBalances();
 		getUserPoolStakes();
-		// getPoolStats();
 	});
 	ws.on(pool.filters.PoolPayOut(), (log) => {
 		if (inCache(log)) return;
 		getPoolBalances();
 		getUserPoolStakes();
-		// getPoolStats();
 	});
 
 }

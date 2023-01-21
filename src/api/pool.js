@@ -102,34 +102,3 @@ export async function withdraw(_asset, _amount) {
 		showError(e);
 	}
 }
-
-export async function getPoolStats() {
-
-	const dataEndpoint = getChainData('dataEndpoint');
-	
-	const assets = getChainData('assets');
-
-	try {
-		const response = await fetch(`${dataEndpoint}/pool-stats/all`);
-		const data = await response.json(); // {asset => {daily, weekly}}
-
-		for (let asset in data) {
-			const assetLabel = getLabelForAsset(asset);
-			const assetData = data[asset];
-			poolStatsDaily.update((psd) => {
-				psd[assetLabel] = assetData.daily;
-				return psd;
-			});
-			poolStatsWeekly.update((psw) => {
-				psw[assetLabel] = assetData.weekly;
-				return psw;
-			});
-		}
-
-	} catch(e) {
-		console.error('/pool-stats GET error', e);
-	}
-
-	return true;
-
-}
