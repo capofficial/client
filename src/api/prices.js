@@ -20,11 +20,11 @@ export async function getMarketTickers(market, type) {
 		if (type == 'latest') {
 			for (const m in json) {
 
-				// const lastPriceTimestamp = get(priceTimestamps)[m];
-				// if (lastPriceTimestamp && lastPriceTimestamp * 1 >= json[m] * 1) {
-				// 	// sent timestamp is older than one we have, dont update
-				// 	continue;
-				// }
+				const lastPriceTimestamp = get(priceTimestamps)[m];
+				if (lastPriceTimestamp && lastPriceTimestamp * 1 >= json[m] * 1) {
+					// sent timestamp is older than one we have, dont update
+					continue;
+				}
 
 				prices.update((p) => {
 					p[m] = json[m]['c'];
@@ -42,6 +42,13 @@ export async function getMarketTickers(market, type) {
 						x[m] = json[m];
 						return x;
 					});
+					const currentPrice = get(prices)[m];
+					if (!currentPrice) {
+						prices.update((p) => {
+							p[m] = json[m]['c'];
+							return p;
+						});
+					}
 				}
 			} else {
 				ohlc.update((x) => {

@@ -2,7 +2,7 @@ import { get } from 'svelte/store'
 import { createChart, ColorType, LineStyle } from 'lightweight-charts'
 
 import { CURRENCY_DECIMALS } from './config'
-import { formatUnits, formatOrder, formatPosition, formatForDisplay } from './formatters'
+import { formatUnits, formatOrder, formatPosition, formatForDisplay, formatPriceForDisplay } from './formatters'
 import { selectedMarket, orders, positions, chartResolution, chartLoading, showOrdersOnChart, showPositionsOnChart, hoveredOHLC } from './stores'
 import { saveUserSetting, getPrecision } from './utils'
 
@@ -253,7 +253,7 @@ export async function loadCandles(_end) {
 	// Set chart precision
 	if (candles.length) {
 		const lastCandle = candles[candles.length-1];
-		const precision = Math.max(getPrecision(lastCandle.close),getPrecision(lastCandle.open),getPrecision(lastCandle.high),getPrecision(lastCandle.low));
+		const precision = getPrecision(formatPriceForDisplay(lastCandle.close * 1));
 		candlestickSeries.applyOptions({
 		    priceFormat: {
 		        type: 'price',

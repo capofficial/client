@@ -4,6 +4,8 @@
 	import { getLeaderboard } from '@api/leaderboard' 
 
 	import { leaderboard } from '@lib/stores'
+	import { formatPnl } from '@lib/formatters'
+	import { shortAddress } from '@lib/utils'
 
 	let isLoading = true, t;
 
@@ -164,15 +166,15 @@
 		<div class='table-header'>
 			<div class='cell la'>Rank</div>
 			<div class='cell la'>User</div>
-			<div class='cell'>P/L</div>
+			<div class='cell'>P/L ($)</div>
 			<div class='cell highlighted'>Prize ($)</div>
 		</div>
 		<div class='table-body'>
 			{#each $leaderboard as { user, pnlUsd }, i }
 			<div class='row'>
 				<div class='cell la'>{i+1}</div>
-				<div class='cell la'>{user}</div>
-				<div class='cell'>{pnlUsd}</div>
+				<div class='cell la'>{shortAddress(user)}</div>
+				<div class={`cell ${pnlUsd * 1 >= 0 ? 'green' : 'red'}`}>{@html formatPnl(pnlUsd)}</div>
 				<div class='cell'>{getPrize(i+1) || "-"}</div>
 			</div>
 			{/each}
