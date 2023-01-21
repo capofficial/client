@@ -33,7 +33,7 @@ export async function getLeaderboard(params) {
 	}
 
 	try {
-		const response = await fetch(`${dataEndpoint}/leaderboard?start=${start}&end=${end}`);
+		const response = await fetch(`${dataEndpoint}/leaderboard?chain=arbitrum&start=${start}&end=${end}`);
 		const items = await response.json() || [];
 		leaderboard.set(items);
 	} catch(e) {

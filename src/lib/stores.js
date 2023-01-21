@@ -177,7 +177,7 @@ export const lastDayChange = derived([prices, ohlc, selectedMarket], ([$prices, 
 	};
 }, {price: 0, percent: 0});
 
-export const marketsFilter = writable('open');
+export const marketsFilter = writable('all');
 export const marketsSortKey = writable(getUserSetting('marketsSortKey') || DEFAULT_MARKETS_SORT_KEY); // [columnName, isDesc]
 export const starredMarkets = writable(getUserSetting('starredMarkets') || {});
 export const marketsSorted = derived([marketInfos, marketSearchQuery, marketsSortKey, prices, ohlc, marketsFilter, starredMarkets], ([$marketInfos, $marketSearchQuery, $marketsSortKey, $prices, $ohlc, $marketsFilter, $starredMarkets]) => {
