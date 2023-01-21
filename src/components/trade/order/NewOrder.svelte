@@ -29,7 +29,8 @@
 		size,
 		buyingPower,
 		price,
-		hasTPSL,
+		hasTP,
+		hasSL,
 		tpPrice,
 		slPrice,
 		leverage,
@@ -55,7 +56,8 @@
 		tpPrice.set();
 		slPrice.set();
 		isReduceOnly.set(false);
-		hasTPSL.set(false);
+		hasTP.set(false);
+		hasSL.set(false);
 		isProtectedOrder.set(false);
 	}
 	$: clearAdvanced(showAdvanced);
@@ -67,7 +69,6 @@
 			if ($orderType == 1) return focusInput('Limit Price');
 			if ($orderType == 2) return focusInput('Stop Price');
 		}
-		if ($hasTPSL && !$tpPrice && !$slPrice) return focusInput('TP Price');
 		submitOrder();
 		highlightedPriceButton = null;
 	}
@@ -137,12 +138,72 @@
     		size.set();
     		tpPrice.set();
     		slPrice.set();
-    		hasTPSL.set(false);
-		isReduceOnly.set(false)
+    		hasTP.set(false);
+    		hasSL.set(false);
+    		isReduceOnly.set(false)
     		isProtectedOrder.set(false);
 	}
 	
-	$: resetOrderFields($selectedMarket)
+	$: resetOrderFields($selectedMarket);
+
+	let tpProfitPercent, slLossPercent;
+	let tpPriceInputActive, tpPercentInputActive, slPriceInputActive, slPercentInputActive;
+
+	function calculateTPSLPercentFromPrices() {
+		const latestPrice = $orderType == 0 ? $prices[$selectedMarket] : $price;
+
+		if ($tpPrice > 0 && tpPriceInputActive) {
+			if ($isLong) {
+				tpProfitPercent = 100 * $leverage * ($tpPrice * 1 - latestPrice * 1) / $tpPrice;
+			} else {
+				tpProfitPercent = 100 * $leverage * (latestPrice * 1 - $tpPrice * 1) / $tpPrice;
+			}
+			if (tpProfitPercent <= 0) {
+				tpProfitPercent = undefined;
+				return;
+			}
+			tpProfitPercent = formatForDisplay(tpProfitPercent);
+		}
+		if ($slPrice > 0 && slPriceInputActive) {
+			if ($isLong) {
+				slLossPercent = 100 * $leverage * (latestPrice * 1 - $slPrice * 1) / $slPrice;
+			} else {
+				slLossPercent = 100 * $leverage * ($slPrice * 1 - latestPrice * 1) / $slPrice;
+			}
+			if (slLossPercent <= 0) {
+				slLossPercent = undefined;
+				return;
+			}
+			slLossPercent = formatForDisplay(slLossPercent);
+		}
+
+	}
+
+	function calculateTPSLFromPercent() {
+		const latestPrice = $orderType == 0 ? $prices[$selectedMarket] : $price;
+		
+		let _tpPrice, _slPrice;
+		if (tpProfitPercent > 0 && tpPercentInputActive) {
+			if ($isLong) {
+				_tpPrice = latestPrice + (latestPrice * ((tpProfitPercent / 100) / $leverage))
+			} else {
+				_tpPrice = latestPrice - (latestPrice * ((tpProfitPercent / 100) / $leverage))
+			}
+			tpPrice.set(formatForDisplay(_tpPrice));
+		}
+		if (slLossPercent > 0 && slPercentInputActive) {
+			if ($isLong) {
+				_slPrice = latestPrice - (latestPrice * ((slLossPercent / 100) / $leverage))
+			} else {
+				_slPrice = latestPrice + (latestPrice * ((slLossPercent / 100) / $leverage))
+			}
+			slPrice.set(formatForDisplay(_slPrice));
+		}
+
+	}
+
+	$: calculateTPSLPercentFromPrices($tpPrice, $slPrice);
+	$: calculateTPSLFromPercent(tpProfitPercent, slLossPercent);
 	
 </script>
 
@@ -196,18 +257,14 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		font-size: 90%;
 	}
 	.advanced-handle :global(svg) {
 		fill: currentColor;
-		width: 10px;
+		width: 12px;
 	}
 	
-	.group {
-		padding-bottom: 25px;
-	}
 	.row {
-		font-size: 90%;
+
 	}
 
 	.bottom-border {
@@ -245,6 +302,7 @@
 	.warning {
 		color: var(--error);
 		font-size: 80%;
+		line-height: 1.318;
 	}
 	.tpsl-header {
 		display: flex;
@@ -297,13 +355,13 @@
 						{/if}
 					</div>
 					{#if showPriceExecutionWarning}
-					<div class='warning bottom-spacing'>This order could execute immediately at the current market price.</div>
+					<div class='warning bottom-spacing'>This price is beyond the current market price. Order might execute immediately.</div>
 					{/if}
 				</div>
 			{/if}
 
 			<div class='top-spacing bottom-spacing'>
-				<Input label='Size' bind:value={$size} isSecondaryColor={!$isLong} placeholder={`0.0 ${$selectedAsset}`} isInvalid={$maxSize && $size > formatForDisplay($maxSize) * 1} />
+				<Input label={`Size (${$selectedAsset})`} bind:value={$size} isSecondaryColor={!$isLong} placeholder={`0.0`} isInvalid={$maxSize && $size > formatForDisplay($maxSize) * 1} />
 			</div>
 			
 			<div class='slider-container bottom-spacing'>
@@ -326,26 +384,38 @@
 			<div class='bottom-spacing'>
 
 				<div class='semi-padding-bottom row tpsl-header'>
-					<Checkbox label='Take-Profit / Stop-Loss' bind:value={$hasTPSL} isSecondaryColor={!$isLong} />
-					{#if $hasTPSL}
-					<a class='tpsl-help-button' on:click|stopPropagation={() => {showModal('AdvancedTPSL')}}>Details</a>
-					{/if}
+					<Checkbox label='Take-Profit' bind:value={$hasTP} isSecondaryColor={!$isLong} />
 				</div>
 
-				{#if $hasTPSL}
+				{#if $hasTP}
 					<div>
 						<div class='semi-padding-bottom'>
-							<Input label='TP Price' bind:value={$tpPrice} isSecondaryColor={!$isLong} />
-						</div>
-
-						<div>
-							<Input label='SL Price' bind:value={$slPrice} isSecondaryColor={!$isLong} />
+							<div class='semi-padding-bottom'>
+								<Input label='TP Price' bind:value={$tpPrice} isSecondaryColor={!$isLong} on:focus={() => {tpPriceInputActive = true}} on:blur={() => {tpPriceInputActive = false}} />
+							</div>
+							<Input label='Profit (%)' bind:value={tpProfitPercent} isSecondaryColor={!$isLong} on:focus={() => {tpPercentInputActive = true}} on:blur={() => {tpPercentInputActive = false}} />
 						</div>
 
 					</div>
 				{/if}
 
-				{#if !$hasTPSL}
+				<div class='semi-padding-bottom row tpsl-header'>
+					<Checkbox label='Stop-Loss' bind:value={$hasSL} isSecondaryColor={!$isLong} />
+				</div>
+
+				{#if $hasSL}
+					<div>
+						<div>
+							<div class='semi-padding-bottom'>
+								<Input label='SL Price' bind:value={$slPrice} isSecondaryColor={!$isLong} on:focus={() => {slPriceInputActive = true}} on:blur={() => {slPriceInputActive = false}} />
+							</div>
+							<Input label='Loss (%)' bind:value={slLossPercent} isSecondaryColor={!$isLong} on:focus={() => {slPercentInputActive = true}} on:blur={() => {slPercentInputActive = false}} />
+						</div>
+
+					</div>
+				{/if}
+
+				{#if !$hasTP && !$hasSL}
 
 					<div class='semi-padding-bottom row'>
 						<Checkbox label='Reduce-Only' bind:value={$isReduceOnly} isSecondaryColor={!$isLong} />

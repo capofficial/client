@@ -13,6 +13,7 @@
 	import { saveUserSetting } from '@lib/utils'
 
 	function saveLeverage() {
+		if ($leverage == null || $leverage * 1 < 1) return;
 		saveUserSetting(`leverage-${$selectedMarket}`, $leverage);
 	}
 
@@ -31,7 +32,7 @@
 </style>
 
 <Modal 
-	title='Select Leverage' 
+	title='Choose Leverage' 
 	width='300'
 	doneButton={true}
 >	

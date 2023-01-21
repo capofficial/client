@@ -15,7 +15,7 @@
 	import { LOADING_ICON, MOON_CIRCLE, STAR_ICON, FLAME_ICON } from '@lib/icons'
 	import { getMarketInfo } from '@api/markets'
 	import { marketInfos, marketSearchQuery, marketsSortKey, marketsSorted, selectedMarket, marketsFilter, starredMarkets } from '@lib/stores'
-	import { getMarketPrices } from '@api/prices'
+	import { getMarketTickers } from '@api/prices'
 	import { saveUserSetting } from '@lib/utils'
 
 	let isLoading = true;
@@ -30,7 +30,7 @@
 	$: fetchData();
 
 	onMount(() => {
-		getMarketPrices('all');
+		getMarketTickers('all', 'latest');
 	});
 
 	let columns = [
@@ -71,7 +71,6 @@
 
 	.markets-wrapper {
 		height: 100%;
-		font-size: 85%;
 	}
 	.search-bar {
 		padding: 20px;
@@ -82,7 +81,7 @@
 		padding: 0 25px;
 		display: grid;
 		align-items: center;
-		height: 32px;
+		height: 36px;
 		color: var(--text0);
 		text-decoration: none;
 		grid-template-columns: var(--grid-template);
@@ -131,7 +130,7 @@
 	}
 	.nav a {
 		cursor: pointer;
-		margin-right: 10px;
+		margin-right: 12px;
 		color: var(--text300);
 	}
 	.nav a:not(.active):hover {
@@ -164,12 +163,11 @@
 	<div class='search-bar'><Search /></div>
 	<div class='nav'>
 		<a on:click={() => filterMarkets('starred')} class:active={$marketsFilter == 'starred'} class='star-icon'>{@html STAR_ICON}</a>
-		<a on:click={() => filterMarkets('open')} class:active={$marketsFilter == 'open'}>Open</a>
 		<a on:click={() => filterMarkets('all')} class:active={$marketsFilter == 'all'}>All</a>
 		<a on:click={() => filterMarkets('crypto')} class:active={$marketsFilter == 'crypto'}>Crypto</a>
-		<a on:click={() => filterMarkets('fx')} class:active={$marketsFilter == 'fx'}>FX</a>
+		<a on:click={() => filterMarkets('fx')} class:active={$marketsFilter == 'fx'}>Forex</a>
 		<!-- <a on:click={() => filterMarkets('indices')} class:active={$marketsFilter == 'indices'}>Index</a> -->
-		<a on:click={() => filterMarkets('commodities')} class:active={$marketsFilter == 'commodities'}>Comm</a>
+		<a on:click={() => filterMarkets('commodities')} class:active={$marketsFilter == 'commodities'}>Metals</a>
 	</div>
 	<div class='table-wrapper'>
 		<Table
@@ -182,15 +180,10 @@
 			
 			{#each $marketsSorted as market}
 
-				<a class='market-row' href={`/trade/${market.market}`} class:selected={market.market == $selectedMarket} class:grayed={$marketInfos[market.market]?.isClosed}>
+				<a class='market-row' href={`/trade/${market.market}`} class:selected={market.market == $selectedMarket} >
 					<Cell>
 						<div class='star-icon mr' class:active={$starredMarkets[market.market]} on:click|stopPropagation|preventDefault={() => {starMarket(market.market)}}>{@html STAR_ICON}</div>
 						{@html formatMarketName(market.market, true)}
-						{#if $marketInfos[market.market]?.isClosed}
-						<div class='moon-icon' use:tooltip={{content: 'Market Closed'}}>{@html MOON_CIRCLE}</div>
-						{:else}
-						<span class='leverage'>{$marketInfos[market.market]?.maxLeverage}×</span>
-						{/if}
 					</Cell>
 					<Cell rightAlign={true}><ColoredPrice price={market.price} /></Cell>
 					<Cell rightAlign={true}>

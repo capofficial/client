@@ -1,6 +1,6 @@
 <script>
 
-	import { formatForDisplay } from '@lib/formatters'
+	import { formatPriceForDisplay } from '@lib/formatters'
 
 
 	export let price;
@@ -11,7 +11,7 @@
 
 	function onPriceChange(p) {
 		if (!priceElem) return;
-		p = formatForDisplay(p) * 1;
+		p = formatPriceForDisplay(p) * 1;
 		clearTimeout(t);
 		priceElem.classList.remove('green');
 		priceElem.classList.remove('red');
@@ -41,5 +41,5 @@
 </style>
 
 <span class='price' bind:this={priceElem}>
-	{price || ''}
+	{formatPriceForDisplay(price) || ''}
 </span>

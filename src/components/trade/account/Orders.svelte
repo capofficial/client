@@ -16,7 +16,8 @@
 		formatSide, 
 		formatOrderType, 
 		formatDate,
-		formatMarketName
+		formatMarketName,
+		formatPriceForDisplay
 	} from '@lib/formatters'
 	import { XMARK_ICON, CHAINLINK_LOGO, LOADING_ICON } from '@lib/icons'
 
@@ -232,7 +233,7 @@
 			{/if}
 
 			{#if $ordersColumnsToShow.includes('price')}
-				<Cell>{order.price * 1 > 0 ? formatForDisplay(order.price) : '-'}</Cell>
+				<Cell>{order.price * 1 > 0 ? formatPriceForDisplay(order.price) : '-'}</Cell>
 			{/if}
 
 			{#if $ordersColumnsToShow.includes('size')}

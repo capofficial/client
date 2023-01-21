@@ -9,10 +9,8 @@
 	import { showModal } from '@lib/ui'
 
 	export let label;
-	export let asset = false;
 	export let value = '';
 	export let disabled = false;
-	export let assetSelect = false;
 	export let isSecondaryColor = false;
 	export let placeholder = false;
 	export let isHighlighted = false;
@@ -50,10 +48,9 @@
 }
 
 	.input-wrapper {
-		height: 42px;
+		height: 48px;
 		position: relative;
-		font-size: 85%;
-		
+		font-size: 90%;
 	}
 	.input-wrapper.invalid {
 		animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
@@ -125,5 +122,5 @@
 	<label for={label} class='prefix'>
 		{label}
 	</label>
-	<input id={label} type='number' step="0.0000001" bind:value={value} min="0" max="10000000" maxlength="10" spellcheck="false" placeholder={placeholder || `0.0`} autocomplete="off" autocorrect="off" inputmode="decimal" lang="en" disabled={disabled}  class:secondaryColor={isSecondaryColor} class:highlighted={isHighlighted} >
+	<input id={label} type='number' step="0.0000001" bind:value={value} min="0" max="10000000" maxlength="10" spellcheck="false" placeholder={placeholder || `0.0`} autocomplete="off" autocorrect="off" inputmode="decimal" lang="en" disabled={disabled}  class:secondaryColor={isSecondaryColor} class:highlighted={isHighlighted} on:focus on:blur>
 </div>

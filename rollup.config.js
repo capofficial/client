@@ -10,6 +10,7 @@ import copy from 'rollup-plugin-copy';
 import replace from '@rollup/plugin-replace';
 import gzipPlugin from 'rollup-plugin-gzip';
 import { brotliCompressSync } from 'zlib';
+import nodePolyfills from 'rollup-plugin-polyfill-node';
 
 const production = !process.env.ROLLUP_WATCH;
 const hash = String(require('child_process').execSync('git rev-parse --short HEAD')).trim(); // append short git commit to bundles
@@ -57,9 +58,23 @@ export default {
 		format: 'iife',
 		name: 'app',
 		file: 'build/bundle.' + hash + '.js',
-		inlineDynamicImports: true
+		inlineDynamicImports: true,
+		strict: false
 	},
 	plugins: [
+
+		// If you have external dependencies installed from
+		// npm, you'll most likely need these plugins. In
+		// some cases you'll need additional configuration -
+		// consult the documentation for details:
+		// https://github.com/rollup/plugins/tree/master/packages/commonjs
+		resolve({
+			browser: true,
+			dedupe: ['svelte']
+		}),
+		commonjs(),
+
+		nodePolyfills(),
 
 		aliases,
 
@@ -81,16 +96,7 @@ export default {
 		// a separate file - better for performance
 		css({ output: 'bundle.' + hash + '.css' }),
 
-		// If you have external dependencies installed from
-		// npm, you'll most likely need these plugins. In
-		// some cases you'll need additional configuration -
-		// consult the documentation for details:
-		// https://github.com/rollup/plugins/tree/master/packages/commonjs
-		resolve({
-			browser: true,
-			dedupe: ['svelte']
-		}),
-		commonjs(),
+		
 		
 		copy({
             targets: [

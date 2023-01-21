@@ -64,7 +64,7 @@
 </style>
 
 <Modal 
-	title='Select Collateral' 
+	title='Choose Balance To Use' 
 	width='300'
 >
 	

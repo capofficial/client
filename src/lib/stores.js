@@ -45,6 +45,9 @@ export const chainlinkPrice = writable(); // for current market
 export const chainlinkAssetPrices = writable({}); // for assets
 export const CAPPrice = writable();
 
+// Leaderboard
+export const leaderboard = writable([]);
+
 // Pool
 export const poolBalances = writable({});
 export const bufferBalances = writable({});
@@ -254,7 +257,8 @@ export const size = writable();
 export const price = writable();
 export const tpPrice = writable();
 export const slPrice = writable();
-export const hasTPSL = writable(false);
+export const hasTP = writable(false);
+export const hasSL = writable(false);
 export const leverage = writable(DEFAULT_LEVERAGE);
 export const priceAsset = writable('USD');
 export const isReduceOnly = writable(false);

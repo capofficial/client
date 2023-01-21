@@ -57,7 +57,7 @@
 	}
 
 	function setValue() {
-		if (!maxValue || progressPercent == undefined) return;
+		if (!maxValue || !nullValue && !progressPercent || progressPercent == undefined) return;
 		if (progressPercent == 0) {
 			if (nullValue) {
 				value = null;

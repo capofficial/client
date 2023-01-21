@@ -112,6 +112,15 @@ export function formatForDisplay(amount, fix) {
 
 }
 
+export function formatPriceForDisplay(price) {
+	if (!price || isNaN(price)) return 0;
+	if (price * 1 < 10) {
+		return (price * 1).toFixed(5);
+	} else {
+		return (price * 1).toFixed(2);
+	}
+}
+
 export function numberWithCommas(amount) {   // Get Commafied Value 
 	let formattedAmount = formatForDisplay(amount) * 1;
 	return formattedAmount.toLocaleString(get(locale));
@@ -166,7 +175,7 @@ export function formatMarket(market) {
 		'Category': market.category,
 		'Chainlink Execution Allowed': market.allowChainlinkExecution ? 'Yes' : 'No',
 		'Fee': `${formatForDisplay(100 * market.fee / BPS_DIVIDER)}%`,
-		'Is Closed': market.isClosed ? 'Yes' : 'No',
+		'Funding Factor': `${formatForDisplay(100 * market.fundingFactor / BPS_DIVIDER)}%`,
 		'Liquidation Threshold': `${formatForDisplay(100 * market.liqThreshold / BPS_DIVIDER)}%`,
 		'Max Deviation vs Chainlink': `${formatForDisplay(100 * market.maxDeviation / BPS_DIVIDER)}%`,
 		'Max Leverage': market.maxLeverage,

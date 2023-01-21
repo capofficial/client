@@ -12,7 +12,7 @@
 
 	import { getChainlinkPrice } from '@api/chainlink'
 	import { getFundingRate, getFundingRate24h } from '@api/markets'
-	import { getMarketTickers, getMarketPrices } from '@api/prices'
+	import { getMarketTickers } from '@api/prices'
 
 	import { showModal } from '@lib/ui'
 
@@ -30,18 +30,19 @@
 		clearTimeout(t2);
 		getFundingRate();
 		getFundingRate24h();
-		getMarketTickers();
 		t1 = setTimeout(fetchFundingData, 1800*1000);
 	}
 	$: fetchFundingData($selectedMarket, $selectedAsset);
 
 	let t3;
-	async function fetchPriceData() {
+	async function fetchTickers() {
 		clearTimeout(t3);
-		// await getMarketPrices();
-		// t3 = setTimeout(fetchPriceData, 5000);
+		getMarketTickers('all');
+		t3 = setTimeout(fetchTickers, 1800*1000);
 	}
-	$: fetchPriceData($selectedMarket);
+
+	$: fetchTickers();
+
 
 	onDestroy(() => {
 		clearTimeout(t1);

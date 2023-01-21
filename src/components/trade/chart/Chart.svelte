@@ -7,7 +7,7 @@
 	import { initChart, loadCandles, onNewPrice } from '@lib/chart'
 	import { chartHeight, selectedMarket, hoveredOHLC, prices } from '@lib/stores'
 	import { setPageTitle } from '@lib/ui'
-	import { formatForDisplay, formatMarketName, formatPnl } from '@lib/formatters'
+	import { formatPriceForDisplay, formatMarketName, formatPnl } from '@lib/formatters'
 
 	let chartConfigured = false;
 	onMount(() => {
@@ -27,7 +27,7 @@
 		// For selected market
 		const price = _prices[$selectedMarket];
 		if (!price) return;
-		setPageTitle(`${formatForDisplay(price)} ${formatMarketName($selectedMarket)}`);
+		setPageTitle(`${formatPriceForDisplay(price)} ${formatMarketName($selectedMarket)}`);
 		onNewPrice(price);
 	}
 

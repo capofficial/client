@@ -16,7 +16,8 @@
 		formatOrderType,
 		formatSide, 
 		formatDate,
-		formatMarketName
+		formatMarketName,
+		formatPriceForDisplay
 	} from '@lib/formatters'
 	import { address, historySortKey, historySorted, historyColumnsToShow, lastHistoryItemsCount, orders } from '@lib/stores'
 	import { showModal } from '@lib/ui'
@@ -266,7 +267,7 @@
 			{/if}
 
 			{#if $historyColumnsToShow.includes('price')}
-				<Cell>{item.price * 1 > 0 ? formatForDisplay(item.price) : '-'}</Cell>
+				<Cell>{item.price * 1 > 0 ? formatPriceForDisplay(item.price) : '-'}</Cell>
 			{/if}
 
 			{#if $historyColumnsToShow.includes('size')}

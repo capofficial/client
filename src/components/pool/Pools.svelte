@@ -2,7 +2,7 @@
 	import { onDestroy } from 'svelte'
 	import Button from '@components/layout/Button.svelte'
 
-	import { getPoolBalances, getBufferBalances, getUserPoolStakes, getPoolStats } from '@api/pool'
+	import { getPoolBalances, getBufferBalances, getUserPoolStakes } from '@api/pool'
 	import { address, poolBalances, bufferBalances, prices, poolStakes } from '@lib/stores'
 	import { getAssets, getAmountInUsd, getTotalAmountInUsd  } from '@lib/utils'
 	import { formatForDisplay, numberWithCommas } from '@lib/formatters'
@@ -16,7 +16,6 @@
 		const done = await getPoolBalances();
 		// getBufferBalances(); // TODO: activate when new contracts are deployed
 		getUserPoolStakes();
-		getPoolStats();
 		if (done) isLoading = false;
 	}
 	$: fetchData($address);

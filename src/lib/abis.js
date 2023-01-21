@@ -15,7 +15,6 @@ const orderTuple = `tuple(
 	uint256 cancelOrderId
 )`;
 
-// TODO: add uint256 fundingFactor, when contracts get upgraded
 const marketTuple = `tuple(
 	string name,
 	string category,
@@ -24,8 +23,11 @@ const marketTuple = `tuple(
 	uint256 maxDeviation,
 	uint256 fee,
 	uint256 liqThreshold,
+	uint256 fundingFactor,
+	uint256 minOrderAge,
+	uint256 pythMaxAge,
+	bytes32 pythFeed,
 	bool allowChainlinkExecution,
-	bool isClosed,
 	bool isReduceOnly
 )`;
 
@@ -124,6 +126,7 @@ export const EVENT_ABIS = [
 		int256 fundingTracker,
 		uint256 fee,
 		int256 pnl,
+		int256 pnlUsd,
 		int256 fundingFee
 	)`,
 
@@ -163,6 +166,7 @@ export const EVENT_ABIS = [
 		bool isLong,
 		uint256 size,
 		uint256 margin,
+		uint256 marginUsd,
 		uint256 price,
 		uint256 fee
 	)`
@@ -182,7 +186,7 @@ export const ABIS = {
 		`function getLastUpdated(address asset, string memory market) external view returns(uint256)`
 	],
 	Orders: [
-		`function submitOrder(${orderTuple}, uint256 tpPrice, uint256 slPrice, string memory refCode) payable`,
+		`function submitOrder(${orderTuple}, uint256 tpPrice, uint256 slPrice) payable`,
 		`function cancelOrder(uint256 orderId) external`,
 		`function cancelOrders(uint256[] calldata orderIds) external`
 	].concat(EVENT_ABIS),
