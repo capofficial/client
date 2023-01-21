@@ -16,7 +16,7 @@
 
 	import { getUserAssetBalances } from '@api/assets'
 	import { listenToEvents } from '@api/listener'
-	import { getMarketPrices } from '@api/prices'
+	import { getMarketTickers } from '@api/prices'
 
 	let interval1;
 
@@ -79,8 +79,8 @@
 		window.onpopstate = () => loadRoute();
 
 		// Always available price data for currency conversion
-		interval1 = runAndInterval(() => {
-			getMarketPrices(Object.values(USD_CONVERSION_MARKETS));
+		interval1 = setInterval(() => {
+			getMarketTickers();
 		}, 2 * 60 * 1000);
 	}
 

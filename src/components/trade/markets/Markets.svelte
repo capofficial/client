@@ -15,7 +15,7 @@
 	import { LOADING_ICON, MOON_CIRCLE, STAR_ICON, FLAME_ICON } from '@lib/icons'
 	import { getMarketInfo } from '@api/markets'
 	import { marketInfos, marketSearchQuery, marketsSortKey, marketsSorted, selectedMarket, marketsFilter, starredMarkets } from '@lib/stores'
-	import { getMarketPrices } from '@api/prices'
+	import { getMarketTickers } from '@api/prices'
 	import { saveUserSetting } from '@lib/utils'
 
 	let isLoading = true;
@@ -30,7 +30,7 @@
 	$: fetchData();
 
 	onMount(() => {
-		getMarketPrices('all');
+		getMarketTickers();
 	});
 
 	let columns = [
