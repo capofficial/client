@@ -24,8 +24,11 @@ const marketTuple = `tuple(
 	uint256 maxDeviation,
 	uint256 fee,
 	uint256 liqThreshold,
+	uint256 fundingFactor,
+	uint256 minOrderAge,
+	uint256 pythMaxAge,
+	bytes32 pythFeed,
 	bool allowChainlinkExecution,
-	bool isClosed,
 	bool isReduceOnly
 )`;
 
@@ -124,6 +127,7 @@ export const EVENT_ABIS = [
 		int256 fundingTracker,
 		uint256 fee,
 		int256 pnl,
+		int256 pnlUsd,
 		int256 fundingFee
 	)`,
 
@@ -163,6 +167,7 @@ export const EVENT_ABIS = [
 		bool isLong,
 		uint256 size,
 		uint256 margin,
+		uint256 marginUsd,
 		uint256 price,
 		uint256 fee
 	)`

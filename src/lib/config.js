@@ -30,7 +30,6 @@ export const EXCLUDED_MARKETS = ['HSI', 'KOSPI', 'USD-CNY', 'USD-JPY', 'USD-KRW'
 export const CURRENCY_DECIMALS = {
 	ETH: 18,
 	USDC: 6,
-	WBTC: 18,
 	CAP: 18
 }
 
@@ -61,12 +60,11 @@ export const CHAINDATA = {
 		explorer: 'https://arbiscan.io',
 		rpc: 'https://arb1.arbitrum.io/rpc', // for walletconnect
 		dataEndpoint: 'https://data.cap.io/api',
-		dataStore: '0x360B0B2b3391FD65D8279E2231C80D9De767ad7b',
+		dataStore: '0xe9d3C9bB9A2047E7467f4770dfA0d62E2a411792',
 		cap: '0x031d35296154279dc1984dcd93e392b1f946737b',
 		assets: {
 			ETH: ADDRESS_ZERO,
-			USDC: '0xff970a61a04b1ca14834a43f5de4533ebddb5cc8',
-			WBTC: '0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f'
+			USDC: '0xff970a61a04b1ca14834a43f5de4533ebddb5cc8'
 		}
 	}
 }
