@@ -91,7 +91,10 @@ export function calculateLiquidationPrice(params) {
 }
 
 export function getAmountInUsd(asset, amount, _prices) {
+	if (!amount) return 0;
 	const market = USD_CONVERSION_MARKETS[asset];
+	if (!market) return amount; // USDC
+	if (!_prices[market]) return 0;
 	return formatForDisplay((_prices[market] || 1) * amount * 1 || 0);
 }
 

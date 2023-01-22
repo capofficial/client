@@ -86,7 +86,9 @@
 			<Input label='Amount' bind:value={amount} />
 		</div>
 		
-		<div class='note'>There are no deposit fees.{#if $poolWithdrawalFees[asset]} The withdrawal fee is currently {$poolWithdrawalFees[asset]}%.{/if}</div>
+		{#if $poolWithdrawalFees[asset]}
+		<div class='note'>There are no deposit fees. The withdrawal fee is currently {$poolWithdrawalFees[asset]}%.</div>
+		{/if}
 
 		<div>
 			{#if asset != 'ETH' && $allowances[asset]?.['FundStore'] * 1 <= amount * 1}

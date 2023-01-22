@@ -32,7 +32,6 @@ header {
   align-items: center;
   justify-content: space-between;
   height: 70px;
-  border-bottom: 1px solid var(--layer1);
 }
 
 header img {
@@ -42,11 +41,13 @@ header img {
 nav {
   display: flex;
   align-items: center;
-  grid-gap: 30px;
+  grid-gap: 40px;
+  color: var(--text1);
+  font-weight: 500;
 }
 
 nav a:hover {
-  color: var(--text1);
+  color: var(--text0);
 }
 
 
@@ -65,19 +66,18 @@ h1,h2,h3,h4,h5 {
 h1 {
   line-height: 1.218;
   margin: 24px auto;
-  font-size: 72px;
+  font-size: 48px;
   max-width: 900px;
-  font-weight: 650;
-  letter-spacing: -0.045em;
+  font-weight: 400;
+  text-transform: uppercase;
 }
 
 h3 {
     margin: 0 auto;
     margin-bottom: 48px;
     font-size: 24px;
-    line-height: 1.418;
+    line-height: 1.618;
     font-weight: 400;
-    color: var(--text1);
     max-width: 460px;
 }
 
@@ -86,13 +86,16 @@ h3 {
 }
 .button {
   display: inline-block;
-  padding: 16px 32px;
+  padding: 20px 32px;
   border-radius: 50px;
   font-weight: 650;
   color: var(--primary-darkest);
   background-color: var(--primary);
   white-space: nowrap;
-  font-size: 110%;
+  font-size: 20px;
+}
+.button:hover {
+  background-color: var(--primary-hover);
 }
 
 .note {
@@ -106,45 +109,41 @@ h3 {
    margin-bottom: 96px;
    display: grid;
    grid-template-columns: 1fr 1fr 1fr 1fr;
-   background-color: var(--layer0-hover);
-   max-width: 960px;
-   border-radius: var(--base-radius);
+   max-width: 1020px;
 }
 
 .stat {
   padding: 20px;
-  border-right: 1px solid var(--layer1);
 }
 .stat:last-child {
   border-right: none;
 }
 
 .stat .value {
-  font-size: 24px;
-  font-weight: 600;
+  font-size: 36px;
+  font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 44px;
 }
 
 .stat .value.grayed {
-  color: var(--text1);
   font-weight: 400;
   font-size: 18px;
+  color: var(--text1);
 }
 .stat .value.grayed img {
   margin-right: 5px;
 }
 
 .stat .value img {
-  height: 30px;
+  height: 40px;
 }
 
 .stat .label {
   margin-top: 14px;
-  color: var(--text1);
-  text-transform: uppercase;
-  font-size: 75%;
+  font-size: 90%;
   letter-spacing: 0.02em;
 }
 
@@ -284,12 +283,12 @@ footer {
 
   <div class='hero'>
 
-    <h1 data-textify>The Most Advanced DeFi Derivatives Exchange</h1>
+    <h1>Decentralized <strong>Perps</strong></h1>
 
     <h3>Trade global markets with low fees, deep liquidity, and up to 100× leverage.</h3>
 
     <div class='button-wrapper'>
-      <a class='button ' href='/trade'>Start Trading ▸</a>
+      <a class='button ' href='/trade'>Start Trading →</a>
     </div>
 
     <div class='note'>CAP is currently in private beta.</div>
@@ -500,7 +499,7 @@ footer {
     <h3 data-textify>Get started in seconds.</h3>
 
     <div class='button-wrapper'>
-      <a class='button ' href='/trade'>Start Trading ▸</a>
+      <a class='button ' href='/trade'>Start Trading →</a>
     </div>
 
     <div class='note' data-textify>CAP is currently in private beta.</div>

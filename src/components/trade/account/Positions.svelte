@@ -36,7 +36,7 @@
 	async function fetchData() {
 		clearTimeout(t1);
 		const done = await getUserPositions();
-		if (done) isLoading = false;
+		isLoading = false;
 		t1 = setTimeout(fetchData, 5000);
 	}
 	$: fetchData($address);

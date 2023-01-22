@@ -21,7 +21,7 @@
 	}
 
 	a {
-		font-size: 90%;
+		font-size: 95%;
 		transition: all 100ms ease-in-out;
 	}
 	a:hover:not(.active) {

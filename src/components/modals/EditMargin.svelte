@@ -20,7 +20,7 @@
 
 	async function _addMargin() {
 
-		if (!margin) return focusInput('Margin');
+		if (!margin) return focusInput('Add Margin');
 		isSubmitting = true;
 
 		const success = await addMargin(data.market, data.assetAddress, margin);
@@ -33,7 +33,7 @@
 
 	async function _removeMargin() {
 
-		if (!margin) return focusInput('Margin');
+		if (!margin) return focusInput('Remove Margin');
 		isSubmitting = true;
 
 		const success = await removeMargin(data.market, data.assetAddress, margin);
@@ -44,10 +44,12 @@
 
 	}
 
-	let selected = 'add';
+	let selected = 'Add';
 	function select(_s) {
 		selected = _s;
-		focusInput('Margin');
+		setTimeout(() => {
+			focusInput(`${selected} ${data.asset}`);
+		}, 50);
 	}
 
 
@@ -117,7 +119,7 @@
 	$: getAllowance(data.asset, 'PositionStore');
 
 	onMount(() => {
-		focusInput('Margin');
+		focusInput(`Add ${data.asset}`);
 	});
 
 </script>
@@ -150,14 +152,14 @@
 	<div class='container'>
 
 		<div class='group selector'>
-			<a class:active={selected=='add'} on:click={() => {select('add')}}>Add</a>
-			<a class:active={selected=='remove'} on:click={() => {select('remove')}}>Remove</a>
+			<a class:active={selected=='Add'} on:click={() => {select('Add')}}>Add</a>
+			<a class:active={selected=='Remove'} on:click={() => {select('Remove')}}>Remove</a>
 		</div>
 
-		<form on:submit|preventDefault={selected == 'add' ? _addMargin : _removeMargin}>
+		<form on:submit|preventDefault={selected == 'Add' ? _addMargin : _removeMargin}>
 			
 			<div class='group'>
-				<Input asset={data.asset} label={`${selected == 'add' ? 'Add' : 'Remove'} ${data.asset}`} bind:value={margin} />
+				<Input label={`${selected} ${data.asset}`} bind:value={margin} />
 			</div>
 
 			<div class='row'>
@@ -176,7 +178,7 @@
 				{#if data.asset != 'ETH' && $allowances[data.asset]?.['FundStore'] * 1 <= margin * 1}
 				<Button noSubmit={true} isLoading={isApproving} label={`Approve ${data.asset}`} on:click={_approveAsset} />
 				{:else}
-				<Button isSmall={true} isLoading={isSubmitting} label={selected == 'add' ? 'Add Margin' : 'Remove Margin'} />
+				<Button isLoading={isSubmitting} label={`${selected} Margin`} />
 				{/if}
 			</div>
 			

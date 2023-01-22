@@ -5,7 +5,7 @@
 
 	import ColoredPrice from '@components/layout/ColoredPrice.svelte'
 
-	import { formatForDisplay, formatPnl, formatMarketName } from '@lib/formatters'
+	import { formatForDisplay, formatPnl, formatMarketName, formatPriceForDisplay } from '@lib/formatters'
 	import { selectedAsset, selectedMarket, selectedMarketInfo, chainlinkPrice, ohlc, fundingRate, fundingRate24h, lastDayChange, prices } from '@lib/stores'
 
 	import { MOON_CIRCLE, INFO_ICON_CIRCLE } from '@lib/icons'
@@ -168,7 +168,7 @@
 		<div class='box'>
 			<div class='label'>Chainlink</div>
 			<div class='value'>
-				{formatForDisplay($chainlinkPrice) || '-'}
+				{formatPriceForDisplay($chainlinkPrice) || '-'}
 			</div>
 		</div>
 		<div class='box' use:tooltip={{content: `24h: ${formatForDisplay($fundingRate24h*100) || 0}%`}}>
@@ -180,19 +180,19 @@
 		<div class='box'>
 			<div class='label'>24h Change</div>
 			<div class='value' class:green={$lastDayChange.price*1 >= 0} class:red={$lastDayChange.price*1 < 0}>
-				{@html formatPnl($lastDayChange.price)} ({@html formatPnl($lastDayChange.percent, true)})
+				{@html formatPnl($lastDayChange.price, false, true)} ({@html formatPnl($lastDayChange.percent, true)})
 			</div>
 		</div>
 		<div class='box'>
 			<div class='label'>24h High</div>
 			<div class='value'>
-				{$ohlc[$selectedMarket]?.h || '-'}
+				{formatPriceForDisplay($ohlc[$selectedMarket]?.h) || '-'}
 			</div>
 		</div>
 		<div class='box'>
 			<div class='label'>24h Low</div>
 			<div class='value'>
-				{$ohlc[$selectedMarket]?.l || '-'}
+				{formatPriceForDisplay($ohlc[$selectedMarket]?.l) || '-'}
 			</div>
 		</div>
 		

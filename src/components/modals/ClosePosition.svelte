@@ -76,7 +76,7 @@
 	.row {
 		display: flex;
 		align-items: center;
-		height: 26px;
+		height: 30px;
 		justify-content: space-between;
 	}
 
@@ -113,7 +113,7 @@
 				{#if data.asset != 'ETH' && $allowances[data.asset]?.['FundStore'] * 1 == 0}
 				<Button noSubmit={true} isLoading={isApproving} label={`Approve ${data.asset}`} on:click={_approveAsset} />
 				{:else}
-				<Button isSmall={true} isLoading={isSubmitting} label={`Submit Close Order`} />
+				<Button isLoading={isSubmitting} label={`Submit Close Order`} />
 				{/if}
 			</div>
 

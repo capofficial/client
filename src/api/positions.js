@@ -73,7 +73,7 @@ export async function getUserPositions() {
 	isLoadingPositions = true;
 	const contract = await getContract('PositionStore');
 	let _positions = [...await contract.getUserPositions(get(address))]
-	_positions = expandUserPositionData(_positions)
+	// _positions = expandUserPositionData(_positions)
 	positions.set(_positions);
 	isLoadingPositions = false;
 	return true;

@@ -252,11 +252,11 @@ export const selectedAsset = writable(getUserSetting('selectedAsset') || DEFAULT
 
 // New Order
 export const isLong = writable(true);
-export const orderType = writable(0);
 export const size = writable();
 export const price = writable();
 export const tpPrice = writable();
 export const slPrice = writable();
+export const hasTrigger = writable(false);
 export const hasTP = writable(false);
 export const hasSL = writable(false);
 export const leverage = writable(DEFAULT_LEVERAGE);
@@ -302,10 +302,10 @@ export const sizeInUsd = derived([size, selectedAsset, prices], ([$size, $select
 	}
 	return $prices[`${$selectedAsset}-USD`] * $size;
 }, 0);
-export const liquidationPrice = derived([prices, price, chainlinkPrice, leverage, isLong, selectedMarket, selectedMarketInfo, orderType], ([$prices, $price, $chainlinkPrice, $leverage, $isLong, $selectedMarket, $selectedMarketInfo, $orderType]) => {
+export const liquidationPrice = derived([prices, price, chainlinkPrice, leverage, isLong, selectedMarket, selectedMarketInfo, hasTrigger], ([$prices, $price, $chainlinkPrice, $leverage, $isLong, $selectedMarket, $selectedMarketInfo, $hasTrigger]) => {
 	if (!$prices || !$leverage || !$selectedMarket || !$selectedMarketInfo) return 0;
 	let _price;
-	if ($orderType == 0) {
+	if (!$hasTrigger) {
 		_price = $chainlinkPrice || $prices[$selectedMarket];
 	} else {
 		_price = $price;
