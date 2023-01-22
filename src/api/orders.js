@@ -2,7 +2,7 @@ import { get } from 'svelte/store'
 import { ADDRESS_ZERO, BPS_DIVIDER, CURRENCY_DECIMALS } from '@lib/config'
 import { getContract } from '@lib/contracts'
 import { parseUnits, createOrderTuple } from '@lib/formatters'
-import { address, marketInfos, orders, selectedMarket, selectedMarketInfo, selectedAsset, margin, size, price, orderType, isReduceOnly, isLong, isProtectedOrder, tpPrice, slPrice, submittingOrder, hasTP, hasSL } from '@lib/stores'
+import { address, marketInfos, orders, selectedMarket, selectedMarketInfo, selectedAsset, margin, size, price, isReduceOnly, isLong, isProtectedOrder, tpPrice, slPrice, submittingOrder, hasTrigger, hasTP, hasSL, prices } from '@lib/stores'
 import { showToast, showError, hideModal } from '@lib/ui'
 import { getLabelForAsset, getAssetAddress } from '@lib/utils'
 
@@ -46,6 +46,7 @@ export function orderSubmitted() {
 	tpPrice.set();
 	slPrice.set();
 	isReduceOnly.set(false);
+	hasTrigger.set(false);
 	hasTP.set(false);
 	hasSL.set(false);
 	isProtectedOrder.set(false);
@@ -85,17 +86,32 @@ export async function submitOrder() {
 
 	let _margin = parseUnits(marginCleaned, assetDecimals);
 	const _size = parseUnits(sizeCleaned, assetDecimals);
-	let _price = parseUnits(get(price));
-	const _orderType = get(orderType);
+	let _priceRaw = get(price);
+	let _price = parseUnits(_priceRaw);
+	const _hasTrigger = get(hasTrigger);
 	const _isReduceOnly = get(isReduceOnly);
 	const _isProtectedOrder = get(isProtectedOrder);
 
-	if (_orderType == 0 && !_isProtectedOrder) {
+	if (!_hasTrigger && !_isProtectedOrder) {
 		_price = parseUnits(0);
 	}
 
 	if (_isReduceOnly) {
 		_margin = parseUnits(0);
+	}
+
+	let orderType = 0;
+	if (_hasTrigger && _priceRaw * 1 > 0) {
+		// limit (1) or stop (2)?
+		const currentPrice = get(prices)[market];
+		console.log('currentPrice', currentPrice);
+		console.log('_price', _priceRaw);
+		console.log('_isLong', _isLong);
+		if (_isLong && _priceRaw * 1 <= currentPrice * 1 || !_isLong && _priceRaw * 1 >= currentPrice * 1) {
+			orderType = 1;
+		} else if (_isLong && _priceRaw * 1 >= currentPrice * 1|| !_isLong && _priceRaw * 1 <= currentPrice * 1) {
+			orderType = 2;
+		}
 	}
 
 	let value = '';
@@ -126,7 +142,7 @@ export async function submitOrder() {
 			margin: _margin,
 			size: _size,
 			price: _price,
-			orderType: _orderType,
+			orderType,
 			isReduceOnly: _isReduceOnly
 		});
 

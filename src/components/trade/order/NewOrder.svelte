@@ -10,7 +10,6 @@
 
 	import DirectionSelect from './DirectionSelect.svelte'
 	import AssetLeverageSelect from './AssetLeverageSelect.svelte'
-	import OrderTypeSelect from './OrderTypeSelect.svelte'
 	import OrderDetails from './OrderDetails.svelte'
 
 	import { BPS_DIVIDER } from '@lib/config'
@@ -23,12 +22,12 @@
 		address,
 		allowances,
 		isLong,
-		orderType,
 		selectedAsset,
 		selectedMarket,
 		size,
 		buyingPower,
 		price,
+		hasTrigger,
 		hasTP,
 		hasSL,
 		tpPrice,
@@ -56,6 +55,7 @@
 		tpPrice.set();
 		slPrice.set();
 		isReduceOnly.set(false);
+		hasTrigger.set(false);
 		hasTP.set(false);
 		hasSL.set(false);
 		isProtectedOrder.set(false);
@@ -65,10 +65,6 @@
 	let highlightedPriceButton;
 	async function submit() {
 		if (!$size) return focusInput('Size');
-		if ($orderType != 0 && !$price || $isProtectedOrder && !$price) {
-			if ($orderType == 1) return focusInput('Limit Price');
-			if ($orderType == 2) return focusInput('Stop Price');
-		}
 		submitOrder();
 		highlightedPriceButton = null;
 	}
@@ -105,31 +101,6 @@
 		price.set(formatForDisplay($prices[$selectedMarket] * (1 + percentDiff/100)));
 		highlightedPriceButton = percentDiff;
 	}
-
-	let showPriceExecutionWarning;
-
-	function checkWarning() {
-		if ($orderType == 0 || !$price || !$prices[$selectedMarket]) {
-			showPriceExecutionWarning = false;
-			return;
-		}
-		if ($orderType == 1 && $isLong || $orderType == 2 && !$isLong) {
-			if ($price >= $prices[$selectedMarket]) {
-				showPriceExecutionWarning = true;
-				return;
-			}
-		}
-		if ($orderType == 1 && !$isLong || $orderType == 2 && $isLong) {
-			if ($price <= $prices[$selectedMarket]) {
-				showPriceExecutionWarning = true;
-				return;
-			}
-		}
-
-		showPriceExecutionWarning = false;
-	}
-
-	$: checkWarning($prices[$selectedMarket], $price, $orderType, $isLong);
 	
   	// reset inputs on market change
 	function resetOrderFields() {
@@ -138,6 +109,7 @@
     		size.set();
     		tpPrice.set();
     		slPrice.set();
+    		hasTrigger.set(false);
     		hasTP.set(false);
     		hasSL.set(false);
     		isReduceOnly.set(false)
@@ -150,7 +122,7 @@
 	let tpPriceInputActive, tpPercentInputActive, slPriceInputActive, slPercentInputActive;
 
 	function calculateTPSLPercentFromPrices() {
-		const latestPrice = $orderType == 0 ? $prices[$selectedMarket] : $price;
+		const latestPrice = $price * 1 > 0 ? $price : $prices[$selectedMarket];
 
 		if ($tpPrice > 0 && tpPriceInputActive) {
 			if ($isLong) {
@@ -180,7 +152,7 @@
 	}
 
 	function calculateTPSLFromPercent() {
-		const latestPrice = $orderType == 0 ? $prices[$selectedMarket] : $price;
+		const latestPrice = $price * 1 > 0 ? $price : $prices[$selectedMarket];
 		
 		let _tpPrice, _slPrice;
 		if (tpProfitPercent > 0 && tpPercentInputActive) {
@@ -329,38 +301,9 @@
 
 	<div class='body'>
 
-		<div class='order-type'>
-			<OrderTypeSelect />
-			<div class='info-icon'>{@html INFO_ICON_CIRCLE}</div>
-		</div>
-
 		<form on:submit|preventDefault={submit}>
 
-			{#if $orderType == 1 || $orderType == 2}
-				<div class='top-spacing'>
-					<Input label={$orderType == 1 ? 'Limit Price' : 'Stop Price'} bind:value={$price} isSecondaryColor={!$isLong} on:click={() => {highlightedPriceButton = null}} />
-				</div>
-				<div class='top-spacing bottom-border'>
-					<div class='price-buttons bottom-spacing'>
-						{#if $orderType == 1 && !$isLong || $orderType == 2 && $isLong}
-							<a on:click={() => {setPrice(2)}} class:highlighted={highlightedPriceButton == 2}>2%↑</a>
-							<a on:click={() => {setPrice(5)}} class:highlighted={highlightedPriceButton == 5}>5%↑</a>
-							<a on:click={() => {setPrice(10)}} class:highlighted={highlightedPriceButton == 10}>10%↑</a>
-							<a on:click={() => {setPrice(20)}} class:highlighted={highlightedPriceButton == 20}>20%↑</a>
-						{:else}
-							<a on:click={() => {setPrice(-2)}} class:highlighted={highlightedPriceButton == -2}>2%↓</a>
-							<a on:click={() => {setPrice(-5)}} class:highlighted={highlightedPriceButton == -5}>5%↓</a>
-							<a on:click={() => {setPrice(-10)}} class:highlighted={highlightedPriceButton == -10}>10%↓</a>
-							<a on:click={() => {setPrice(-20)}} class:highlighted={highlightedPriceButton == -20}>20%↓</a>
-						{/if}
-					</div>
-					{#if showPriceExecutionWarning}
-					<div class='warning bottom-spacing'>This price is beyond the current market price. Order might execute immediately.</div>
-					{/if}
-				</div>
-			{/if}
-
-			<div class='top-spacing bottom-spacing'>
+			<div class='bottom-spacing'>
 				<Input label={`Size (${$selectedAsset})`} bind:value={$size} isSecondaryColor={!$isLong} placeholder={`0.0`} isInvalid={$maxSize && $size > formatForDisplay($maxSize) * 1} />
 			</div>
 			
@@ -382,6 +325,16 @@
 
 			{#if showAdvanced}
 			<div class='bottom-spacing'>
+
+				<div class='semi-padding-bottom row tpsl-header'>
+					<Checkbox label='Limit / Stop' bind:value={$hasTrigger} isSecondaryColor={!$isLong} />
+				</div>
+
+				{#if $hasTrigger}
+					<div class='semi-padding-bottom'>
+						<Input label={'Price'} bind:value={$price} isSecondaryColor={!$isLong} />
+					</div>
+				{/if}
 
 				<div class='semi-padding-bottom row tpsl-header'>
 					<Checkbox label='Take-Profit' bind:value={$hasTP} isSecondaryColor={!$isLong} />
@@ -421,7 +374,7 @@
 						<Checkbox label='Reduce-Only' bind:value={$isReduceOnly} isSecondaryColor={!$isLong} />
 					</div>
 
-					{#if $orderType == 0}
+					{#if !$hasTrigger}
 						<div class='row semi-padding-bottom'>
 							<Checkbox label='Protected Order' bind:value={$isProtectedOrder} isSecondaryColor={!$isLong} />
 						</div>

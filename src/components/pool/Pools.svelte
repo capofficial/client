@@ -14,7 +14,7 @@
 	async function fetchData() {
 		clearTimeout(t);
 		const done = await getPoolBalances();
-		// getBufferBalances(); // TODO: activate when new contracts are deployed
+		getBufferBalances();
 		getUserPoolStakes();
 		if (done) isLoading = false;
 	}

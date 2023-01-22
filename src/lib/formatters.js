@@ -114,7 +114,7 @@ export function formatForDisplay(amount, fix) {
 
 export function formatPriceForDisplay(price) {
 	if (!price || isNaN(price)) return 0;
-	if (price * 1 < 10) {
+	if (Math.abs(price * 1) < 10) {
 		return (price * 1).toFixed(5);
 	} else {
 		return (price * 1).toFixed(2);
@@ -153,15 +153,17 @@ export function formatSide(isLong, isReduceOnly, pnl) {
 	}
 }
 
-export function formatPnl(pnl, isPercent) {
+export function formatPnl(pnl, isPercent, isPrice) {
 	let string = '';
 	if (pnl == undefined) return string;
 	if (pnl > 0) {
 		string += '+';
-	} else if (pnl > 0) {
-		string += '-';
 	}
-	string += formatForDisplay(pnl, isPercent ? 2 : null) || 0;
+	if (isPrice) {
+		string += formatPriceForDisplay(pnl);
+	} else {
+		string += formatForDisplay(pnl, isPercent ? 2 : null) || 0;
+	}
 	if (isPercent) string += '%';
 	return string;
 }

@@ -15,7 +15,6 @@
 	import { LOADING_ICON, MOON_CIRCLE, STAR_ICON, FLAME_ICON } from '@lib/icons'
 	import { getMarketInfo } from '@api/markets'
 	import { marketInfos, marketSearchQuery, marketsSortKey, marketsSorted, selectedMarket, marketsFilter, starredMarkets } from '@lib/stores'
-	import { getMarketTickers } from '@api/prices'
 	import { saveUserSetting } from '@lib/utils'
 
 	let isLoading = true;
@@ -28,10 +27,6 @@
 		t = setTimeout(fetchData, 2 * 60 * 1000);
 	}
 	$: fetchData();
-
-	onMount(() => {
-		getMarketTickers('all', 'latest');
-	});
 
 	let columns = [
 		{key: 'market', gridTemplate: '115px', sortable: true},
@@ -85,6 +80,7 @@
 		color: var(--text0);
 		text-decoration: none;
 		grid-template-columns: var(--grid-template);
+		font-size: 90%;
 	}
 	.market-row:hover {
 		background-color: var(--layer100);
@@ -127,6 +123,7 @@
 		display: flex;
 		align-items: center;
 		padding: 10px 25px;
+		font-size: 90%;
 	}
 	.nav a {
 		cursor: pointer;

@@ -84,6 +84,8 @@
 
 		await checkCode();
 
+		getMarketTickers('all', 'latest');
+
 	});
 
 	// User asset balances
