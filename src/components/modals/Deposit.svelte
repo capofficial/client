@@ -98,7 +98,7 @@
 
 		<div>
 			{#if asset != 'ETH' && $allowances[asset]?.['FundStore'] * 1 <= amount * 1}
-			<Button label={`Approve ${asset}`} on:click={_approveAsset} />
+			<Button noSubmit={true} label={`Approve ${asset}`} on:click={_approveAsset} />
 			{:else}
 			<Button isLoading={isSubmitting} label={`Deposit`} />
 			{/if}

@@ -75,7 +75,7 @@
 
 			<div>
 				{#if $allowances['CAP']?.['FundStore'] * 1 <= amount * 1}
-				<Button label={`Approve CAP`} on:click={_approveAsset} />
+				<Button noSubmit={true} label={`Approve CAP`} on:click={_approveAsset} />
 				{:else}
 				<Button isLoading={isSubmitting} label={`Stake`} />
 				{/if}
