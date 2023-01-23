@@ -50,6 +50,11 @@ nav a:hover {
   color: var(--text0);
 }
 
+@media all and (max-width: 600px) {
+  nav {
+    grid-gap: 16px;
+  }
+}
 
 .hero {
   text-align: center;
@@ -70,6 +75,12 @@ h1 {
   max-width: 900px;
   font-weight: 400;
   text-transform: uppercase;
+}
+
+@media all and (max-width: 600px) {
+  h1 {
+    font-size: 36px;
+  }
 }
 
 h3 {
@@ -110,6 +121,17 @@ h3 {
    display: grid;
    grid-template-columns: 1fr 1fr 1fr 1fr;
    max-width: 1020px;
+}
+
+@media all and (max-width: 600px) {
+  .stats {
+    grid-template-columns: 100%;
+    grid-template-rows: auto auto auto auto;
+    grid-gap: 32px;
+    height: auto;
+    width: 100%;
+    margin-bottom: 64px;
+  }
 }
 
 .stat {
@@ -189,6 +211,15 @@ h4 {
   grid-gap: 15px;
 }
 
+@media all and (max-width: 600px) {
+  .grid {
+    grid-template-columns: 100%;
+    grid-template-rows: repeat(12, auto);
+    height: auto;
+    width: 100%;
+  }
+}
+
 .box {
   background-color: var(--layer0-hover);
   border-radius: 15px;
@@ -220,6 +251,11 @@ h4 {
   gap: 50px;
   margin-bottom: 50px;
 }
+@media all and (max-width: 600px) {
+  .partners {
+    flex-direction: column;
+  }
+}
 
 .partners img {
   min-height: 25px;
@@ -243,6 +279,15 @@ footer {
   margin: 0 auto;
   max-width: 1120px;
   grid-gap: 30px;
+}
+
+@media all and (max-width: 600px) {
+  .footer-inner {
+    grid-template-columns: 100%;
+    grid-template-rows: repeat(5, auto);
+    height: auto;
+    width: 100%;
+  }
 }
 
 .footer-inner .category {
@@ -478,7 +523,7 @@ footer {
 
     <h2 data-textify>A Staple of DeFi Since 2020</h2>
 
-    <h4 data-textify>CAP pioneered on-demand oracle settlement and continues to contribute to the DeFi community.</h4>
+    <h4 data-textify>CAP pioneered on-demand oracles and continues to contribute to the DeFi community.</h4>
 
     <div class='partners'>
       <a href='https://portfolio.nansen.ai/?utm_campaign=portfolio_cap_27oct22' target='_blank'><img src='im/partners/nansen.png'></a>
