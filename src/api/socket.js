@@ -1,7 +1,7 @@
 import { get } from 'svelte/store'
 import { PriceServiceConnection } from "@pythnetwork/pyth-common-js";
 import { Buffer } from "buffer";
-import { prices, marketInfos } from '@lib/stores'
+import { prices, marketInfos, priceTimestamps } from '@lib/stores'
 
 export class EvmPriceServiceConnection extends PriceServiceConnection {
   /**
@@ -74,6 +74,10 @@ export function connectSocket() {
 				// console.log(market, price);
 				prices.update((p) => {
 					p[market] = price;
+					return p;
+				});
+				priceTimestamps.update((p) => {
+					p[market] = Date.now() / 1000;
 					return p;
 				});
 			} catch(e) {

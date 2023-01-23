@@ -17,6 +17,7 @@
 	export let isEmpty;
 	export let infiniteScroll = false;
 	export let itemsPerPage = 0;
+	export let minWidth = false;
 
 	function setSortKey(key) {
 		if (!sortKey || !sortKey[0] || sortKey[0] != key) {
@@ -74,6 +75,41 @@
 </script>
 
 <style>
+
+	.table-wrapper {
+
+	}
+
+	@media all and (max-width: 600px) {
+		.table-wrapper  {
+			max-width: 100%;
+			overflow-x: scroll;
+			scrollbar-color: var(--layer200);
+			scrollbar-width: thin;
+		}
+		.table-wrapper::-webkit-scrollbar-track {
+			background-color: transparent;
+			border-radius: 6px;
+		}
+		.table-wrapper::-webkit-scrollbar {
+			height: 5px;
+			background-color: transparent;
+		}
+		.table-wrapper::-webkit-scrollbar-thumb {
+			border-radius: 6px;
+			background-color: var(--layer200);
+		}
+		.data-wrapper {
+			height: 100%;
+			overflow-x: visible;
+			overflow-y: visible !important;
+			scrollbar-width: unset;
+			scrollbar-color: transparent;
+		}
+		.table.min-width {
+			min-width: 1440px;
+		}
+	}
 
 	.table {
 		height: 100%;
@@ -159,7 +195,9 @@
 
 </style>
 
-<div class='table' style={`--grid-template: ${gridTemplate};`}>
+<div class='table-wrapper no-scrollbar'>
+
+<div class={`table ${minWidth ? 'min-width' :''}`} style={`--grid-template: ${gridTemplate};`}>
 	
 	<div class='columns' id='columns'>
 		{#each columns as column}
@@ -179,7 +217,7 @@
 			{:else if column.key == 'tools'}
 				<div></div>
 			{:else}
-				<div>{getLabelForKey(column.key)}</div>
+				<div style={column.rightAlign ? 'justify-content: flex-end' : ''}>{getLabelForKey(column.key)}</div>
 			{/if}
 		{/each}
 	</div>
@@ -195,5 +233,7 @@
 		{/if}
 
 	</div>
+
+</div>
 
 </div>

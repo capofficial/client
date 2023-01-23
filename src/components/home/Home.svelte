@@ -138,7 +138,7 @@ h3 {
 }
 
 .stat .value img {
-  height: 40px;
+  height: 36px;
 }
 
 .stat .label {
@@ -301,15 +301,15 @@ footer {
       </div>
 
       <div class='stat'>
-        <div class='value grayed'>
-          <img src='im/market-logos.svg'> +100
+        <div class='value'>
+          30+
         </div>
         <div class='label'>Markets</div>
       </div>
 
       <div class='stat'>
-        <div class='value'><img src='im/asset-logos.svg'></div>
-        <div class='label'>Collaterals</div>
+        <div class='value'>1000s</div>
+        <div class='label'>Of Traders</div>
       </div>
 
       <div class='stat'>
@@ -520,6 +520,7 @@ footer {
         <div class='item'><a href='/trade' class=''>Trade</a></div>
         <div class='item'><a href='/pool' class=''>Pool</a></div>
         <div class='item'><a href='/stake' class=''>Stake</a></div>
+        <div class='item'><a href='/leaderboard' class=''>Leaderboard</a></div>
         <div class='item'><a href='https://app.uniswap.org/#/swap?inputCurrency=ETH&outputCurrency=0x031d35296154279dc1984dcd93e392b1f946737b' target='_blank'>Buy CAP</a></div>
       </div>
         
@@ -536,6 +537,7 @@ footer {
         <div class='category'>Community</div>
         <div class='item'><a href='https://discord.gg/zkdr8vnujz' target='_blank'>Discord</a></div>
         <div class='item'><a href='https://twitter.com/CapDotFinance' target='_blank'>Twitter</a></div>
+        <div class='item'><a href='https://capfinance.medium.com/' target='_blank'>Medium</a></div>
         <div class='item'><a href='https://github.com/0xcap' target='_blank'>Github</a></div>
         <div class='item'><a href='https://cap.finance/whitepaper_mm.pdf' target='_blank'>Whitepapers</a></div>
       </div>

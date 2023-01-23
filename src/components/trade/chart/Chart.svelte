@@ -51,7 +51,7 @@
 	.current-ohlc {
 		font-size: 80%;
 		margin-left: 16px;
-		line-height: 1.518;
+		line-height: 1.418;
 	}
 	.chart {
 		height: 100%;

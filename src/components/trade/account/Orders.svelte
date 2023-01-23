@@ -201,6 +201,11 @@
 	.wrapper {
 		max-height: calc(var(--account-height) - 50px - 39px);
 	}
+	@media all and (max-width: 600px) {
+		.wrapper {
+			max-height: 100%;
+		}
+	}
 </style>
 
 <Table
@@ -209,6 +214,7 @@
 	columns={columns}
 	isLoading={false}
 	isEmpty={$ordersSorted.length == 0}
+	minWidth={true}
 >
 	
 	<div class='wrapper'>

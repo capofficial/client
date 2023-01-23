@@ -121,7 +121,8 @@ export function formatPriceForDisplay(price) {
 	}
 }
 
-export function numberWithCommas(amount) {   // Get Commafied Value 
+export function numberWithCommas(amount) {
+	if (!amount) return 0;
 	let formattedAmount = formatForDisplay(amount) * 1;
 	return formattedAmount.toLocaleString(get(locale));
 }
@@ -271,10 +272,7 @@ export function formatPosition(position, preProcessing) {
 	position.size = formatUnits(position.size, units);
 	position.price = formatUnits(position.price);
 
-	if (preProcessing)
-	{
 	position.leverage = Math.ceil(position.size * 1000 / position.margin)/1000;
-	}
 	
 	return position;
 }

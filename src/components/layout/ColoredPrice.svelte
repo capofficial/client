@@ -24,7 +24,7 @@
 			if (!priceElem) return;
 			priceElem.classList.remove('green');
 			priceElem.classList.remove('red');
-		}, 4000);
+		}, 1000);
 		previousPrice = p;
 	}
 

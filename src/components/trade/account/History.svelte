@@ -234,6 +234,11 @@
 	.wrapper {
 		max-height: calc(var(--account-height) - 50px - 39px);
 	}
+	@media all and (max-width: 600px) {
+		.wrapper {
+			max-height: 100%;
+		}
+	}
 </style>
 
 <Table
@@ -244,6 +249,7 @@
 	infiniteScroll={true}
 	itemsPerPage={DEFAULT_HISTORY_COUNT}
 	isEmpty={$historySorted.length == 0}
+	minWidth={true}
 >
 	<div class='wrapper'>
 	{#each formattedHistory as item}

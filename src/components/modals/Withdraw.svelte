@@ -77,7 +77,7 @@
 			</div>
 
 			<div class="group">
-				<LabelValue label='Available' value={formatForDisplay($poolStakes[asset])} />
+				<LabelValue label='Available' value={formatForDisplay($poolStakes[asset])} isClickable={true} on:click={() => {amount = $poolStakes[asset]}} />
 			</div>
 
 			{#if $poolWithdrawalFees[asset]}

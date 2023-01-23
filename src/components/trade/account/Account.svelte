@@ -9,7 +9,7 @@
 
 	import tooltip from '@lib/tooltip'
 
-	import { TABLE_ICON, FILTER_ICON, XMARK_ICON } from '@lib/icons'
+	import { TABLE_ICON, FILTER_ICON, XMARK_ICON, TROPHY_ICON } from '@lib/icons'
 	import { address, ordersSorted, positionsSorted } from '@lib/stores'
 	import { showModal } from '@lib/ui'
 
@@ -92,6 +92,7 @@
 <style>
 
 	.account {
+		width: 100%;
 		max-height: var(--account-height);
 	}
 
@@ -146,9 +147,28 @@
 	.tools a:hover {
 		color: var(--text0);
 	}
-	.tools a :global(svg) {
+	.tools a:not(.leaderboard-link) :global(svg) {
 		fill: currentColor;
 		height: 16px;
+	}
+
+	.tools a.leaderboard-link {
+		text-decoration: none;
+		padding: 6px 8px;
+		background-color: var(--layer50);
+		border-radius: 5px;
+		color: gold;
+		font-size: 85%;
+	}
+	.leaderboard-link .text {
+		margin-left: 6px;
+	}
+	.tools a.leaderboard-link:hover {
+		background-color: var(--layer100);
+	}
+	.tools a.leaderboard-link :global(svg) {
+		fill: gold !important;
+		height: 12px;
 	}
 
 	.count {
@@ -162,6 +182,15 @@
 	.active .count {
 	 	color: var(--primary);
 		background-color: var(--primary-highlighted);
+	}
+
+	@media all and (max-width: 600px) {
+		.account, .account-wrapper {
+			max-height: 100%;
+		}
+		.leaderboard-link .text {
+			display: none;
+		}
 	}
 	
 </style>
@@ -177,6 +206,7 @@
 			<a class:active={panel == 'history'} on:click={() => {panel = 'history'}}>History</a>
 		</div>
 		<div class='tools'>
+			<a class='leaderboard-link' href='/leaderboard'>{@html TROPHY_ICON} <span class='text'>Leaderboard</span></a>
 			{#if panel == 'history'}
 				<a on:click|stopPropagation={() => {showModal('HistoryOrderStatus')}} use:tooltip={{content: 'Filter history'}}>{@html FILTER_ICON}</a>
 			{/if}

@@ -75,6 +75,21 @@
 		font-weight: 500;
 	}
 
+	@media all and (max-width: 600px) {
+		.settings {
+			display: none;
+		}
+		.address {
+			padding: 6px 10px;
+		}
+		.address :global(svg) {
+			margin-right: 0;
+		}
+		.address-body {
+			display: none;
+		}
+	}
+
 </style>
 
 <div class='connect'>
@@ -87,7 +102,7 @@
 		{:else}
 		<div class='address'>
 			{@html CHECKMARK_CIRCLE_ICON}
-			{shortAddress($address)}
+			<span class='address-body'>{shortAddress($address)}</span>
 		</div>
 		{/if}
 
