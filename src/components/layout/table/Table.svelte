@@ -77,7 +77,7 @@
 <style>
 
 	.table-wrapper {
-
+		height: 100%;
 	}
 
 	@media all and (max-width: 600px) {
