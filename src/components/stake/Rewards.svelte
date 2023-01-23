@@ -35,6 +35,12 @@
 
 <style>
 
+	@media all and (max-width: 600px) {
+		.table, .header {
+			min-width: 960px;
+		}
+	}
+	
 	.stake-cap {
 		margin-top: 48px;
 	}

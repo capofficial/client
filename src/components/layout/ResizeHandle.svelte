@@ -43,7 +43,6 @@
 		box-sizing: border-box;
 	}
 	.inner {
-		background-color: var(--layer100);
 		height: 1px;
 	}
 	.handle:hover .inner {

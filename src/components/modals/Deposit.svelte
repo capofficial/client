@@ -8,9 +8,10 @@
 	import { onMount } from 'svelte'
 
 	import { BPS_DIVIDER } from '@lib/config'
+	import { numberWithCommas } from '@lib/formatters'
 	import { deposit, getPoolWithdrawalFee } from '@api/pool'
-	import { approveAsset, getAllowance } from '@api/assets'
-	import { allowances, poolWithdrawalFees } from '@lib/stores'
+	import { approveAsset, getAllowance, getUserAssetBalances } from '@api/assets'
+	import { allowances, poolWithdrawalFees, balances } from '@lib/stores'
 	import { focusInput, hideModal } from '@lib/ui'
 	import { getAssets } from '@lib/utils'
 
@@ -49,6 +50,7 @@
 	onMount(() => {
 		selectAsset('ETH');
 		focusInput('Amount');
+		getUserAssetBalances();
 	});
 
 </script>
@@ -85,7 +87,11 @@
 		<div class="group">
 			<Input label='Amount' bind:value={amount} />
 		</div>
-		
+
+		<div class="group">
+			<LabelValue label='Available' value={numberWithCommas($balances[asset])} isClickable={true} on:click={() => {amount = $balances[asset]}} />
+		</div>
+
 		{#if $poolWithdrawalFees[asset]}
 		<div class='note'>There are no deposit fees. The withdrawal fee is currently {$poolWithdrawalFees[asset]}%.</div>
 		{/if}

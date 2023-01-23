@@ -81,6 +81,7 @@
 	.right {
 		display: flex;
 		align-items: center;
+		margin-left: 12px;
 	}
 
 	.moon-icon {
@@ -134,13 +135,13 @@
 	}
 
 	@media all and (max-width: 600px) {
-		.ticker {
-			display: block;
-		}
 		.selected-market {
-			width: 100%;
+			width: auto;
 		}
-		.stats {
+		.box {
+			margin-right: 0;
+		}
+		.no-mobile {
 			display: none;
 		}
 	}
@@ -165,31 +166,31 @@
 				<ColoredPrice price={$prices[$selectedMarket]} />
 			</div>
 		</div>
-		<div class='box'>
+		<div class='box no-mobile'>
 			<div class='label'>Chainlink</div>
 			<div class='value'>
 				{formatPriceForDisplay($chainlinkPrice) || '-'}
 			</div>
 		</div>
-		<div class='box' use:tooltip={{content: `24h: ${formatForDisplay($fundingRate24h*100) || 0}%`}}>
+		<div class='box no-mobile' use:tooltip={{content: `24h: ${formatForDisplay($fundingRate24h*100) || 0}%`}}>
 			<div class='label'>Funding / 1h</div>
 			<div class='value'>
 				{formatForDisplay($fundingRate*100) || 0}%
 			</div>
 		</div>
-		<div class='box'>
+		<div class='box no-mobile'>
 			<div class='label'>24h Change</div>
 			<div class='value' class:green={$lastDayChange.price*1 >= 0} class:red={$lastDayChange.price*1 < 0}>
 				{@html formatPnl($lastDayChange.price, false, true)} ({@html formatPnl($lastDayChange.percent, true)})
 			</div>
 		</div>
-		<div class='box'>
+		<div class='box no-mobile'>
 			<div class='label'>24h High</div>
 			<div class='value'>
 				{formatPriceForDisplay($ohlc[$selectedMarket]?.h) || '-'}
 			</div>
 		</div>
-		<div class='box'>
+		<div class='box no-mobile'>
 			<div class='label'>24h Low</div>
 			<div class='value'>
 				{formatPriceForDisplay($ohlc[$selectedMarket]?.l) || '-'}

@@ -50,6 +50,11 @@ nav a:hover {
   color: var(--text0);
 }
 
+@media all and (max-width: 600px) {
+  nav {
+    grid-gap: 16px;
+  }
+}
 
 .hero {
   text-align: center;
@@ -70,6 +75,12 @@ h1 {
   max-width: 900px;
   font-weight: 400;
   text-transform: uppercase;
+}
+
+@media all and (max-width: 600px) {
+  h1 {
+    font-size: 36px;
+  }
 }
 
 h3 {
@@ -112,6 +123,17 @@ h3 {
    max-width: 1020px;
 }
 
+@media all and (max-width: 600px) {
+  .stats {
+    grid-template-columns: 100%;
+    grid-template-rows: auto auto auto auto;
+    grid-gap: 32px;
+    height: auto;
+    width: 100%;
+    margin-bottom: 64px;
+  }
+}
+
 .stat {
   padding: 20px;
 }
@@ -138,7 +160,7 @@ h3 {
 }
 
 .stat .value img {
-  height: 40px;
+  height: 36px;
 }
 
 .stat .label {
@@ -189,6 +211,15 @@ h4 {
   grid-gap: 15px;
 }
 
+@media all and (max-width: 600px) {
+  .grid {
+    grid-template-columns: 100%;
+    grid-template-rows: repeat(12, auto);
+    height: auto;
+    width: 100%;
+  }
+}
+
 .box {
   background-color: var(--layer0-hover);
   border-radius: 15px;
@@ -220,6 +251,11 @@ h4 {
   gap: 50px;
   margin-bottom: 50px;
 }
+@media all and (max-width: 600px) {
+  .partners {
+    flex-direction: column;
+  }
+}
 
 .partners img {
   min-height: 25px;
@@ -243,6 +279,15 @@ footer {
   margin: 0 auto;
   max-width: 1120px;
   grid-gap: 30px;
+}
+
+@media all and (max-width: 600px) {
+  .footer-inner {
+    grid-template-columns: 100%;
+    grid-template-rows: repeat(5, auto);
+    height: auto;
+    width: 100%;
+  }
 }
 
 .footer-inner .category {
@@ -301,15 +346,15 @@ footer {
       </div>
 
       <div class='stat'>
-        <div class='value grayed'>
-          <img src='im/market-logos.svg'> +100
+        <div class='value'>
+          30+
         </div>
         <div class='label'>Markets</div>
       </div>
 
       <div class='stat'>
-        <div class='value'><img src='im/asset-logos.svg'></div>
-        <div class='label'>Collaterals</div>
+        <div class='value'>1000s</div>
+        <div class='label'>Of Traders</div>
       </div>
 
       <div class='stat'>
@@ -478,7 +523,7 @@ footer {
 
     <h2 data-textify>A Staple of DeFi Since 2020</h2>
 
-    <h4 data-textify>CAP pioneered on-demand oracle settlement and continues to contribute to the DeFi community.</h4>
+    <h4 data-textify>CAP pioneered on-demand oracles and continues to contribute to the DeFi community.</h4>
 
     <div class='partners'>
       <a href='https://portfolio.nansen.ai/?utm_campaign=portfolio_cap_27oct22' target='_blank'><img src='im/partners/nansen.png'></a>
@@ -520,6 +565,7 @@ footer {
         <div class='item'><a href='/trade' class=''>Trade</a></div>
         <div class='item'><a href='/pool' class=''>Pool</a></div>
         <div class='item'><a href='/stake' class=''>Stake</a></div>
+        <div class='item'><a href='/leaderboard' class=''>Leaderboard</a></div>
         <div class='item'><a href='https://app.uniswap.org/#/swap?inputCurrency=ETH&outputCurrency=0x031d35296154279dc1984dcd93e392b1f946737b' target='_blank'>Buy CAP</a></div>
       </div>
         
@@ -536,6 +582,7 @@ footer {
         <div class='category'>Community</div>
         <div class='item'><a href='https://discord.gg/zkdr8vnujz' target='_blank'>Discord</a></div>
         <div class='item'><a href='https://twitter.com/CapDotFinance' target='_blank'>Twitter</a></div>
+        <div class='item'><a href='https://capfinance.medium.com/' target='_blank'>Medium</a></div>
         <div class='item'><a href='https://github.com/0xcap' target='_blank'>Github</a></div>
         <div class='item'><a href='https://cap.finance/whitepaper_mm.pdf' target='_blank'>Whitepapers</a></div>
       </div>

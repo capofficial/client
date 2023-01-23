@@ -26,6 +26,12 @@
 
 <style>
 
+	@media all and (max-width: 600px) {
+		.table, .header {
+			min-width: 960px;
+		}
+	}
+	
 	.table {
 		--grid-template: repeat(6, 1fr);
 	}

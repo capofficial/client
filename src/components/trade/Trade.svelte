@@ -51,7 +51,7 @@
 	@media all and (max-width: 600px) {
 		.grid {
 			grid-template-rows: auto 300px 300px auto var(--account-height);
-			grid-template-columns: 1fr;
+			grid-template-columns: 100%;
 			grid-template-areas: 
 				"ticker"
 				"markets"
@@ -61,6 +61,7 @@
 			grid-gap: 1px;
 			height: auto;
 			overflow: initial; /* overflow fix */
+			width: 100%;
 		}
 	}
 	
@@ -80,6 +81,7 @@
 		grid-area: account;
 		overflow: hidden;
 		background-color: var(--layer0);
+		width: 100%;
 	}
 	.sidebar {
 		grid-area: sidebar;

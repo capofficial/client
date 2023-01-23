@@ -42,13 +42,15 @@ export async function getMarketTickers(market, type) {
 						x[m] = json[m];
 						return x;
 					});
-					const currentPrice = get(prices)[m];
-					if (!currentPrice) {
-						prices.update((p) => {
-							p[m] = json[m]['c'];
-							return p;
-						});
-					}
+					setTimeout(() => {
+						const currentPrice = get(prices)[m];
+						if (!currentPrice) {
+							prices.update((p) => {
+								p[m] = json[m]['c'];
+								return p;
+							});
+						}
+					}, 5000); // basically just for closed markets
 				}
 			} else {
 				ohlc.update((x) => {

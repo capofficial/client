@@ -42,6 +42,7 @@
 		balances,
 		maxSize,
 		prices,
+		priceTimestamps,
 		submittingOrder
 	} from '@lib/stores'
 
@@ -64,7 +65,7 @@
 	
 	let highlightedPriceButton;
 	async function submit() {
-		if (!$size) return focusInput('Size');
+		if (!$size) return;
 		submitOrder();
 		highlightedPriceButton = null;
 	}
@@ -176,6 +177,18 @@
 
 	$: calculateTPSLPercentFromPrices($tpPrice, $slPrice);
 	$: calculateTPSLFromPercent(tpProfitPercent, slLossPercent);
+
+	function _focusInput(name, isActive) {
+		if (!isActive) return;
+		setTimeout(() => {
+			focusInput(name);
+		}, 100);
+	}
+
+	$: _focusInput('Price', $hasTrigger);
+	$: _focusInput('TP Price', $hasTP);
+	$: _focusInput('SL Price', $hasSL);
+	$: _focusInput('Best Price', $isProtectedOrder);
 	
 </script>
 
@@ -184,6 +197,7 @@
 	.new-order {
 		height: 100%;
 		background-color: var(--layer25);
+		overflow-y: scroll;
 		/*box-shadow:
 		0px 6px 10px 0px hsla(0,0%,0%,0.14), 
 		0px 1px 18px 0px hsla(0,0%,0%,0.12), 
@@ -292,7 +306,7 @@
 
 </style>
 
-<div class='new-order'>
+<div class='new-order no-scrollbar'>
 
 	<div class='header'>
 		<DirectionSelect />
@@ -396,7 +410,7 @@
 				{#if $selectedAsset != 'ETH' && $allowances[$selectedAsset]?.['FundStore'] * 1 <= $margin * 1}
 				<Button noSubmit={true} isLoading={isApproving} isRed={!$isLong} label={`Approve ${$selectedAsset}`} on:click={_approveAsset} />
 				{:else}
-				<Button isLoading={$submittingOrder} isRed={!$isLong} label={`Submit ${$isLong ? 'Buy' : 'Sell'} Order`} />
+				<Button isLoading={$submittingOrder} isRed={!$isLong} label={`${$isLong ? 'Buy / Long' : 'Sell / Short'}`} />
 				{/if}
 			</div>
 
@@ -407,7 +421,12 @@
 		<div class='od'>
 			<OrderDetails market={$selectedMarket} asset={$selectedAsset} size={$size} />
 		</div>
-	
+
+		{#if $priceTimestamps[$selectedMarket] && $priceTimestamps[$selectedMarket] * 1 < Date.now() / 1000 - 2 * 60}
+		<div class='top-spacing warning'>
+			This market's price hasn't updated in a while. The market might be closed and submitted orders cancelled.
+		</div>
+		{/if}
 	</div>
 
 </div>

@@ -1,10 +1,14 @@
 <script>
 	import { onMount, onDestroy } from 'svelte'
 
+	import Table from '@components/layout/table/Table.svelte'
+	import Row from '@components/layout/table/Row.svelte'
+	import Cell from '@components/layout/table/Cell.svelte'
+
 	import { getLeaderboard } from '@api/leaderboard' 
 
 	import { leaderboard } from '@lib/stores'
-	import { formatPnl } from '@lib/formatters'
+	import { formatPnl, numberWithCommas } from '@lib/formatters'
 	import { shortAddress } from '@lib/utils'
 
 	let isLoading = true, t;
@@ -12,6 +16,7 @@
 	let showPreviousLeaderboard = false;
 
 	async function loadLeaderboard(isPrevious) {
+		isLoading = true
 		if (isPrevious) {
 			showPreviousLeaderboard = true;
 			await getLeaderboard({previous: true});
@@ -19,6 +24,7 @@
 			showPreviousLeaderboard = false;
 			await getLeaderboard();
 		}
+		isLoading = false;
 	}
 
 	onMount(() => {
@@ -38,12 +44,18 @@
 	const lastMonth = lastMonthDate.toLocaleString('default', { month: 'short' });
 	const lastMonthYear = lastMonthDate.getFullYear();
 
+	// SET PRIZES HERE
+
 	let currentPrizes = {
-		1: '25000'
+		1: '25000',
+		2: '10000',
+		3: '5000'
 	};
 
 	let previousPrizes = {
-		1: '25000'
+		1: '25000',
+		2: '10000',
+		3: '5000'
 	};
 
 	function getPrize(rank) {
@@ -58,10 +70,6 @@
 		padding: 20px var(--base-padding);
 		max-width: 1280px;
 		margin: 0 auto;
-	}
-	
-	.table {
-		--grid-template: 70px 1fr 1fr 1fr;
 	}
 
 	.header {
@@ -80,6 +88,10 @@
 		color: var(--text300);
 	}
 
+	.buttons a:first-child {
+		margin-right: 8px;
+	}
+
 	.buttons a {
 		color: var(--primary);
 	}
@@ -88,51 +100,6 @@
 		color: var(--text0);
 		font-weight: 600;
 		pointer-events: none;
-	}
-
-	.table {
-		border: 1px solid var(--layer100);
-		border-radius: 6px;
-	}
-
-	.table-header {
-		display: grid;
-		align-items: center;
-		height: 38px;
-		border-bottom: 1px solid var(--layer100);
-		grid-template-columns: var(--grid-template);
-		color: var(--text300);
-		font-size: 85%;
-	}
-
-	.row {
-		display: grid;
-		align-items: center;
-		grid-template-columns: var(--grid-template);
-		border-bottom: 1px solid var(--layer0-hover);
-		height: 50px;
-	}
-
-	.cell {
-		display: flex;
-		align-items: center;
-		text-transform: capitalize;
-		height: 100%;
-		padding: 0 25px;
-		justify-content: flex-end;
-		text-align: right;
-	}
-	.cell.la {
-		justify-content: flex-start;
-		text-align: left;
-	}
-	.cell.highlighted {
-		background-color: var(--layer50);
-	}
-
-	.cell img {
-		margin-right: 8px;
-		width: 18px;
 	}
 
 	.grayed {
@@ -157,28 +124,31 @@
 			<div class='subtitle'>Win prizes every month based on your trading P/L.</div>
 		</div>
 		<div class='right buttons'>
-			<a class:active={showPreviousLeaderboard == false} on:click={() => {loadLeaderboard()}}>Current Month</a> | 
+			<a class:active={showPreviousLeaderboard == false} on:click={() => {loadLeaderboard()}}>This Month</a>
 			<a class:active={showPreviousLeaderboard == true} on:click={() => {loadLeaderboard(true)}}>Last Month</a>
 		</div>
 	</div>
 
-	<div class='table'>
-		<div class='table-header'>
-			<div class='cell la'>Rank</div>
-			<div class='cell la'>User</div>
-			<div class='cell'>P/L ($)</div>
-			<div class='cell highlighted'>Prize ($)</div>
-		</div>
-		<div class='table-body'>
-			{#each $leaderboard as { user, pnlUsd }, i }
-			<div class='row'>
-				<div class='cell la'>{i+1}</div>
-				<div class='cell la'>{shortAddress(user)}</div>
-				<div class={`cell ${pnlUsd * 1 >= 0 ? 'green' : 'red'}`}>{@html formatPnl(pnlUsd)}</div>
-				<div class='cell'>{getPrize(i+1) || "-"}</div>
-			</div>
-			{/each}
-		</div>
-	</div>
+	<Table
+		defaultSortKey={[]}
+		sortKey={['rank', false]}
+		columns={[
+		{key: 'Rank', gridTemplate: '70px', sortable: false},
+		{key: 'User', gridTemplate: '1fr', sortable: false},
+		{key: 'P/L ($)', gridTemplate: '1fr', sortable: false, rightAlign: true},
+		{key: 'Prize ($)', gridTemplate: '1fr', sortable: false, rightAlign: true},
+	]}
+		isLoading={isLoading}
+		isEmpty={$leaderboard.length == 0}
+	>
+		{#each $leaderboard as { user, pnlUsd }, i }
+			<Row>
+				<Cell>{i+1}</Cell>
+				<Cell>{shortAddress(user)}</Cell>
+				<Cell rightAlign={true}><span class={`cell ${pnlUsd * 1 >= 0 ? 'green' : 'red'}`}>{@html formatPnl(pnlUsd)}</span></Cell>
+				<Cell rightAlign={true}>{numberWithCommas(getPrize(i+1)) || "-"}</Cell>
+			</Row>
+		{/each}
+	</Table>
 
 </div>
