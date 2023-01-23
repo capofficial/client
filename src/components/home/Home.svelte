@@ -409,7 +409,7 @@ footer {
 
         </div>
         <div class='title'>Multi-Collateral</div>
-        <div class='text'>Use ETH, USDC, or WBTC as margin when placing trades.</div>
+        <div class='text'>Use ETH or USDC as margin when placing trades.</div>
       </div>
 
       <div class='box'>
