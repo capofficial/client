@@ -71,7 +71,7 @@ h1,h2,h3,h4,h5 {
 h1 {
   line-height: 1.218;
   margin: 24px auto;
-  font-size: 48px;
+  font-size: 64px;
   max-width: 900px;
   font-weight: 400;
   text-transform: uppercase;
@@ -79,7 +79,7 @@ h1 {
 
 @media all and (max-width: 600px) {
   h1 {
-    font-size: 36px;
+    font-size: 48px;
   }
 }
 
@@ -336,7 +336,7 @@ footer {
       <a class='button ' href='/trade'>Start Trading →</a>
     </div>
 
-    <div class='note'>CAP is currently in private beta.</div>
+    <div class='note'>CAP is currently in public beta.</div>
 
     <div class='stats'>
 
@@ -547,7 +547,7 @@ footer {
       <a class='button ' href='/trade'>Start Trading →</a>
     </div>
 
-    <div class='note' data-textify>CAP is currently in private beta.</div>
+    <div class='note' data-textify>CAP is currently in public beta.</div>
 
   </div>
 

@@ -36,7 +36,7 @@
 		<div class='row'>
 			<LabelValue 
 				label={'Margin'}
-				value={`${formatForDisplay($margin)} ${asset}`}
+				value={`${$margin ? `${formatForDisplay($margin)} ${asset}` : '-'}`}
 			/>
 		</div>
 
@@ -70,7 +70,7 @@
 		<div class='row'>
 			<LabelValue 
 				label='Size (USD)' 
-				value={`$${formatForDisplay($sizeInUsd)}`}
+				value={`${size > 0 ? `$${formatForDisplay($sizeInUsd)}` : '-'}`}
 			/>
 			
 		</div>

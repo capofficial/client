@@ -56,7 +56,7 @@
 	}
 
 	.value {
-
+		text-transform: capitalize;
 	}
 
 	.clickable {

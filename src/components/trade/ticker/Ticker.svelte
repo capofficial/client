@@ -6,7 +6,7 @@
 	import ColoredPrice from '@components/layout/ColoredPrice.svelte'
 
 	import { formatForDisplay, formatPnl, formatMarketName, formatPriceForDisplay } from '@lib/formatters'
-	import { selectedAsset, selectedMarket, selectedMarketInfo, chainlinkPrice, ohlc, fundingRate, fundingRate24h, lastDayChange, prices } from '@lib/stores'
+	import { selectedAsset, selectedMarket, selectedMarketInfo, chainlinkPrice, ohlc, fundingRate, fundingRate24h, lastDayChange, prices, showMarkets } from '@lib/stores'
 
 	import { MOON_CIRCLE, INFO_ICON_CIRCLE } from '@lib/icons'
 

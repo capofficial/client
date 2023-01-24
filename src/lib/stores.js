@@ -19,8 +19,8 @@ export const activeModal = writable();
 export const activeError = writable();
 
 // Settings
-export const showOrdersOnChart = writable(getUserSetting('showOrdersOnChart') == undefined ? false : getUserSetting('showOrdersOnChart'));
-export const showPositionsOnChart = writable(getUserSetting('showPositionsOnChart') == undefined ? false : getUserSetting('showPositionsOnChart'));
+export const showOrdersOnChart = writable(getUserSetting('showOrdersOnChart') == undefined ? true : getUserSetting('showOrdersOnChart'));
+export const showPositionsOnChart = writable(getUserSetting('showPositionsOnChart') == undefined ? true : getUserSetting('showPositionsOnChart'));
 export const showTooltips = writable(getUserSetting('showTooltips') == undefined ? true : getUserSetting('showTooltips'));
 
 // Contracts
@@ -156,6 +156,7 @@ export const lastHistoryItemsCount = writable(0); // how many items were fetched
 export const historyOrderStatusToShow = writable(getUserSetting('historyOrderStatusToShow') || ['cancelled', 'executed', 'liquidated'])
 
 // Markets
+export const showMarkets = writable(true);
 export const marketSearchQuery = writable();
 export const marketInfos = writable({});
 export const marketList = writable([]);

@@ -26,9 +26,19 @@
 		margin-right: 20px;
 	}
 
+	.note {
+		color: var(--text300);
+		line-height: 1.318;
+		padding: 20px;
+		font-size: 85%;
+		border-bottom: 1px solid var(--layer200);
+	}
+
 </style>
 
 <Modal title='Connect Your Wallet' width={300}>
+
+	<div class='note'>By connecting your wallet, you agree to CAP's Terms of Service — in particular, that you are not a citizen or resident of the USA, Canada, or any other restricted jurisdiction.</div>
 	
 	<div class='row' on:click|stopPropagation={() => {connectMetamask()}}>
 		<img src='https://raw.githubusercontent.com/MetaMask/brand-resources/master/SVG/metamask-fox.svg'>

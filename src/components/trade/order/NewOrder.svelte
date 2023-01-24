@@ -114,15 +114,16 @@
   	// reset inputs on market change
 	function resetOrderFields() {
 		highlightedPriceButton = null;
-    		price.set();
-    		size.set();
-    		tpPrice.set();
-    		slPrice.set();
-    		hasTrigger.set(false);
-    		hasTP.set(false);
-    		hasSL.set(false);
-    		isReduceOnly.set(false)
-    		isProtectedOrder.set(false);
+		price.set();
+		size.set();
+		tpPrice.set();
+		slPrice.set();
+		showAdvanced = false;
+		hasTrigger.set(false);
+		hasTP.set(false);
+		hasSL.set(false);
+		isReduceOnly.set(false)
+		isProtectedOrder.set(false);
 	}
 	
 	$: resetOrderFields($selectedMarket);

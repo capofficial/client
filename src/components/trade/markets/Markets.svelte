@@ -14,7 +14,7 @@
 	import tooltip from '@lib/tooltip'
 	import { LOADING_ICON, MOON_CIRCLE, STAR_ICON, FLAME_ICON } from '@lib/icons'
 	import { getMarketInfo } from '@api/markets'
-	import { marketInfos, marketSearchQuery, marketsSortKey, marketsSorted, selectedMarket, marketsFilter, starredMarkets } from '@lib/stores'
+	import { marketInfos, marketSearchQuery, marketsSortKey, marketsSorted, selectedMarket, marketsFilter, starredMarkets, showMarkets } from '@lib/stores'
 	import { saveUserSetting } from '@lib/utils'
 
 	let isLoading = true;
@@ -66,6 +66,10 @@
 
 	.markets-wrapper {
 		height: 100%;
+		/*position: absolute;
+		top: 150px;
+		left: 0;
+		z-index: 100;*/
 	}
 	.search-bar {
 		padding: 20px;
@@ -156,6 +160,7 @@
 
 </style>
 
+{#if $showMarkets}
 <div class='markets-wrapper'>
 	<div class='search-bar'><Search /></div>
 	<div class='nav'>
@@ -194,3 +199,4 @@
 	</div>
 
 </div>
+{/if}
