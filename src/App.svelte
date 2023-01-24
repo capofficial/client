@@ -16,7 +16,7 @@
 
 	import { getUserAssetBalances } from '@api/assets'
 	import { listenToEvents } from '@api/listener'
-	import { getMarketTickers } from '@api/prices'
+	import { getMarketPrices } from '@api/prices'
 
 	let interval1;
 
@@ -81,11 +81,8 @@
 	}
 
 	onMount(async () => {
-
 		await checkCode();
-
-		getMarketTickers('all', 'latest');
-
+		getMarketPrices('all');
 	});
 
 	// User asset balances

@@ -88,8 +88,16 @@
 	}
 	$: fetchData($address, $selectedAsset);
 
+	let t9,timeoutElapsed;
+	onMount(() => {
+		t9 = setTimeout(() => {
+			timeoutElapsed = true;
+		}, 10000)
+	})
+
 	onDestroy(() => {
 		clearTimeout(t1);
+		clearTimeout(t9);
 	});
 
 	let sizeHighlighted;
@@ -422,9 +430,9 @@
 			<OrderDetails market={$selectedMarket} asset={$selectedAsset} size={$size} />
 		</div>
 
-		{#if $priceTimestamps[$selectedMarket] && $priceTimestamps[$selectedMarket] * 1 < Date.now() / 1000 - 2 * 60}
+		{#if timeoutElapsed && (!$priceTimestamps[$selectedMarket] || $priceTimestamps[$selectedMarket] * 1 < Date.now() / 1000 - 2 * 60)}
 		<div class='top-spacing warning'>
-			This market's price hasn't updated in a while. The market might be closed and submitted orders cancelled.
+			<strong>Market closed.</strong> This market's price hasn't changed in a while. Submitted orders might be cancelled.
 		</div>
 		{/if}
 	</div>
