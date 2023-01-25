@@ -341,7 +341,7 @@ footer {
     <div class='stats'>
 
       <div class='stat'>
-        <div class='value' id='volumeValue'>$8B+</div>
+        <div class='value' id='volumeValue'>$7B+</div>
         <div class='label'>Volume</div>
       </div>
 
@@ -523,7 +523,7 @@ footer {
 
     <h2 data-textify>A Staple of DeFi Since 2020</h2>
 
-    <h4 data-textify>CAP pioneered on-demand oracles and continues to contribute to the DeFi community.</h4>
+    <h4 data-textify>CAP Labs pioneered on-demand oracles and continues to contribute to the DeFi community.</h4>
 
     <div class='partners'>
       <a href='https://portfolio.nansen.ai/?utm_campaign=portfolio_cap_27oct22' target='_blank'><img src='im/partners/nansen.png'></a>
@@ -566,7 +566,7 @@ footer {
         <div class='item'><a href='/pool' class=''>Pool</a></div>
         <div class='item'><a href='/stake' class=''>Stake</a></div>
         <div class='item'><a href='/leaderboard' class=''>Leaderboard</a></div>
-        <div class='item'><a href='https://app.uniswap.org/#/swap?inputCurrency=ETH&outputCurrency=0x031d35296154279dc1984dcd93e392b1f946737b' target='_blank'>Buy CAP</a></div>
+        <div class='item'><a href='https://app.uniswap.org/#/swap?inputCurrency=ETH&outputCurrency=0x031d35296154279dc1984dcd93e392b1f946737b' target='_blank'>Buy CAP (Arbitrum)</a></div>
       </div>
         
       <div class='column'>
@@ -584,16 +584,14 @@ footer {
         <div class='item'><a href='https://twitter.com/CapDotFinance' target='_blank'>Twitter</a></div>
         <div class='item'><a href='https://capfinance.medium.com/' target='_blank'>Medium</a></div>
         <div class='item'><a href='https://github.com/0xcap' target='_blank'>Github</a></div>
-        <div class='item'><a href='https://cap.finance/whitepaper_mm.pdf' target='_blank'>Whitepapers</a></div>
+        <div class='item'><a href='https://cap.finance/whitepaper_mm.pdf' target='_blank'>Whitepaper</a></div>
       </div>
 
       <div class='column'>
         <div class='category'>Legal</div>
-        <div class='item grayed'><a>Terms of Use</a></div>
-        <div class='item grayed'><a>Referral Program Terms</a></div>
-        <div class='item grayed'><a>Risk Disclosure</a></div>
-        <div class='item grayed'><a>Restricted Jurisdictions</a></div>
-        <div class='item grayed'><a>Exchange Rules</a></div>
+        <div class='item'><a href='https://docs.cap.io/legal/terms-of-use'>Terms of Use</a></div>
+        <div class='item'><a href='https://docs.cap.io/legal/restricted-jurisdiction-policy'>Restricted Jurisdictions</a></div>
+        <div class='item'><a href='https://docs.cap.io/legal/risk-disclosure'>Risk Disclosure</a></div>
       </div>
 
     </div>
