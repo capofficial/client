@@ -142,7 +142,7 @@ h3 {
 }
 
 .stat .value {
-  font-size: 36px;
+  font-size: 38px;
   font-weight: 800;
   display: flex;
   align-items: center;
@@ -223,7 +223,7 @@ h4 {
 .box {
   background-color: var(--layer0-hover);
   border-radius: 15px;
-  padding: var(--base-padding);
+  padding: 30px var(--base-padding);
 }
 
 .box .icon {
