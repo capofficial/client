@@ -55,8 +55,8 @@
 	}
 
 	.buttons {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
+		display: flex;
+		gap: var(--base-padding);
 		grid-gap: var(--base-padding);
 	}
 
@@ -121,8 +121,12 @@
 			<div class='subtitle'>Pools pay out trader wins and receive losses plus fees.</div>
 		</div>
 		<div class='right buttons'>
-			<Button isSmall={true} label={`Deposit`} on:click={() => {showModal('Deposit')}} />
-			<Button isSmall={true} label={`Withdraw`} on:click={() => {showModal('Withdraw')}} />
+			{#if $address}
+				<Button isSmall={true} label={`Deposit`} on:click={() => {showModal('Deposit')}} />
+				<Button isSmall={true} label={`Withdraw`} on:click={() => {showModal('Withdraw')}} />
+			{:else}
+				<Button isSmall={true} label={`Connect Wallet`} on:click={() => {showModal('Connect')}} />
+			{/if}
 		</div>
 	</div>
 

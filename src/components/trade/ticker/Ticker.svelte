@@ -134,6 +134,12 @@
 		font-size: 80%;
 	}
 
+	@media all and (max-width: 1500px) {
+		.no-1500 {
+			display: none;
+		}
+	}
+
 	@media all and (max-width: 600px) {
 		.selected-market {
 			width: auto;
@@ -166,7 +172,7 @@
 				<ColoredPrice price={$prices[$selectedMarket]} />
 			</div>
 		</div>
-		<div class='box no-mobile'>
+		<div class='box no-1500 no-mobile'>
 			<div class='label'>Chainlink</div>
 			<div class='value'>
 				{formatPriceForDisplay($chainlinkPrice) || '-'}
@@ -184,13 +190,13 @@
 				{@html formatPnl($lastDayChange.price, false, true)} ({@html formatPnl($lastDayChange.percent, true)})
 			</div>
 		</div>
-		<div class='box no-mobile'>
+		<div class='box no-1500 no-mobile'>
 			<div class='label'>24h High</div>
 			<div class='value'>
 				{formatPriceForDisplay($ohlc[$selectedMarket]?.h) || '-'}
 			</div>
 		</div>
-		<div class='box no-mobile'>
+		<div class='box no-1500 no-mobile'>
 			<div class='label'>24h Low</div>
 			<div class='value'>
 				{formatPriceForDisplay($ohlc[$selectedMarket]?.l) || '-'}

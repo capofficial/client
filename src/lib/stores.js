@@ -131,7 +131,7 @@ function sorter(_array, _sortKey) {
 
 // Orders
 export const orders = writable([]);
-export const ordersColumnsToShow = writable(getUserSetting('ordersColumnsToShow') || ['timestamp', 'isLong', 'market', 'price', 'size', 'margin', 'orderType', 'isReduceOnly', 'tools']);
+export const ordersColumnsToShow = writable(getUserSetting('ordersColumnsToShow') || ['isLong', 'market', 'price', 'size', 'margin', 'orderType', 'isReduceOnly', 'tools']);
 export const ordersSortKey = writable(getUserSetting('ordersSortKey') || DEFAULT_ORDERS_SORT_KEY); // [columnName, isDesc]
 export const ordersSorted = derived([orders, ordersSortKey], ([$orders, $ordersSortKey]) => {
 	return sorter($orders, $ordersSortKey);
@@ -139,7 +139,7 @@ export const ordersSorted = derived([orders, ordersSortKey], ([$orders, $ordersS
 
 // Positions
 export const positions = writable([]);
-export const positionsColumnsToShow = writable(getUserSetting('positionsColumnsToShow') || ['timestamp', 'isLong', 'market', 'price', 'size', 'margin', 'upl', 'funding', 'liqprice', 'tools']);
+export const positionsColumnsToShow = writable(getUserSetting('positionsColumnsToShow') || ['isLong', 'market', 'price', 'size', 'margin', 'upl', 'funding', 'liqprice', 'tools']);
 export const positionsSortKey = writable(getUserSetting('positionsSortKey') || DEFAULT_POSITIONS_SORT_KEY); // [columnName, isDesc]
 export const positionsSorted = derived([positions, positionsSortKey], ([$positions, $positionsSortKey]) => {
 	return sorter($positions, $positionsSortKey);
@@ -147,7 +147,7 @@ export const positionsSorted = derived([positions, positionsSortKey], ([$positio
 
 // History
 export const history = writable([]);
-export const historyColumnsToShow = writable(getUserSetting('historyColumnsToShow') || ['timestamp', 'isLong', 'market', 'price', 'size', 'status', 'reason', 'pnl']);
+export const historyColumnsToShow = writable(getUserSetting('historyColumnsToShow') || ['isLong', 'market', 'price', 'size', 'status', 'reason', 'pnl']);
 export const historySortKey = writable(['timestamp', true]); // [columnName, isDesc]
 export const historySorted = derived([history, historySortKey], ([$history, $historySortKey]) => {
 	return sorter($history, $historySortKey);
