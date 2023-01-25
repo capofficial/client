@@ -38,7 +38,7 @@
 
 <Modal title='Connect Your Wallet' width={300}>
 
-	<div class='note'><strong>CAP is currently in unaudited beta.</strong> By connecting your wallet, you agree to CAP's Terms of Service — in particular, that you are not a citizen or resident of the USA, Canada, or any other restricted jurisdiction.</div>
+	<div class='note'><strong>CAP is currently in unaudited beta.</strong> By connecting your wallet, you agree to the <a href='https://docs.cap.io/legal/terms-of-use' target='_blank'>Terms of Use</a> — in particular, that you are not a citizen or resident of the USA, Canada, or any other restricted jurisdiction.</div>
 	
 	<div class='row' on:click|stopPropagation={() => {connectMetamask()}}>
 		<img src='https://raw.githubusercontent.com/MetaMask/brand-resources/master/SVG/metamask-fox.svg'>
