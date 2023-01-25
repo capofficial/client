@@ -57,6 +57,7 @@
 	}
 
 	function setValue() {
+		// console.log(maxValue, nullValue, progressPercent, value);
 		if (!maxValue || !nullValue && !progressPercent || progressPercent == undefined) return;
 		if (progressPercent == 0) {
 			if (nullValue) {
@@ -68,7 +69,11 @@
 		}
 		value = formatForDisplay(progressPercent * maxValue / 100);
 		if (integersOnly) {
-			value = Math.round(value);
+			if (nullValue) {
+				value = Math.round(value);
+			} else {
+				value = Math.ceil(value);
+			}
 		}
 	}
 
