@@ -20,89 +20,23 @@
 
 	let interval1;
 
-	let checkingCode = true;
-	let codeValid = false;
-	let error = false;
-	let code = localStorage.getItem('betaCode');
+	onMount(async () => {
 
-	async function checkCode() {
-
-		// CHECK BETA PRIVATE CODE
-
-		checkingCode = true;
-
-		localStorage.setItem('betaKey', hashString(navigator.userAgent));
-
-		if (code) {
-			const dataEndpoint = getChainData('dataEndpoint');
-			try {
-				const response = await fetch(`${dataEndpoint}/check-code?code=${code}&key=${localStorage.getItem('betaKey')}`);
-				const json = await response.json();
-
-				if (json && json.success) {
-					codeValid = true;
-					localStorage.setItem('betaCode', code);
-				} else {
-					error = true;
-				}
-			} catch(e) {
-				console.error('Code check', e);
-			}
-		}
-
-		checkingCode = false;
-
-		if (!codeValid) return;
-
-		continueWithMount();
-		
-	}
-
-	function continueWithMount() {
-
-		// Set ref code if there isn't one
-		let params = new URLSearchParams(location.search);
-		let entries = params.entries();
-		const obj = Object.fromEntries(entries);
-		if (obj && obj.r) {
-			const refCode = localStorage.getItem('refCode');
-			if (!refCode) {
-				localStorage.setItem('refCode', obj.r);
-			}
-			window.history.replaceState({}, document.title, location.pathname);
-		}
-		
 		loadRoute();
 		catchLinks((path) => navigateTo(path));
 
 		// For back button functionality
 		window.onpopstate = () => loadRoute();
 
-	}
-
-	onMount(async () => {
-		await checkCode();
 		getMarketPrices('all');
 	});
 
-	// User asset balances
-	let t1;
-	// async function fetchData() {
-	// 	clearTimeout(t1);
-	// 	await getUserAssetBalances();
-	// 	t1 = setTimeout(fetchData, 10 * 1000);
-	// }
-	// $: fetchData($address);
-
 	onDestroy(() => {
 		clearInterval(interval1);
-		clearTimeout(t1);
 	});
 
 	// Listener
 	$: listenToEvents($address);
-
-
 
 </script>
 
@@ -272,8 +206,6 @@
 
 <svelte:window on:keydown={hidePopoversOnKeydown} on:click={hidePopoversOnClick} />
 
-{#if codeValid}
-
 {#if $pageName != 'Home'}
 <Errors />
 <Modals />
@@ -282,25 +214,3 @@
 {/if}
 
 <svelte:component this={$component}/>
-
-{:else}
-
-	{#if checkingCode}
-	<div class='note'>Checking access...</div>
-	{:else if error}
-	<div class='note'>Submitted code is invalid.</div>
-	{/if}
-	
-	{#if !checkingCode}
-	<form class='code-check' on:submit|preventDefault={checkCode}>
-		<div><input placeholder="Beta code" bind:value={code}></div>
-		<div><button type='submit'>Submit</button></div>
-	</form>
-
-	<div class='note'>Enter the code you received in the Discord to access the CAP private beta.</div>
-
-	<div class='note'><strong>Important note, please read:</strong> only use funds you can afford to lose. The CAP private beta is meant for testing purposes only. There can be bugs and exploits that result in the complete loss of funds. No refunds will be made in case of lost funds. Thanks for helping CAP test its new product.</div>
-
-
-	{/if}
-{/if}

@@ -48,6 +48,6 @@
 
 <LabelValue 
 	label={`Fee (${formatForDisplay(($marketInfos[market]?.fee || 0)/100)}%)`} 
-	value={`${formatForDisplay(feeAmount)} ${asset}`}
+	value={`${feeAmount ? `${formatForDisplay(feeAmount)} ${asset}` : '-'}`}
 	isSecondaryColor={isSecondaryColor}
 />

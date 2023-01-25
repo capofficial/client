@@ -131,9 +131,11 @@
 			<div class='title'>Your Pending Rewards</div>
 			<div class='subtitle'>CAP rewards are paid directly in underlying currency.</div>
 		</div>
+		{#if $address}
 		<div class='right buttons'>
 			<Button isSmall={true} label={`Collect Rewards`} on:click={collect} />
 		</div>
+		{/if}
 	</div>
 
 	<div class='table'>

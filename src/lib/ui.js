@@ -1,6 +1,6 @@
 import { get } from 'svelte/store'
 import { parseError } from './errors'
-import { activeModal, toasts, showMarketList, activeError } from './stores'
+import { activeModal, toasts, showMarkets, activeError } from './stores'
 
 export function setPageTitle(title) {
 	document.title = `${title} | CAP`;
@@ -22,7 +22,7 @@ export function showToast(message, type) {
 	if (!type) type = 0; // 0 = error, 1 = success, 2 = info
 	toastId++;
 	toasts.update((_toasts) => {
-		_toasts.push({message, type, id: toastId});
+		_toasts.unshift({message, type, id: toastId});
 		return _toasts;
 	});
 	let _toastId = toastId;
@@ -71,7 +71,7 @@ function hidePopovers() {
 		hideError();
 	} else {
 		hideModal();
-		showMarketList.set(false);
+		// showMarkets.set(false);
 	}
 }
 

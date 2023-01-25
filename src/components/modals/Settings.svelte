@@ -37,10 +37,10 @@
 	</div>
 	<div class='row'>
 		<Checkbox hasPadding={true} label='Positions on chart' bind:value={$showPositionsOnChart} />
-	</div>
+	</div><!-- 
 	<div class='row'>
 		<Checkbox hasPadding={true} label='Tooltips' bind:value={$showTooltips} />
-	</div>
+	</div> -->
 	<LabelValue 
 		label='Reset Preferences' 
 		value='Reset'

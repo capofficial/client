@@ -71,7 +71,7 @@ h1,h2,h3,h4,h5 {
 h1 {
   line-height: 1.218;
   margin: 24px auto;
-  font-size: 48px;
+  font-size: 64px;
   max-width: 900px;
   font-weight: 400;
   text-transform: uppercase;
@@ -79,7 +79,7 @@ h1 {
 
 @media all and (max-width: 600px) {
   h1 {
-    font-size: 36px;
+    font-size: 48px;
   }
 }
 
@@ -336,12 +336,12 @@ footer {
       <a class='button ' href='/trade'>Start Trading →</a>
     </div>
 
-    <div class='note'>CAP is currently in private beta.</div>
+    <div class='note'>CAP is currently in public beta.</div>
 
     <div class='stats'>
 
       <div class='stat'>
-        <div class='value' id='volumeValue'>$8B+</div>
+        <div class='value' id='volumeValue'>$7B+</div>
         <div class='label'>Volume</div>
       </div>
 
@@ -395,7 +395,7 @@ footer {
         <path d="M3.06641 17.998L19.9609 17.998C22.0117 17.998 23.0273 16.9824 23.0273 14.9707L23.0273 3.04688C23.0273 1.03516 22.0117 0.0195312 19.9609 0.0195312L3.06641 0.0195312C1.02539 0.0195312 0 1.02539 0 3.04688L0 14.9707C0 16.9922 1.02539 17.998 3.06641 17.998ZM3.08594 16.4258C2.10938 16.4258 1.57227 15.9082 1.57227 14.8926L1.57227 3.125C1.57227 2.10938 2.10938 1.5918 3.08594 1.5918L19.9414 1.5918C20.9082 1.5918 21.4551 2.10938 21.4551 3.125L21.4551 14.8926C21.4551 15.9082 20.9082 16.4258 19.9414 16.4258ZM7.44141 16.7285L8.97461 16.7285L8.97461 1.29883L7.44141 1.29883ZM3.59375 6.25977L5.43945 6.25977C5.68359 6.25977 5.87891 6.08398 5.87891 5.82031L5.87891 3.99414C5.87891 3.7207 5.69336 3.54492 5.43945 3.54492L3.59375 3.54492C3.32031 3.54492 3.13477 3.7207 3.13477 3.99414L3.13477 5.82031C3.13477 6.08398 3.33008 6.25977 3.59375 6.25977ZM3.59375 10.3613L5.43945 10.3613C5.68359 10.3613 5.87891 10.166 5.87891 9.92188L5.87891 8.07617C5.87891 7.82227 5.69336 7.62695 5.43945 7.62695L3.59375 7.62695C3.32031 7.62695 3.13477 7.82227 3.13477 8.07617L3.13477 9.92188C3.13477 10.166 3.33008 10.3613 3.59375 10.3613ZM3.59375 14.4434L5.43945 14.4434C5.68359 14.4434 5.87891 14.2676 5.87891 14.0039L5.87891 12.1777C5.87891 11.9141 5.69336 11.7285 5.43945 11.7285L3.59375 11.7285C3.32031 11.7285 3.13477 11.9141 3.13477 12.1777L3.13477 14.0039C3.13477 14.2676 3.33008 14.4434 3.59375 14.4434Z"/>
       </svg>
         </div>
-        <div class='title'>100+ Markets</div>
+        <div class='title'>30+ Markets</div>
         <div class='text'>Trade crypto, forex, commodities, and more using crypto collateral.</div>
       </div>
 
@@ -523,7 +523,7 @@ footer {
 
     <h2 data-textify>A Staple of DeFi Since 2020</h2>
 
-    <h4 data-textify>CAP pioneered on-demand oracles and continues to contribute to the DeFi community.</h4>
+    <h4 data-textify>CAP Labs pioneered on-demand oracles and continues to contribute to the DeFi community.</h4>
 
     <div class='partners'>
       <a href='https://portfolio.nansen.ai/?utm_campaign=portfolio_cap_27oct22' target='_blank'><img src='im/partners/nansen.png'></a>
@@ -547,7 +547,7 @@ footer {
       <a class='button ' href='/trade'>Start Trading →</a>
     </div>
 
-    <div class='note' data-textify>CAP is currently in private beta.</div>
+    <div class='note' data-textify>CAP is currently in public beta.</div>
 
   </div>
 
@@ -566,7 +566,7 @@ footer {
         <div class='item'><a href='/pool' class=''>Pool</a></div>
         <div class='item'><a href='/stake' class=''>Stake</a></div>
         <div class='item'><a href='/leaderboard' class=''>Leaderboard</a></div>
-        <div class='item'><a href='https://app.uniswap.org/#/swap?inputCurrency=ETH&outputCurrency=0x031d35296154279dc1984dcd93e392b1f946737b' target='_blank'>Buy CAP</a></div>
+        <div class='item'><a href='https://app.uniswap.org/#/swap?inputCurrency=ETH&outputCurrency=0x031d35296154279dc1984dcd93e392b1f946737b' target='_blank'>Buy CAP (Arbitrum)</a></div>
       </div>
         
       <div class='column'>
@@ -584,16 +584,14 @@ footer {
         <div class='item'><a href='https://twitter.com/CapDotFinance' target='_blank'>Twitter</a></div>
         <div class='item'><a href='https://capfinance.medium.com/' target='_blank'>Medium</a></div>
         <div class='item'><a href='https://github.com/0xcap' target='_blank'>Github</a></div>
-        <div class='item'><a href='https://cap.finance/whitepaper_mm.pdf' target='_blank'>Whitepapers</a></div>
+        <div class='item'><a href='https://cap.finance/whitepaper_mm.pdf' target='_blank'>Whitepaper</a></div>
       </div>
 
       <div class='column'>
         <div class='category'>Legal</div>
-        <div class='item grayed'><a>Terms of Use</a></div>
-        <div class='item grayed'><a>Referral Program Terms</a></div>
-        <div class='item grayed'><a>Risk Disclosure</a></div>
-        <div class='item grayed'><a>Restricted Jurisdictions</a></div>
-        <div class='item grayed'><a>Exchange Rules</a></div>
+        <div class='item'><a href='https://docs.cap.io/legal/terms-of-use'>Terms of Use</a></div>
+        <div class='item'><a href='https://docs.cap.io/legal/restricted-jurisdiction-policy'>Restricted Jurisdictions</a></div>
+        <div class='item'><a href='https://docs.cap.io/legal/risk-disclosure'>Risk Disclosure</a></div>
       </div>
 
     </div>

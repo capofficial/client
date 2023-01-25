@@ -57,8 +57,8 @@
 	}
 
 	.buttons {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
+		display: flex;
+		gap: var(--base-padding);
 		grid-gap: var(--base-padding);
 	}
 
@@ -123,8 +123,12 @@
 			<div class='subtitle'>Stake CAP to receive a portion of protocol revenue. <a href='https://app.uniswap.org/#/swap?inputCurrency=ETH&outputCurrency=0x031d35296154279dc1984dcd93e392b1f946737b' target="_blank">Buy CAP</a></div>
 		</div>
 		<div class='right buttons'>
-			<Button isSmall={true} label={`Stake`} on:click={() => {showModal('StakeCAP')}} />
-			<Button isSmall={true} label={`Unstake`} on:click={() => {showModal('UnstakeCAP')}} />	
+			{#if $address}
+				<Button isSmall={true} label={`Stake`} on:click={() => {showModal('StakeCAP')}} />
+				<Button isSmall={true} label={`Unstake`} on:click={() => {showModal('UnstakeCAP')}} />	
+			{:else}
+				<Button isSmall={true} label={`Connect Wallet`} on:click={() => {showModal('Connect')}} />
+			{/if}
 		</div>
 	</div>
 

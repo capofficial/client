@@ -114,15 +114,16 @@
   	// reset inputs on market change
 	function resetOrderFields() {
 		highlightedPriceButton = null;
-    		price.set();
-    		size.set();
-    		tpPrice.set();
-    		slPrice.set();
-    		hasTrigger.set(false);
-    		hasTP.set(false);
-    		hasSL.set(false);
-    		isReduceOnly.set(false)
-    		isProtectedOrder.set(false);
+		price.set();
+		size.set();
+		tpPrice.set();
+		slPrice.set();
+		showAdvanced = false;
+		hasTrigger.set(false);
+		hasTP.set(false);
+		hasSL.set(false);
+		isReduceOnly.set(false)
+		isProtectedOrder.set(false);
 	}
 	
 	$: resetOrderFields($selectedMarket);
@@ -415,10 +416,14 @@
 			{/if}
 
 			<div class='buttons bottom-spacing'>
-				{#if $selectedAsset != 'ETH' && $allowances[$selectedAsset]?.['FundStore'] * 1 <= $margin * 1}
-				<Button noSubmit={true} isLoading={isApproving} isRed={!$isLong} label={`Approve ${$selectedAsset}`} on:click={_approveAsset} />
+				{#if $address}
+					{#if $selectedAsset != 'ETH' && $allowances[$selectedAsset]?.['FundStore'] * 1 <= $margin * 1}
+					<Button noSubmit={true} isLoading={isApproving} isRed={!$isLong} label={`Approve ${$selectedAsset}`} on:click={_approveAsset} />
+					{:else}
+					<Button isLoading={$submittingOrder} isRed={!$isLong} label={`${$isLong ? 'Buy / Long' : 'Sell / Short'}`} />
+					{/if}
 				{:else}
-				<Button isLoading={$submittingOrder} isRed={!$isLong} label={`${$isLong ? 'Buy / Long' : 'Sell / Short'}`} />
+					<Button noSubmit={true} isRed={!$isLong} label={`Connect Wallet`} on:click={() => {showModal('Connect')}} />
 				{/if}
 			</div>
 

@@ -19,11 +19,12 @@ export class EvmPriceServiceConnection extends PriceServiceConnection {
   }
 }
 
-let connection, t;
+let connection, t, i1;
 
 export function connectSocket() {
 
 	clearTimeout(t);
+	clearInterval(i1);
 
 	if (connection) {
 		connection.closeWebSocket();
@@ -61,6 +62,9 @@ export function connectSocket() {
 	// 	'0xca80ba6dc32e08d06f1aa886011eed1d77c77be9eb761cc10d72b7d0a2fd57a6': 'ETH-USD'
 	// };
 
+	let _prices = {};
+	let _priceTimestamps = {};
+
 	connection.subscribePriceFeedUpdates(priceIds, (priceFeed) => {
 		const feedId = `0x${priceFeed.id}`;
 		const market = pythFeedToMarket[feedId];
@@ -72,20 +76,31 @@ export function connectSocket() {
 				// convert price to decimal without exponent and extra 0s
 				const price = priceObj.price / 10**(-1 * priceObj.expo);
 				// console.log(market, price);
-				prices.update((p) => {
-					p[market] = price;
-					return p;
-				});
-				priceTimestamps.update((p) => {
-					p[market] = Date.now() / 1000;
-					return p;
-				});
+				// if (market != 'BTC-USD') return;
+				_prices[market] = price;
+				_priceTimestamps[market] = Date.now() / 1000;
 			} catch(e) {
 				console.error(e);
 			}
 
 		} // else price is stale
 	});
+
+	// throttle store updates
+	i1 = setInterval(() => {
+		for (const market in _prices) {
+			prices.update((p) => {
+				p[market] = _prices[market];
+				return p;
+			});
+			priceTimestamps.update((p) => {
+				p[market] = _priceTimestamps[market];
+				return p;
+			});
+		}
+		_prices = {};
+		_priceTimestamps = {};
+	}, 1000);
 
 }
 

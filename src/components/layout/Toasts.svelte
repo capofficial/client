@@ -8,8 +8,8 @@
 
 	.toast-container {
 		position: fixed;
-		bottom: 10px;
-		left: var(--base-padding);
+		top: 10px;
+		right: var(--base-padding);
 		z-index: 101;
 	}
 
