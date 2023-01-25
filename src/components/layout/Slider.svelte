@@ -28,28 +28,52 @@
 	}
 
 	function handleClick(e) {
+		// console.log('touch start', e);
+
+		let mouseX;
+
+		if (e.type == 'touchstart') {
+			let evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
+			let touch = evt.touches[0] || evt.changedTouches[0];
+			mouseX = touch.pageX;
+			mouseXOnSliderGrab = mouseX;
+			// console.log('mouseX', mouseX);
+		} else {
+			mouseX = e.layerX || e.offsetX;
+			mouseXOnSliderGrab = e.pageX || e.screenX || e.x;
+		}
+
 		if (e.srcElement?.id != 'handle') {
-			const mouseX = e.layerX || e.offsetX;
 			progressPercent = snapProgress(100 * mouseX / sliderElem.offsetWidth);
 		}
-		grabSlider(e);
+
+		// grab slider
+		sliderGrabbed = true;
+		progressPercentOnSliderGrab = progressPercent;
+		isActive = true;
+
+		// console.log('mouseXOnSliderGrab', mouseXOnSliderGrab);
+
 	}
 
 	function handleMouseMove(e) {
+		// console.log('handleMouseMove', e);
 		if (!sliderGrabbed) return;
-		const mouseX = e.pageX || e.screenX || e.x;
+		let mouseX;
+		if (e.type == 'touchmove') {
+			let evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
+			let touch = evt.touches[0] || evt.changedTouches[0];
+			mouseX = touch.pageX;
+			// console.log('mouseX touchmove', mouseX);
+		} else {
+			mouseX = e.pageX || e.screenX || e.x;
+		}
 		const xDiff = mouseX - mouseXOnSliderGrab;
 		let progress = progressPercentOnSliderGrab + 100 * xDiff / sliderElem.offsetWidth;
+		// console.log('progress', progress, mouseX, mouseXOnSliderGrab);
 		if (progress < 0) progress = 0;
 		if (progress > 100) progress = 100;
 		progressPercent = snapProgress(progress);
-	}
-
-	function grabSlider(e) {
-		sliderGrabbed = true;
-		mouseXOnSliderGrab = e.pageX || e.screenX || e.x;
-		progressPercentOnSliderGrab = progressPercent;
-		isActive = true;
 	}
 
 	function releaseSlider(e) {
@@ -202,10 +226,10 @@
 
 </style>
 
-<svelte:window on:mousemove={handleMouseMove} on:mouseup={releaseSlider} on:mousedown={handleBlur} />
+<svelte:window on:mousemove={handleMouseMove} on:mouseup={releaseSlider} on:mousedown={handleBlur} on:touchmove={handleMouseMove} on:touchend={releaseSlider} on:touchstart={handleBlur} />
 
 <div class='slider-container' id='slider'>
-	<div class="slider" bind:this={sliderElem} on:mousedown={handleClick}>
+	<div class="slider" bind:this={sliderElem} on:mousedown={handleClick} on:touchstart={handleClick}>
 		{#if showDots}
 		<div class='slider-dot-overlay'>
 			<div class='slider-dot' class:active={true}></div>

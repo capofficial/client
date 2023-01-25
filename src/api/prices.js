@@ -22,7 +22,7 @@ export async function getMarketPrices(markets) {
 	try {
 		const response = await fetch(`${dataEndpoint}/price/${markets == 'all' ? 'all' : markets.join(',')}`);
 		const json = await response.json();
-		console.log('getMarketPrices json', json);
+		// console.log('getMarketPrices json', json);
 		// json: {market => [price, timestamp]}
 		let dontUpdatePrice = {};
 		for (const m in json) {
@@ -56,7 +56,7 @@ export async function getMarketTickers(market) {
 		const response = await fetch(`${dataEndpoint}/ticker/${market}`);
 		const json = await response.json();
 
-		console.log('getMarketTickers json', json);
+		// console.log('getMarketTickers json', json);
 		// if market = all, json: {market => {o,h,l,c,t}}
 		// if market, json: {o,h,l,c,t}
 
