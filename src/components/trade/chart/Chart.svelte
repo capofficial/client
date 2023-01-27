@@ -61,6 +61,11 @@
 		color: var(--layer300);
 		font-weight: 600;
 	}
+	@media all and (max-width: 1280px) {
+		.current-ohlc {
+			display: none;
+		}
+	}
 </style>
 
 <div class='wrapper'>

@@ -435,11 +435,12 @@
 			<OrderDetails market={$selectedMarket} asset={$selectedAsset} size={$size} />
 		</div>
 
-		{#if timeoutElapsed && (!$priceTimestamps[$selectedMarket] || $priceTimestamps[$selectedMarket] * 1 < Date.now() / 1000 - 2 * 60)}
+		<!-- {#if timeoutElapsed && (!$priceTimestamps[$selectedMarket] || $priceTimestamps[$selectedMarket] * 1 < Date.now() / 1000 - 2 * 60)}
 		<div class='top-spacing warning'>
 			<strong>Market closed.</strong> This market's price hasn't changed in a while. Submitted orders might be cancelled.
 		</div>
-		{/if}
+		{/if} -->
+		
 	</div>
 
 </div>
