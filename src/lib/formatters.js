@@ -56,6 +56,8 @@ export function getLabelForKey(key) {
 			return 'P/L';
 		case 'pnl':
 			return 'P/L';
+		case 'currentPrice':
+			return 'Market Price';
 		case 'isReduceOnly':
 			return 'Reduce-Only';
 		case 'cancelOrderId':

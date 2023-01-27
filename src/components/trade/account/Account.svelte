@@ -37,6 +37,7 @@
 			{key: 'isLong', gridTemplate: '0.5fr', sortable: true},
 			{key: 'market', gridTemplate: '0.5fr', sortable: true},
 			{key: 'price', gridTemplate: '0.75fr', sortable: true},
+			{key: 'currentPrice', gridTemplate: '0.75fr', sortable: true},
 			{key: 'size', gridTemplate: '1fr', sortable: true},
 			{key: 'margin', gridTemplate: '1fr', sortable: true},
 			{key: 'leverage', gridTemplate: '0.5fr', sortable: true},

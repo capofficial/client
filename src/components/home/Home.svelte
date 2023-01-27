@@ -526,7 +526,7 @@ footer {
     <h4 data-textify>CAP Labs pioneered on-demand oracles and continues to contribute to the DeFi community.</h4>
 
     <div class='partners'>
-      <a href='https://portfolio.nansen.ai/?utm_campaign=portfolio_cap_27oct22' target='_blank'><img src='im/partners/nansen.png'></a>
+      <a href='https://pyth.network' target='_blank'><img src='im/partners/pyth.svg'></a>
       <a href='https://tokenterminal.com/terminal/projects/cap' target='_blank'><img src='im/partners/tokenterminal.svg'></a>
       <a href='https://dune.com/crypt0gnome/cap-finance' target='_blank'><img src='im/partners/dune.png'></a>
     </div>

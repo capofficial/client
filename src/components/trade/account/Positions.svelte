@@ -298,6 +298,10 @@
 				<Cell>{formatPriceForDisplay(position.price)}</Cell>
 			{/if}
 
+			{#if $positionsColumnsToShow.includes('currentPrice')}
+				<Cell>{formatPriceForDisplay($prices[position.market])}</Cell>
+			{/if}
+
 			{#if $positionsColumnsToShow.includes('size')}
 				<Cell>{formatForDisplay(position.size)} {position.asset}</Cell>
 			{/if}
