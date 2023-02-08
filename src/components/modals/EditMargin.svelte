@@ -23,7 +23,7 @@
 		if (!margin) return focusInput('Add Margin');
 		isSubmitting = true;
 
-		const success = await addMargin(data.market, data.assetAddress, margin);
+		const success = await addMargin(data.position.market, data.position.assetAddress, margin);
 		if (success) {
 			hideModal();
 		}
@@ -36,7 +36,7 @@
 		if (!margin) return focusInput('Remove Margin');
 		isSubmitting = true;
 
-		const success = await removeMargin(data.market, data.assetAddress, margin);
+		const success = await removeMargin(data.position.market, data.position.assetAddress, margin);
 		if (success) {
 			hideModal();
 		}
@@ -48,63 +48,45 @@
 	function select(_s) {
 		selected = _s;
 		setTimeout(() => {
-			focusInput(`${selected} ${data.asset}`);
+			focusInput(`${selected} ${data.position.asset}`);
 		}, 50);
 	}
 
 
-	let newLiqPrice = data.liqprice;
+	let newLiqPrice = data.position.liqprice;
 	let newMargin = 0;
 	function calculateNewLiquidationPrice(marginDelta, mode) {
 
-		if (mode == 'add')
-		{
-			newMargin = ((data.margin*1 + data.funding*1) + marginDelta);
+		if (!marginDelta) marginDelta = 0;
 
-			if (data.isLong)
-			{
-				newLiqPrice = data.price * 1 - newMargin * data.price / data.size;
-			} 
-			else 
-			{
-				newLiqPrice = data.price * 1 + newMargin * data.price / data.size;
+		if (mode == 'Add') {
+			newMargin = ((data.position.margin*1 + data.funding*1) + marginDelta);
+
+			if (data.position.isLong) {
+				newLiqPrice = data.position.price * 1 - newMargin * data.position.price / data.position.size;
+			} else {
+				newLiqPrice = data.position.price * 1 + newMargin * data.position.price / data.position.size;
 			}
-
-			if (newLiqPrice < 0)
-			{
-				newLiqPrice = 0.00;
-			}
-		}
-		else
-		{
-
-			if (marginDelta >= (data.margin*1 + data.funding*1))
-			{
+			if (newLiqPrice < 0) newLiqPrice = 0;
+		} else {
+			if (marginDelta >= (data.position.margin*1 + data.funding*1)) {
 				newMargin = 0;
-				margin = (data.margin*1 + data.funding*1);
+				margin = (data.position.margin*1 + data.funding*1);
+			} else {
+				newMargin = ((data.position.margin*1 + data.funding*1) - marginDelta);
 			}
-			else
-			{
-				newMargin = ((data.margin*1 + data.funding*1) - marginDelta);
+			if (data.position.isLong) {
+				newLiqPrice = data.position.price * 1 - ((data.position.margin*1 + data.funding*1) - marginDelta) * data.position.price / data.position.size;
+			} else {
+				newLiqPrice = data.position.price * 1 + ((data.position.margin*1 + data.funding*1 - marginDelta)) * data.position.price / data.position.size;
 			}
-
-			if (data.isLong)
-			{
-				newLiqPrice = data.price * 1 - ((data.margin*1 + data.funding*1) - marginDelta) * data.price / data.size;
-			} 
-			else 
-			{
-				newLiqPrice = data.price * 1 + ((data.margin*1 + data.funding*1 - marginDelta)) * data.price / data.size;
-			}
-			
 		}
-
-		calculateNewLeverage()
+		calculateNewLeverage();
 	}
 
 	let newLeverage = 0;
 	function calculateNewLeverage() {
-			newLeverage = data.size / newMargin;
+		newLeverage = data.position.size / newMargin;
 	}
 
 	$: calculateNewLiquidationPrice(margin, selected)
@@ -112,14 +94,14 @@
 	let isApproving = false;
 	async function _approveAsset() {
 		isApproving = true;
-		const success = await approveAsset(data.asset, 'FundStore');
+		const success = await approveAsset(data.position.asset, 'FundStore');
 		isApproving = false;
 	}
 
-	$: getAllowance(data.asset, 'PositionStore');
+	$: getAllowance(data.position.asset, 'PositionStore');
 
 	onMount(() => {
-		focusInput(`Add ${data.asset}`);
+		focusInput(`Add ${data.position.asset}`);
 	});
 
 </script>
@@ -159,7 +141,7 @@
 		<form on:submit|preventDefault={selected == 'Add' ? _addMargin : _removeMargin}>
 			
 			<div class='group'>
-				<Input label={`${selected} ${data.asset}`} bind:value={margin} />
+				<Input label={`${selected} ${data.position.asset}`} bind:value={margin} />
 			</div>
 
 			<div class='row'>
@@ -175,8 +157,8 @@
 			</div>
 
 			<div class='button'>
-				{#if data.asset != 'ETH' && $allowances[data.asset]?.['FundStore'] * 1 <= margin * 1}
-				<Button noSubmit={true} isLoading={isApproving} label={`Approve ${data.asset}`} on:click={_approveAsset} />
+				{#if data.position.asset != 'ETH' && $allowances[data.position.asset]?.['FundStore'] * 1 <= margin * 1}
+				<Button noSubmit={true} isLoading={isApproving} label={`Approve ${data.position.asset}`} on:click={_approveAsset} />
 				{:else}
 				<Button isLoading={isSubmitting} label={`${selected} Margin`} />
 				{/if}

@@ -67,6 +67,7 @@ export async function submitOrder() {
 	
 	// Params
 	const market = get(selectedMarket);
+	const marketInfo = get(selectedMarketInfo);
 
 	const _asset = get(selectedAsset);
 	const asset = getAssetAddress(_asset);
@@ -81,11 +82,18 @@ export async function submitOrder() {
 	let marginCleaned = (Math.ceil(get(margin) * 10**cleaningDecimals) / 10**cleaningDecimals).toFixed(cleaningDecimals);
 	let sizeCleaned = (Math.floor(get(size) * 10**cleaningDecimals) / 10**cleaningDecimals).toFixed(cleaningDecimals);
 
+	// If leverage > max leverage, adjust margin
+	let leverage = sizeCleaned / marginCleaned;
+	if (leverage > marketInfo.maxLeverage * 1) {
+		marginCleaned = (Math.ceil(sizeCleaned * 10**cleaningDecimals / (marketInfo.maxLeverage * 1)) / 10**cleaningDecimals).toFixed(cleaningDecimals);
+	}
+
 	// console.log('marginCleaned', marginCleaned);
 	// console.log('sizeCleaned', sizeCleaned);
 
 	let _margin = parseUnits(marginCleaned, assetDecimals);
 	const _size = parseUnits(sizeCleaned, assetDecimals);
+
 	let _priceRaw = get(price);
 	let _price = parseUnits(_priceRaw);
 	const _hasTrigger = get(hasTrigger);
@@ -117,7 +125,6 @@ export async function submitOrder() {
 	let value = '';
 	if (_asset == 'ETH') {
 		// Send value equal to margin + fee
-		const marketInfo = get(selectedMarketInfo);
 		const feeAmount = _size.mul(marketInfo.fee).div(BPS_DIVIDER);
 		console.log('marketInfo.fee', marketInfo.fee);
 		console.log('feeAmount', feeAmount.toString());

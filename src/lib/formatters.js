@@ -135,7 +135,7 @@ export function formatCAPForDisplay(amountStr) {
 	const minIncrement = 10**-digits;
 	if (!amount) return 0;
 	if (amount <= minIncrement) return minIncrement;
-	return Math.ceil(amount * 10**digits) / 10**digits;
+	return Math.floor(amount * 10**digits) / 10**digits;
 }
 
 export function formatOrderType(orderType) {

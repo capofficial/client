@@ -331,7 +331,7 @@
 			{/if}
 
 			<Cell isTools={true}>
-				<a use:tooltip={{content: 'Edit'}} on:click|stopPropagation={() => { showModal('EditMargin', position) }}>{@html PENCIL_ICON}</a>
+				<a use:tooltip={{content: 'Edit'}} on:click|stopPropagation={() => { showModal('EditMargin', {position, funding: fundings[`${position.asset}:${position.market}`]}) }}>{@html PENCIL_ICON}</a>
 				<a use:tooltip={{content: 'Close'}} on:click|stopPropagation={() => { showModal('ClosePosition', position) }}>{@html XMARK_ICON}</a>
 			</Cell>
 
