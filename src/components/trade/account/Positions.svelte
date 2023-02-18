@@ -111,6 +111,9 @@
 	function calculateLiqPrices(_positions, _marketInfos, _fundings) {
 		for (const position of _positions) {
 			if (!_marketInfos[position.market]) continue;
+
+			const liqThreshold = _marketInfos[position.market].liqThreshold / BPS_DIVIDER;
+
 			// Liquidation price is the price at which UPL = margin
 
 			const funding = fundings[`${position.asset}:${position.market}`] || 0;
@@ -121,9 +124,9 @@
 
 			let liqPrice;
 			if (position.isLong) {
-				liqPrice = position.price * 1 - (position.margin*1 + funding*1) * position.price / position.size;
+				liqPrice = position.price * 1 - liqThreshold * (position.margin*1 + funding*1) * position.price / position.size;
 			} else {
-				liqPrice = position.price * 1 + (position.margin*1 + funding*1) * position.price / position.size;
+				liqPrice = position.price * 1 + liqThreshold * (position.margin*1 + funding*1) * position.price / position.size;
 			}
 
 			// console.log('liqPrice', liqPrice);
