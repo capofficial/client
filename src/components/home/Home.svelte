@@ -85,7 +85,7 @@ h1 {
 
 h3 {
     margin: 0 auto;
-    margin-bottom: 48px;
+    margin-bottom: 64px;
     font-size: 26px;
     line-height: 1.618;
     font-weight: 400;
@@ -94,7 +94,7 @@ h3 {
 }
 
 .button-wrapper {
-  margin-bottom: 64px;
+  margin-bottom: 32px;
 }
 .button {
   display: inline-block;
@@ -112,8 +112,8 @@ h3 {
 
 .note {
    margin-bottom: 64px;
-   color: var(--text1);
    line-height: 1.318;
+   font-weight: 500;
 }
 
 .stats {
@@ -353,6 +353,8 @@ footer {
     <div class='button-wrapper'>
       <a class='button ' href='/trade'>Start Trading →</a>
     </div>
+
+    <div class='note'>⚡️50% off fees until May 31!</div>
 
     <div class='stats'>
 
