@@ -94,7 +94,7 @@ h3 {
 }
 
 .button-wrapper {
-  margin-bottom: 32px;
+  margin-bottom: 16px;
 }
 .button {
   display: inline-block;
@@ -354,7 +354,7 @@ footer {
       <a class='button ' href='/trade'>Start Trading →</a>
     </div>
 
-    <div class='note'>⚡️50% off fees until May 31!</div>
+    <div class='note'>⚡️ Get 50% off fees until May 31!</div>
 
     <div class='stats'>
 
@@ -580,7 +580,7 @@ footer {
 
       <div class='column'>
         <div class='logo'><img src='im/logo-full.svg'></div>
-        <div class='copyright'>&copy; 2020 - <span id='yearValue'>{year}</span></div>
+        <div class='copyright'>&copy; <span id='yearValue'>{year}</span></div>
       </div>
 
       <div class='column'>
@@ -588,7 +588,7 @@ footer {
         <div class='item'><a href='/trade' class=''>Trade</a></div>
         <div class='item'><a href='/pool' class=''>Pool</a></div>
         <div class='item'><a href='/stake' class=''>Stake</a></div>
-        <div class='item'><a href='/leaderboard' class=''>Leaderboard</a></div>
+        <!-- <div class='item'><a href='/leaderboard' class=''>Leaderboard</a></div> -->
         <div class='item'><a href='https://app.uniswap.org/#/swap?inputCurrency=ETH&outputCurrency=0x031d35296154279dc1984dcd93e392b1f946737b' target='_blank'>Buy CAP (Arbitrum)</a></div>
       </div>
         
@@ -597,7 +597,6 @@ footer {
         <div class='item'><a href='https://docs.cap.io/trade'>For Traders</a></div>
         <div class='item'><a href='https://docs.cap.io/pool'>For Liquidity Providers</a></div>
         <div class='item'><a href='https://docs.cap.io/stake'>For Stakers</a></div>
-        <div class='item'><a href='https://docs.cap.io/developers'>For Developers</a></div>
         <div class='item'><a href='https://docs.cap.io/'>Docs</a></div>
       </div>
 
@@ -607,7 +606,6 @@ footer {
         <div class='item'><a href='https://twitter.com/CapDotFinance' target='_blank'>Twitter</a></div>
         <div class='item'><a href='https://capfinance.medium.com/' target='_blank'>Medium</a></div>
         <div class='item'><a href='https://github.com/0xcap' target='_blank'>Github</a></div>
-        <div class='item'><a href='https://cap.finance/whitepaper_mm.pdf' target='_blank'>Whitepaper</a></div>
       </div>
 
       <div class='column'>

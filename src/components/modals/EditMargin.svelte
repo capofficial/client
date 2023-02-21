@@ -52,7 +52,7 @@
 		}, 50);
 	}
 
-
+	let funding = data.funding || 0;
 	let newLiqPrice = data.position.liqprice;
 	let newMargin = 0;
 	function calculateNewLiquidationPrice(marginDelta, mode) {
@@ -60,7 +60,7 @@
 		if (!marginDelta) marginDelta = 0;
 
 		if (mode == 'Add') {
-			newMargin = ((data.position.margin*1 + data.funding*1) + marginDelta);
+			newMargin = ((data.position.margin*1 + funding*1) + marginDelta);
 
 			if (data.position.isLong) {
 				newLiqPrice = data.position.price * 1 - newMargin * data.position.price / data.position.size;
@@ -69,16 +69,16 @@
 			}
 			if (newLiqPrice < 0) newLiqPrice = 0;
 		} else {
-			if (marginDelta >= (data.position.margin*1 + data.funding*1)) {
+			if (marginDelta >= (data.position.margin*1 + funding*1)) {
 				newMargin = 0;
-				margin = (data.position.margin*1 + data.funding*1);
+				margin = (data.position.margin*1 + funding*1);
 			} else {
-				newMargin = ((data.position.margin*1 + data.funding*1) - marginDelta);
+				newMargin = ((data.position.margin*1 + funding*1) - marginDelta);
 			}
 			if (data.position.isLong) {
-				newLiqPrice = data.position.price * 1 - ((data.position.margin*1 + data.funding*1) - marginDelta) * data.position.price / data.position.size;
+				newLiqPrice = data.position.price * 1 - ((data.position.margin*1 + funding*1) - marginDelta) * data.position.price / data.position.size;
 			} else {
-				newLiqPrice = data.position.price * 1 + ((data.position.margin*1 + data.funding*1 - marginDelta)) * data.position.price / data.position.size;
+				newLiqPrice = data.position.price * 1 + ((data.position.margin*1 + funding*1 - marginDelta)) * data.position.price / data.position.size;
 			}
 		}
 		calculateNewLeverage();

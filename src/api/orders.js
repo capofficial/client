@@ -53,7 +53,7 @@ export function orderSubmitted() {
 }
 
 export function closeOrderSubmitted() {
-	showToast('Close order submitted.', 1);
+	showToast('Order submitted.', 1);
 	hideModal();
 }
 
@@ -83,9 +83,9 @@ export async function submitOrder() {
 	let sizeCleaned = (Math.floor(get(size) * 10**cleaningDecimals) / 10**cleaningDecimals).toFixed(cleaningDecimals);
 
 	// If leverage > max leverage, adjust margin
-	let leverage = sizeCleaned / marginCleaned;
+	let leverage = 1 * sizeCleaned / marginCleaned;
 	if (leverage > marketInfo.maxLeverage * 1) {
-		marginCleaned = (Math.ceil(sizeCleaned * 10**cleaningDecimals / (marketInfo.maxLeverage * 1)) / 10**cleaningDecimals).toFixed(cleaningDecimals);
+		marginCleaned = (marginCleaned * 1.0003).toFixed(cleaningDecimals);
 	}
 
 	// console.log('marginCleaned', marginCleaned);
@@ -112,9 +112,9 @@ export async function submitOrder() {
 	if (_hasTrigger && _priceRaw * 1 > 0) {
 		// limit (1) or stop (2)?
 		const currentPrice = get(prices)[market];
-		console.log('currentPrice', currentPrice);
-		console.log('_price', _priceRaw);
-		console.log('_isLong', _isLong);
+		// console.log('currentPrice', currentPrice);
+		// console.log('_price', _priceRaw);
+		// console.log('_isLong', _isLong);
 		if (_isLong && _priceRaw * 1 <= currentPrice * 1 || !_isLong && _priceRaw * 1 >= currentPrice * 1) {
 			orderType = 1;
 		} else if (_isLong && _priceRaw * 1 >= currentPrice * 1|| !_isLong && _priceRaw * 1 <= currentPrice * 1) {
@@ -126,8 +126,8 @@ export async function submitOrder() {
 	if (_asset == 'ETH') {
 		// Send value equal to margin + fee
 		const feeAmount = _size.mul(marketInfo.fee).div(BPS_DIVIDER);
-		console.log('marketInfo.fee', marketInfo.fee);
-		console.log('feeAmount', feeAmount.toString());
+		// console.log('marketInfo.fee', marketInfo.fee);
+		// console.log('feeAmount', feeAmount.toString());
 
 		value = _margin.add(feeAmount);
 		if (get(tpPrice)) {
@@ -153,7 +153,7 @@ export async function submitOrder() {
 			isReduceOnly: _isReduceOnly
 		});
 
-		console.log('orderTuple', orderTuple, get(tpPrice), get(slPrice), value);
+		// console.log('orderTuple', orderTuple, get(tpPrice), get(slPrice), value);
 
 		tx = await contract.submitOrder(orderTuple, parseUnits(get(tpPrice)), parseUnits(get(slPrice)), {value: value});
 
@@ -199,13 +199,13 @@ export async function submitCloseOrder(params) {
 		if (_asset == 'ETH') {
 			// Send value equal to margin + fee
 			let marketInfo = get(marketInfos)[market];
-			console.log('marketInfo', marketInfo);
+			// console.log('marketInfo', marketInfo);
 
 			const feeAmount = size.mul(marketInfo.fee).div(BPS_DIVIDER);
 			value = feeAmount;
 		}
 
-		console.log('value', asset, value);
+		// console.log('value', asset, value);
 
 		let tx = await contract.submitOrder(
 			createOrderTuple({
@@ -226,7 +226,7 @@ export async function submitCloseOrder(params) {
 		let receipt = await tx.wait();
 
 		if (receipt && receipt.status == 1) {
-			// closeOrderSubmitted();
+			closeOrderSubmitted();
 			// getUserOrders();
 			return true;
 		}

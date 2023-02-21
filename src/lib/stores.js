@@ -139,7 +139,7 @@ export const ordersSorted = derived([orders, ordersSortKey], ([$orders, $ordersS
 
 // Positions
 export const positions = writable([]);
-export const positionsColumnsToShow = writable(getUserSetting('positionsColumnsToShow') || ['isLong', 'market', 'price', 'size', 'margin', 'upl', 'funding', 'liqprice', 'tools']);
+export const positionsColumnsToShow = writable(getUserSetting('positionsColumnsToShow') || ['isLong', 'market', 'price', 'size', 'margin', 'upl', 'liqprice', 'tools']);
 export const positionsSortKey = writable(getUserSetting('positionsSortKey') || DEFAULT_POSITIONS_SORT_KEY); // [columnName, isDesc]
 export const positionsSorted = derived([positions, positionsSortKey], ([$positions, $positionsSortKey]) => {
 	return sorter($positions, $positionsSortKey);

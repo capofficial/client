@@ -22,7 +22,7 @@ export function showToast(message, type) {
 	if (!type) type = 0; // 0 = error, 1 = success, 2 = info
 	toastId++;
 	toasts.update((_toasts) => {
-		_toasts.unshift({message, type, id: toastId});
+		_toasts.push({message, type, id: toastId});
 		return _toasts;
 	});
 	let _toastId = toastId;

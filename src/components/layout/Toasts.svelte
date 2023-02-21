@@ -8,8 +8,8 @@
 
 	.toast-container {
 		position: fixed;
-		top: 10px;
-		right: var(--base-padding);
+		bottom: 10px;
+		left: 20px;
 		z-index: 101;
 	}
 
@@ -17,7 +17,7 @@
 		border-radius: var(--base-radius);
 		display: flex;
 		align-items: center;
-		padding: var(--semi-padding);
+		padding: 8px 16px;
 		max-width: 260px;
 		word-break: break-word;
 		font-weight: 500;
