@@ -365,7 +365,7 @@ footer {
 
       <div class='stat'>
         <div class='value'>
-          30+
+          20+
         </div>
         <div class='label'>Markets</div>
       </div>
