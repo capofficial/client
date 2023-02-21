@@ -69,31 +69,32 @@ h1,h2,h3,h4,h5 {
 }
 
 h1 {
-  line-height: 1.218;
+  line-height: 1.418;
   margin: 24px auto;
   font-size: 64px;
-  max-width: 900px;
-  font-weight: 400;
+  max-width: 720px;
+  font-weight: 600;
   text-transform: uppercase;
 }
 
 @media all and (max-width: 600px) {
   h1 {
-    font-size: 36px;
+    font-size: 42px;
   }
 }
 
 h3 {
     margin: 0 auto;
     margin-bottom: 48px;
-    font-size: 24px;
+    font-size: 26px;
     line-height: 1.618;
     font-weight: 400;
-    max-width: 460px;
+    max-width: 480px;
+    color: var(--text1);
 }
 
 .button-wrapper {
-  margin-bottom: 32px;
+  margin-bottom: 64px;
 }
 .button {
   display: inline-block;
@@ -345,9 +346,9 @@ footer {
 
   <div class='hero'>
 
-    <h1>Decentralized <strong>Perps</strong></h1>
+    <h1>The Best Place to Trade On-Chain</h1>
 
-    <h3>Trade global markets with low fees, deep liquidity, and up to 100× leverage.</h3>
+    <h3>Trade with low fees, deep liquidity, and up to 100× leverage.</h3>
 
     <div class='button-wrapper'>
       <a class='button ' href='/trade'>Start Trading →</a>
@@ -387,9 +388,9 @@ footer {
 
   <div class='section'>
 
-    <h2 data-textify>The Best Place To Trade</h2>
+    <h2 data-textify>Feature-Packed Perps</h2>
 
-    <h4 data-textify>All the features you need for fast and secure on-chain trading.</h4>
+    <h4 data-textify>Everything you need for fast and secure on-chain trading.</h4>
 
     <div class='grid'>
 
@@ -545,12 +546,12 @@ footer {
 
     <h2 data-textify>A Staple of DeFi</h2>
 
-    <h4 data-textify>CAP Labs pioneered on-demand oracles and continues to contribute to the DeFi community.</h4>
+    <h4 data-textify>CAP pioneered on-demand oracles and continues to contribute to the DeFi community.</h4>
 
     <div class='partners'>
       <a href='https://pyth.network' target='_blank'><img src='im/partners/pyth.svg'></a>
       <a href='https://tokenterminal.com/terminal/projects/cap' target='_blank'><img src='im/partners/tokenterminal.svg'></a>
-      <a href='https://dune.com/crypt0gnome/cap-finance' target='_blank'><img src='im/partners/dune.png'></a>
+      <a href='https://dune.com/shogun/cap-finance-v4-analytics' target='_blank'><img src='im/partners/dune2.png'></a>
     </div>
 
     <div class='partners'>

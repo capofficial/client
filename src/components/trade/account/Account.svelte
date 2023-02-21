@@ -207,7 +207,7 @@
 			<a class:active={panel == 'history'} on:click={() => {panel = 'history'}}>History</a>
 		</div>
 		<div class='tools'>
-			<a class='leaderboard-link' href='/leaderboard'>{@html TROPHY_ICON} <span class='text'>Leaderboard</span></a>
+			<!-- <a class='leaderboard-link' href='/leaderboard'>{@html TROPHY_ICON} <span class='text'>Leaderboard</span></a> -->
 			{#if panel == 'history'}
 				<a on:click|stopPropagation={() => {showModal('HistoryOrderStatus')}} use:tooltip={{content: 'Filter history'}}>{@html FILTER_ICON}</a>
 			{/if}

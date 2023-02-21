@@ -60,7 +60,7 @@ export const CHAINDATA = {
 		explorer: 'https://arbiscan.io',
 		rpc: 'https://arb1.arbitrum.io/rpc', // for walletconnect
 		dataEndpoint: 'https://data.cap.io/api',
-		dataStore: '0xe9d3C9bB9A2047E7467f4770dfA0d62E2a411792',
+		dataStore: '0xa64694E51B22A081EA1e4051EF4EA1b715b47026',
 		cap: '0x031d35296154279dc1984dcd93e392b1f946737b',
 		assets: {
 			ETH: ADDRESS_ZERO,

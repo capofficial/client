@@ -136,7 +136,6 @@
 		{key: 'Rank', gridTemplate: '70px', sortable: false},
 		{key: 'User', gridTemplate: '1fr', sortable: false},
 		{key: 'P/L ($)', gridTemplate: '1fr', sortable: false, rightAlign: true},
-		{key: 'Prize ($)', gridTemplate: '1fr', sortable: false, rightAlign: true},
 	]}
 		isLoading={isLoading}
 		isEmpty={$leaderboard.length == 0}
@@ -146,7 +145,6 @@
 				<Cell>{i+1}</Cell>
 				<Cell>{shortAddress(user)}</Cell>
 				<Cell rightAlign={true}><span class={`cell ${pnlUsd * 1 >= 0 ? 'green' : 'red'}`}>{@html formatPnl(pnlUsd)}</span></Cell>
-				<Cell rightAlign={true}>{numberWithCommas(getPrize(i+1)) || "-"}</Cell>
 			</Row>
 		{/each}
 	</Table>
