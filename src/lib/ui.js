@@ -71,7 +71,7 @@ function hidePopovers() {
 		hideError();
 	} else {
 		hideModal();
-		// showMarkets.set(false);
+		showMarkets.set(false);
 	}
 }
 

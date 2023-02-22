@@ -2,6 +2,7 @@ import { writable, derived, get } from 'svelte/store'
 
 import Home from '@components/home/Home.svelte'
 import Trade from '@components/trade/Trade.svelte'
+import Earn from '@components/earn/Earn.svelte'
 import Leaderboard from '@components/leaderboard/Leaderboard.svelte'
 import Pool from '@components/pool/Pool.svelte'
 import Stake from '@components/stake/Stake.svelte'
@@ -19,6 +20,10 @@ const PAGES = {
 	'Trade': {
 		component: Trade,
 		paths: ['trade']
+	},
+	'Earn': {
+		component: Earn,
+		paths: ['earn']
 	},
 	'Leaderboard': {
 		component: Leaderboard,

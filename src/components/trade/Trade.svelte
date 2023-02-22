@@ -33,8 +33,8 @@
 		grid-template-columns: 320px 1fr 1fr 310px;
 		grid-template-areas: 
 			"ticker ticker ticker sidebar"
-			"markets chart chart sidebar"
-			"markets chart chart sidebar"
+			"chart chart chart sidebar"
+			"chart chart chart sidebar"
 			"account account account sidebar";
 		grid-gap: 1px;
 		height: calc(100vh - 80px);
@@ -54,7 +54,6 @@
 			grid-template-columns: 100%;
 			grid-template-areas: 
 				"ticker"
-				"markets"
 				"chart"
 				"sidebar"
 				"account";
@@ -67,10 +66,6 @@
 	
 	.ticker {
 		grid-area: ticker;
-		background-color: var(--layer0);
-	}
-	.markets {
-		grid-area: markets;
 		background-color: var(--layer0);
 	}
 	.chart {
@@ -91,7 +86,6 @@
 
 <div class='grid' style={`--account-height: ${$accountHeight}px`}>
 	<div class='ticker'><Ticker /></div>
-	<div class='markets'><Markets /></div>
 	<div class='chart'><Chart /></div>
 	<div class='sidebar'><NewOrder /></div>
 	<div class='account'><Account /></div>

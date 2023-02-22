@@ -48,6 +48,9 @@ export const CAPPrice = writable();
 // Leaderboard
 export const leaderboard = writable([]);
 
+// Stats
+export const stats = writable([]);
+
 // Pool
 export const poolBalances = writable({});
 export const bufferBalances = writable({});
@@ -156,7 +159,7 @@ export const lastHistoryItemsCount = writable(0); // how many items were fetched
 export const historyOrderStatusToShow = writable(getUserSetting('historyOrderStatusToShow') || ['cancelled', 'executed', 'liquidated'])
 
 // Markets
-export const showMarkets = writable(true);
+export const showMarkets = writable(false);
 export const marketSearchQuery = writable();
 export const marketInfos = writable({});
 export const marketList = writable([]);

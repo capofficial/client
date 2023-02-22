@@ -4,11 +4,12 @@
 	import tooltip from '@lib/tooltip'
 
 	import ColoredPrice from '@components/layout/ColoredPrice.svelte'
+	import Markets from '../markets/Markets.svelte'
 
 	import { formatForDisplay, formatPnl, formatMarketName, formatPriceForDisplay } from '@lib/formatters'
 	import { selectedAsset, selectedMarket, selectedMarketInfo, chainlinkPrice, ohlc, fundingRate, fundingRate24h, lastDayChange, prices, showMarkets } from '@lib/stores'
 
-	import { MOON_CIRCLE, INFO_ICON_CIRCLE } from '@lib/icons'
+	import { MOON_CIRCLE, INFO_ICON_CIRCLE, CHEVRON_DOWN, CHEVRON_UP } from '@lib/icons'
 
 	import { getChainlinkPrice } from '@api/chainlink'
 	import { getFundingRate, getFundingRate24h } from '@api/markets'
@@ -50,6 +51,10 @@
 		clearTimeout(t3);
 	});
 
+	function toggleMarkets() {
+		showMarkets.set(!$showMarkets);
+	}
+
 </script>
 
 <style>
@@ -71,6 +76,7 @@
 		padding: 0 25px;
 		box-sizing: border-box;
 		height: 100%;
+		cursor: pointer;
 	}
 
 	.left {
@@ -97,6 +103,7 @@
 		display: flex;
 		align-items: center;
 		cursor: pointer;
+		margin-left: 12px;
 	}
 	.info-icon :global(svg) {
 		fill: var(--text200);
@@ -134,6 +141,23 @@
 		font-size: 80%;
 	}
 
+	.markets-wrapper {
+		position: absolute;
+		width: 320px;
+		top: 148px;
+		left: 0;
+		bottom: 0;
+		z-index: 900;
+		background-color: var(--layer0);
+		border-right: 1px solid var(--layer100);
+		opacity:0;
+		pointer-events: none;
+	}
+	.markets-wrapper.active {
+		opacity: 1;
+		pointer-events: all;
+	}
+
 	@media all and (max-width: 1500px) {
 		.no-1500 {
 			display: none;
@@ -150,12 +174,18 @@
 		.no-mobile {
 			display: none;
 		}
+		.markets-wrapper {
+			width: 100%;
+			border-right: none;
+		}
 	}
+
+
 	
 </style>
 
 <div class='ticker'>
-	<div class="selected-market">
+	<div class="selected-market" on:click|stopPropagation={toggleMarkets}>
 		<div class='left'>{formatMarketName($selectedMarket)} {#if $selectedMarketInfo?.maxLeverage}<span class='leverage'>{$selectedMarketInfo?.maxLeverage}×</span>{/if}</div>
 
 		<div class='right'>
@@ -163,7 +193,11 @@
 			<div class='moon-icon' use:tooltip={{content: 'Market Closed'}}>{@html MOON_CIRCLE}</div>
 			{/if}
 			<div class='info-icon' on:click|stopPropagation={() => showModal('MarketInfo', $selectedMarketInfo)}>{@html INFO_ICON_CIRCLE}</div>
+			<div class='info-icon'>{#if $showMarkets}{@html CHEVRON_UP}{:else}{@html CHEVRON_DOWN}{/if}</div>
 		</div>
+	</div>
+	<div class='markets-wrapper' class:active={$showMarkets}>
+		<Markets/>
 	</div>
 	<div class='stats'>
 		<div class='box'>

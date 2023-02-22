@@ -160,16 +160,16 @@
 
 </style>
 
-{#if $showMarkets}
+
 <div class='markets-wrapper'>
-	<div class='search-bar'><Search /></div>
+	<div class='search-bar' on:click|stopPropagation><Search /></div>
 	<div class='nav'>
-		<a on:click={() => filterMarkets('starred')} class:active={$marketsFilter == 'starred'} class='star-icon'>{@html STAR_ICON}</a>
-		<a on:click={() => filterMarkets('all')} class:active={$marketsFilter == 'all'}>All</a>
-		<a on:click={() => filterMarkets('crypto')} class:active={$marketsFilter == 'crypto'}>Crypto</a>
-		<a on:click={() => filterMarkets('fx')} class:active={$marketsFilter == 'fx'}>Forex</a>
-		<a on:click={() => filterMarkets('indices')} class:active={$marketsFilter == 'indices'}>Index</a>
-		<a on:click={() => filterMarkets('commodities')} class:active={$marketsFilter == 'commodities'}>Metals</a>
+		<a on:click|stopPropagation={() => filterMarkets('starred')} class:active={$marketsFilter == 'starred'} class='star-icon'>{@html STAR_ICON}</a>
+		<a on:click|stopPropagation={() => filterMarkets('all')} class:active={$marketsFilter == 'all'}>All</a>
+		<a on:click|stopPropagation={() => filterMarkets('crypto')} class:active={$marketsFilter == 'crypto'}>Crypto</a>
+		<a on:click|stopPropagation={() => filterMarkets('fx')} class:active={$marketsFilter == 'fx'}>Forex</a>
+		<a on:click|stopPropagation={() => filterMarkets('indices')} class:active={$marketsFilter == 'indices'}>Index</a>
+		<a on:click|stopPropagation={() => filterMarkets('commodities')} class:active={$marketsFilter == 'commodities'}>Metals</a>
 	</div>
 	<div class='table-wrapper'>
 		<Table
@@ -199,4 +199,3 @@
 	</div>
 
 </div>
-{/if}
