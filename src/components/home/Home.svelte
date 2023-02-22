@@ -354,7 +354,7 @@ footer {
       <a class='button ' href='/trade'>Start Trading →</a>
     </div>
 
-    <div class='note'>⚡️ Get 50% off fees until May 31!</div>
+    <div class='note'>⚡️ Get 50% off fees until May 31</div>
 
     <div class='stats'>
 
