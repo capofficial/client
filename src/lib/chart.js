@@ -59,7 +59,7 @@ export function initChart(cb) {
 
 	window.onresize = () => {
 		if (window.innerWidth > 650) {
-			chart.applyOptions({ width: window.innerWidth - 310 - 5 });
+			chart.applyOptions({ width: window.innerWidth - 315 });
 		} else {
 			chart.applyOptions({ width: window.innerWidth });
 		}
