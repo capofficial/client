@@ -152,10 +152,10 @@
 			{/each}
 			<div class='row'>
 				<div class='cell la'>Total</div>
-				<div class='cell'>${getTotalAmountInUsd($poolBalances, $prices)}</div>
+				<div class='cell'>${numberWithCommas(getTotalAmountInUsd($poolBalances, $prices))}</div>
 				<div class='cell'>-</div>
 				<div class='cell'>-</div>
-				<div class='cell highlighted'>${getTotalAmountInUsd($poolStakes, $prices)}</div>
+				<div class='cell highlighted'>${numberWithCommas(getTotalAmountInUsd($poolStakes, $prices))}</div>
 				<div class='cell highlighted'>-</div>
 			</div>
 		</div>

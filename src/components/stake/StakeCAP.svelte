@@ -139,7 +139,7 @@
 			<div class='cell'>Total Supply</div>
 			<div class='cell'>Total Staked</div>
 			<div class='cell highlighted'>Your Stake</div>
-			<div class='cell highlighted'>% of Stake</div>
+			<div class='cell highlighted'>% of Total</div>
 		</div>
 		<div class='table-body'>
 			<div class='row'>
