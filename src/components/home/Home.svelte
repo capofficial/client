@@ -97,7 +97,6 @@ h3 {
     line-height: 1.618;
     font-weight: 400;
     max-width: 500px;
-    color: var(--text1);
 }
 
 .button-wrapper {
@@ -121,6 +120,7 @@ h3 {
    margin-bottom: 96px;
    line-height: 1.318;
    color: var(--text1);
+   font-size: 90%;
 }
 
 .stats {
