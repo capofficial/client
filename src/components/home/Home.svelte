@@ -21,6 +21,18 @@
   transform: translateY(-50%);
 }
 
+.bg-wrap {
+  position: absolute;
+  width: 100%;
+  height: 800px;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  background-image: url('/im/hero-bg.png');
+  background-repeat: repeat-x;
+  opacity: 0.1;
+}
+
 .container {
   padding: 0 var(--base-padding);
   max-width: 1120px;
@@ -69,7 +81,7 @@ h1 {
   line-height: 1.418;
   margin: 16px 0;
   font-size: 56px;
-  font-weight: 600;
+  font-weight: 400;
   text-transform: uppercase;
 }
 
@@ -84,7 +96,7 @@ h3 {
     font-size: 26px;
     line-height: 1.618;
     font-weight: 400;
-    max-width: 600px;
+    max-width: 500px;
     color: var(--text1);
 }
 
@@ -93,7 +105,7 @@ h3 {
 }
 .button {
   display: inline-block;
-  padding: 16px 32px;
+  padding: 18px 32px;
   border-radius: 12px;
   font-weight: 600;
   color: var(--primary-darkest);
@@ -131,7 +143,7 @@ h3 {
 
 .stat {
   padding: 20px;
-  background-color: var(--layer0-hover);
+/*  background-color: var(--layer25);*/
   border-radius: 12px;
 }
 
@@ -201,7 +213,7 @@ h4 {
 }
 
 .box {
-  background-color: var(--layer0-hover);
+  background-color: var(--layer25);
   border-radius: 15px;
   padding: 30px var(--base-padding);
 }
@@ -218,9 +230,9 @@ h4 {
 }
 
 .box .title {
-  font-weight: 600;
+  font-weight: 500;
   font-size: 18px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .box .text {
@@ -297,6 +309,8 @@ footer {
 }
 </style>
 
+<div class='bg-wrap'></div>
+
 <div class='container'>
 
   <header>
@@ -309,9 +323,9 @@ footer {
 
   <div class='hero'>
 
-    <h1>Decentralized Perps</h1>
+    <h1>Decentralized <strong>Perps</strong></h1>
 
-    <h3>Trade global markets with leverage on the most advanced derivatives protocol.</h3>
+    <h3>Trade with leverage on the most advanced derivatives protocol.</h3>
 
     <div class='button-wrapper'>
       <a class='button ' href='/trade'>Start Trading →</a>
