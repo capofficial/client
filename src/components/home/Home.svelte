@@ -23,11 +23,11 @@
 
 .container {
   padding: 0 var(--base-padding);
+  max-width: 1120px;
+  margin: 0 auto;
 }
 
 header {
-  margin: 0 auto;
-  max-width: 1120px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -57,10 +57,7 @@ nav a:hover {
 }
 
 .hero {
-  text-align: center;
-  padding-top: 64px;
-  margin: 0 auto;
-  max-width: 1120px;
+  padding-top: 128px;
 }
 
 h1,h2,h3,h4,h5 {
@@ -70,9 +67,8 @@ h1,h2,h3,h4,h5 {
 
 h1 {
   line-height: 1.418;
-  margin: 24px auto;
-  font-size: 64px;
-  max-width: 720px;
+  margin: 16px 0;
+  font-size: 56px;
   font-weight: 600;
   text-transform: uppercase;
 }
@@ -84,12 +80,11 @@ h1 {
 }
 
 h3 {
-    margin: 0 auto;
-    margin-bottom: 64px;
+    margin-bottom: 48px;
     font-size: 26px;
     line-height: 1.618;
     font-weight: 400;
-    max-width: 480px;
+    max-width: 600px;
     color: var(--text1);
 }
 
@@ -98,9 +93,9 @@ h3 {
 }
 .button {
   display: inline-block;
-  padding: 20px 32px;
-  border-radius: 50px;
-  font-weight: 650;
+  padding: 16px 32px;
+  border-radius: 12px;
+  font-weight: 600;
   color: var(--primary-darkest);
   background-color: var(--primary);
   white-space: nowrap;
@@ -111,17 +106,16 @@ h3 {
 }
 
 .note {
-   margin-bottom: 64px;
+   margin-bottom: 96px;
    line-height: 1.318;
-   font-weight: 500;
+   color: var(--text1);
 }
 
 .stats {
-  margin: 0 auto;
    margin-bottom: 96px;
    display: grid;
    grid-template-columns: 1fr 1fr 1fr 1fr;
-   max-width: 1020px;
+   grid-gap: 32px;
 }
 
 @media all and (max-width: 600px) {
@@ -137,27 +131,17 @@ h3 {
 
 .stat {
   padding: 20px;
-}
-.stat:last-child {
-  border-right: none;
+  background-color: var(--layer0-hover);
+  border-radius: 12px;
 }
 
 .stat .value {
-  font-size: 38px;
-  font-weight: 800;
+  font-size: 42px;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
   height: 44px;
-}
-
-.stat .value.grayed {
-  font-weight: 400;
-  font-size: 18px;
-  color: var(--text1);
-}
-.stat .value.grayed img {
-  margin-right: 5px;
 }
 
 .stat .value img {
@@ -168,38 +152,22 @@ h3 {
   margin-top: 14px;
   font-size: 90%;
   letter-spacing: 0.02em;
-}
-
-.screen {
-  margin: 0 auto;
-  max-width: 1640px;
-  margin-bottom: 128px;
-}
-
-.screen img {
-  border-radius: 15px;
-  width: 100%;
-  box-shadow: 0 20px 40px rgb(28 28 28 / 50%);
-  border: 2px solid rgb(60 60 60 / 50%);
+  text-align: center;
 }
 
 .section {
-  margin: 0 auto;
-  max-width: 1120px;
-  text-align: center;
   margin-bottom: 128px;
 }
 
 h2 {
-  margin-bottom: 24px;
-  font-size: 42px;
-  font-weight: 650;
-  line-height: 1.318;
-  color: var(--text0);
+  margin-bottom: 16px;
+  font-size: 22px;
+  text-transform: uppercase;
+  font-weight: 500;
 }
 
 h4 {
-  font-size: 20px;
+  font-size: 18px;
   line-height: 1.418;
   color: var(--text1);
   font-weight: 400;
@@ -208,21 +176,19 @@ h4 {
 
 .grid {
   display: grid;
-  grid-template: 1fr 1fr 1fr / 1fr 1fr 1fr;
+  grid-template: 1fr 1fr 1fr / 1fr 1fr;
   grid-gap: 15px;
 }
 .grid-sec {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: 15px;
-  max-width: 720px;
-  margin: 0 auto;
 }
 
 @media all and (max-width: 600px) {
   .grid {
     grid-template-columns: 100%;
-    grid-template-rows: repeat(12, auto);
+    grid-template-rows: repeat(6, auto);
     height: auto;
     width: 100%;
   }
@@ -265,7 +231,6 @@ h4 {
 .partners {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 50px;
   margin-bottom: 50px;
 }
@@ -282,7 +247,7 @@ h4 {
 }
 
 footer {
-  border-top: 1px solid var(--layer0-hover);
+  border-top: 1px solid var(--layer50);
   padding: 64px 30px;
 }
 
@@ -337,24 +302,22 @@ footer {
   <header>
     <img src='im/logo-full.svg'>
     <nav class='right'>
-      <a href='/trade'>Trade</a>
-      <a href='/pool'>Pool</a>
-      <a href='/stake'>Stake</a>
+      <a href='https://discord.gg/zkdr8vnujz' target='_blank'>Discord</a>
       <a href='https://docs.cap.io'>Docs</a>
     </nav>
   </header>
 
   <div class='hero'>
 
-    <h1>The Best Place to Trade On-Chain</h1>
+    <h1>Decentralized Perps</h1>
 
-    <h3>Trade with low fees, deep liquidity, and up to 100× leverage.</h3>
+    <h3>Trade global markets with leverage on the most advanced derivatives protocol.</h3>
 
     <div class='button-wrapper'>
       <a class='button ' href='/trade'>Start Trading →</a>
     </div>
 
-    <div class='note'>⚡️ Get 50% off fees until May 31</div>
+    <div class='note'>Get 50% off fees until May 31.</div>
 
     <div class='stats'>
 
@@ -384,28 +347,13 @@ footer {
 
   </div>
 
-  <div class='screen'>
-    <img src='im/dashboard.png' />
-  </div>
-
   <div class='section'>
 
-    <h2 data-textify>Feature-Packed Perps</h2>
+    <h2>Features</h2>
 
-    <h4 data-textify>Everything you need for fast and secure on-chain trading.</h4>
+    <h4>Everything you need for fast and secure on-chain trading.</h4>
 
     <div class='grid'>
-
-      <div class='box'>
-        <div class='icon'>
-          <svg viewBox="0 0 23.2812 20.3613" height="48">
-            <path d="M2.27539 15.3223C1.8457 15.3223 1.57227 15.0488 1.57227 14.6191L1.57227 2.95898C1.57227 2.51953 1.8457 2.25586 2.27539 2.25586L21.0059 2.25586C21.4355 2.25586 21.709 2.51953 21.709 2.95898L21.709 14.6191C21.709 15.0488 21.4355 15.3223 21.0059 15.3223Z" fill="#ffffff" fill-opacity="0"/>
-            <path d="M2.24609 16.8945L21.0254 16.8945C22.4316 16.8945 23.2812 16.0449 23.2812 14.6387L23.2812 2.92969C23.2812 1.52344 22.4316 0.683594 21.0254 0.683594L2.24609 0.683594C0.849609 0.683594 0 1.52344 0 2.92969L0 14.6387C0 16.0449 0.849609 16.8945 2.24609 16.8945ZM2.27539 15.3223C1.8457 15.3223 1.57227 15.0488 1.57227 14.6191L1.57227 2.95898C1.57227 2.51953 1.8457 2.25586 2.27539 2.25586L21.0059 2.25586C21.4355 2.25586 21.709 2.51953 21.709 2.95898L21.709 14.6191C21.709 15.0488 21.4355 15.3223 21.0059 15.3223ZM8.55469 19.2188L14.7266 19.2188L14.7266 16.7676L8.55469 16.7676ZM8.49609 20.3613L14.7852 20.3613C15.2148 20.3613 15.5664 20.0098 15.5664 19.5703C15.5664 19.1309 15.2148 18.7793 14.7852 18.7793L8.49609 18.7793C8.06641 18.7793 7.70508 19.1309 7.70508 19.5703C7.70508 20.0098 8.06641 20.3613 8.49609 20.3613Z" fill="#21CC23" />
-          </svg>
-        </div>
-        <div class='title' data-textify>World-Class Platform</div>
-        <div class='text' data-textify>CAP offers an intuitive interface with real time prices, charting, and more.</div>
-      </div>
 
       <div class='box'>
         <div class='icon'>
@@ -414,7 +362,7 @@ footer {
       </svg>
         </div>
         <div class='title'>30+ Markets</div>
-        <div class='text'>Trade crypto, forex, commodities, and more using crypto collateral.</div>
+        <div class='text'>Trade crypto, forex, and metals using crypto collateral.</div>
       </div>
 
       <div class='box'>
@@ -440,18 +388,7 @@ footer {
 
         </div>
         <div class='title' data-textify>Advanced Order Types</div>
-        <div class='text' data-textify>CAP supports market, limit, stop, reduce-only, and OCO orders.</div>
-      </div>
-
-      <div class='box'>
-        <div class='icon'>
-          <svg viewBox="0 0 23.9551 22.6904"  height="48">
-            <path d="M0.703125 13.2349L3.56445 13.2349C3.82812 13.2349 4.07227 13.0786 4.14062 12.7954L4.59961 10.7642L4.25781 10.7642L5.80078 17.9126C5.92773 18.4985 6.88477 18.4985 6.97266 17.9028L8.16406 10.0708L9.56055 22.1509C9.64844 22.8735 10.6836 22.8638 10.7422 22.1509L12.0215 7.74658L13.3105 22.1411C13.3691 22.8735 14.4043 22.8735 14.4922 22.1411L15.8887 10.0708L17.0801 17.9126C17.1777 18.5083 18.125 18.5083 18.252 17.9126L19.7852 10.813L19.4141 10.8228L19.9121 12.7954C20 13.1177 20.2246 13.2349 20.4883 13.2349L23.2617 13.2349C23.6523 13.2349 23.9551 12.9321 23.9551 12.5513C23.9551 12.1704 23.6523 11.8579 23.2617 11.8579L20.918 11.8579L20.1367 8.83057C19.9609 8.17627 19.1113 8.17627 18.9648 8.83057L17.7637 14.5337L16.3867 5.53955C16.2793 4.82666 15.293 4.84619 15.2051 5.54932L13.9746 16.2231L12.627 0.98877C12.5586 0.256348 11.4941 0.256348 11.4258 0.98877L10.0781 16.2231L8.84766 5.54932C8.75977 4.82666 7.77344 4.82666 7.66602 5.53955L6.28906 14.5337L5.08789 8.83057C4.95117 8.2251 4.08203 8.2251 3.91602 8.83057L3.13477 11.8579L0.703125 11.8579C0.302734 11.8579 0 12.1704 0 12.5513C0 12.9321 0.302734 13.2349 0.703125 13.2349Z" fill="#21CC23"/>
-          </svg>
-
-        </div>
-        <div class='title' data-textify>Risk Management</div>
-        <div class='text' data-textify>Set a take-profit or stop-loss to automatically manage your trade risk.</div>
+        <div class='text' data-textify>Submit limit, stop, take-profit, reduce-only, and OCO orders.</div>
       </div>
 
       <div class='box'>
@@ -461,7 +398,7 @@ footer {
             </svg>
         </div>
         <div class='title' data-textify>Dynamic Funding</div>
-        <div class='text' data-textify>Longs pay shorts (and vice versa) based on open interest imbalance.</div>
+        <div class='text' data-textify>Longs pay shorts (and vice versa) based on OI imbalance.</div>
       </div>
 
       <div class='box'>
@@ -473,7 +410,7 @@ footer {
 
         </div>
         <div class='title' data-textify>Adjustable Leverage</div>
-        <div class='text' data-textify>Fine tune your leverage level on every order you submit, up to 100×.</div>
+        <div class='text' data-textify>Fine tune leverage on every order you submit, up to 100×.</div>
       </div>
 
       <div class='box'>
@@ -484,21 +421,8 @@ footer {
           </svg>
         </div>
         <div class='title' data-textify>Self Custody</div>
-        <div class='text' data-textify>Your keys, your coins. Trade directly from your wallet, no deposits required.</div>
+        <div class='text' data-textify>Trade directly from your wallet, no deposits required.</div>
       </div>
-
-      <div class='box'>
-        <div class='icon'>
-          <svg viewBox="0 0 21.8189 22.8003" height="48">
-            <path d="M14.7778 18.4851L4.33839 8.02613L1.05714 11.2976C-0.339343 12.6941-0.36864 14.1394 1.06691 15.5652L7.24855 21.7371C8.68409 23.1628 10.1196 23.1433 11.5161 21.7468ZM7.04347 5.32105L17.4829 15.7605L21.0376 12.2058C21.77 11.4734 21.8189 11.0535 21.8189 10.0281L21.8189 6.31714C21.8189 5.28199 21.5747 4.95972 20.8325 4.21753L18.5864 1.97144C17.854 1.23902 17.5318 0.985111 16.4966 0.985111L12.7759 0.985111C11.7505 0.985111 11.3403 1.03394 10.6079 1.76636ZM14.856 8.79761C14.0845 8.79761 13.5181 8.20191 13.5181 7.45972C13.5181 6.70777 14.0845 6.12183 14.856 6.12183C15.6177 6.12183 16.1939 6.70777 16.1939 7.45972C16.1939 8.20191 15.6177 8.79761 14.856 8.79761Z" fill="#21CC23"/>
-            <path d="M18.8599 20.8972C19.1626 21.1902 19.6411 21.1902 19.9243 20.8972C20.2075 20.6043 20.2173 20.1257 19.9243 19.8328L2.9712 2.87964C2.67824 2.58667 2.19972 2.57691 1.89699 2.87964C1.61378 3.16284 1.61378 3.65113 1.89699 3.94409Z" fill="#21CC23"/>
-          </svg>
-
-        </div>
-        <div class='title' data-textify>Low Fees</div>
-        <div class='text' data-textify>Get superior trade execution with low fees and zero slippage.</div>
-      </div>
-
 
     </div>
 
@@ -506,7 +430,7 @@ footer {
 
   <div class='section'>
 
-    <h2>Audited &amp; Verified</h2>
+    <h2>Security</h2>
 
     <h4>$0 hacked or lost since CAP first launched.</h4>
 
@@ -546,7 +470,7 @@ footer {
 
   <div class='section'>
 
-    <h2 data-textify>A Staple of DeFi</h2>
+    <h2 data-textify>Ecosystem</h2>
 
     <h4 data-textify>CAP pioneered on-demand oracles and continues to contribute to the DeFi community.</h4>
 
