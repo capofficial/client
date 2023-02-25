@@ -40,7 +40,7 @@ export const USD_CONVERSION_MARKETS = {
 	WBTC: 'BTC-USD'
 };
 
-export const DEFAULT_CHAIN_ID = 42161; // !! change for production
+export const DEFAULT_CHAIN_ID = 42161;
 
 export const CHAINDATA = {
 	31337: {
@@ -65,6 +65,17 @@ export const CHAINDATA = {
 		assets: {
 			ETH: ADDRESS_ZERO,
 			USDC: '0xff970a61a04b1ca14834a43f5de4533ebddb5cc8'
+		}
+	},
+	84531: {
+		label: 'base-goerli',
+		explorer: 'https://goerli.basescan.org',
+		rpc: 'https://goerli.base.org', // for walletconnect
+		dataEndpoint: 'https://data.cap.io/api',
+		dataStore: '0x31B693DDa8e36edACBaef79A8094c33EfF72a151',
+		cap: '0x031d35296154279dc1984dcd93e392b1f946737b',
+		assets: {
+			ETH: ADDRESS_ZERO
 		}
 	}
 }

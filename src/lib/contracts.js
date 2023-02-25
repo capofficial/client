@@ -8,10 +8,13 @@ import { provider, signer, chainId, unsupportedNetwork } from './stores'
 import { getChainData } from './utils'
 
 let addresses = {}; // cache
-let contracts = {}; // cache
 
 export async function getAddress(name) {
 	return await getContract(name, false, true);
+}
+
+export function bustCache() {
+	addresses = {};
 }
 
 export async function getContract(name, hasSigner, addressOnly) {
@@ -19,6 +22,8 @@ export async function getContract(name, hasSigner, addressOnly) {
 	const _provider = get(provider);
 	const _signer = get(signer);
 	const _chainId = get(chainId);
+
+	// console.log('getContract', _provider, _signer, _chainId);
 
 	if (!_chainId || !_provider) return;
 

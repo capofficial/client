@@ -3,7 +3,8 @@ import { ethers } from 'ethers'
 import { DEFAULT_CHAIN_ID, CHAINDATA, ALCHEMY_SETTINGS } from './config'
 import { chainId, signer, provider, address } from './stores'
 import { showToast, hideModal } from './ui'
-
+import { getMarketInfo } from '@api/markets'
+import { bustCache } from './contracts'
 
 // set default provider, when user is not connected
 chainId.set(DEFAULT_CHAIN_ID);
@@ -36,11 +37,16 @@ export async function connectMetamask(resume) {
 
 	const network = await _provider.getNetwork();
 	chainId.set(network.chainId);
+	// console.log('network.chainId', network.chainId);
 	metamask.on('chainChanged', (_chainId) => {
 		window.location.reload();
 	});
 
-	// provider.set(_provider);
+	if (network.chainId != 42161) {
+		provider.set(_provider);
+		bustCache();
+		getMarketInfo('all');
+	}
 
 	if (accounts.length) {
 		handleAccountsChanged();
@@ -61,7 +67,8 @@ export async function connectWalletConnect() {
 
 		_walletConnect = new WalletConnectProvider.default({
 			rpc: {
-				42161: CHAINDATA[42161].rpc
+				42161: CHAINDATA[42161].rpc,
+				84531: CHAINDATA[84531].rpc
 			}
 		});
 
