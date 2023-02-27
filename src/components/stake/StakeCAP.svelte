@@ -7,6 +7,7 @@
 	import { formatForDisplay, numberWithCommas } from '@lib/formatters'
 	import { address, totalSupplyCAP, CAPPrice, CAPStake } from '@lib/stores'
 	import { showModal } from '@lib/ui'
+	import { connect } from '@lib/connect'
 
 	let t;
 	async function fetchData() {
@@ -127,7 +128,7 @@
 				<Button isSmall={true} label={`Stake`} on:click={() => {showModal('StakeCAP')}} />
 				<Button isSmall={true} label={`Unstake`} on:click={() => {showModal('UnstakeCAP')}} />	
 			{:else}
-				<Button isSmall={true} label={`Connect Wallet`} on:click={() => {showModal('Connect')}} />
+				<Button isSmall={true} label={`Connect Wallet`} on:click={() => {connect()}} />
 			{/if}
 		</div>
 	</div>

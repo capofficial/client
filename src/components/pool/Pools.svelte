@@ -7,6 +7,7 @@
 	import { getAssets, getAmountInUsd, getTotalAmountInUsd  } from '@lib/utils'
 	import { formatForDisplay, numberWithCommas } from '@lib/formatters'
 	import { showModal } from '@lib/ui'
+	import { connect } from '@lib/connect'
 
 	let assets = getAssets();
 
@@ -125,7 +126,7 @@
 				<Button isSmall={true} label={`Deposit`} on:click={() => {showModal('Deposit')}} />
 				<Button isSmall={true} label={`Withdraw`} on:click={() => {showModal('Withdraw')}} />
 			{:else}
-				<Button isSmall={true} label={`Connect Wallet`} on:click={() => {showModal('Connect')}} />
+				<Button isSmall={true} label={`Connect Wallet`} on:click={() => {connect()}} />
 			{/if}
 		</div>
 	</div>

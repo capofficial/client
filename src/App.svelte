@@ -99,6 +99,10 @@
 
 		--accent: blue; /*neutral, can be used for info, etc.*/
 
+		--onboard-link-color: var(--primary);
+		--action-color: var(--primary);
+		--account-center-app-btn-background: var(--primary);
+		--account-center-maximized-upper-action-color: var(--primary);
 		--account-center-position-top: -6px;
 		--account-center-position-right: -0.5rem;
 		--account-center-z-index: 1000;

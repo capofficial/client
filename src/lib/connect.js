@@ -59,21 +59,24 @@ const onboard = Onboard({
 	  }
   ],
   connect: {
-  	// autoConnectLastWallet: true
+  	autoConnectLastWallet: true
   },
   appMetadata,
   theme: 'dark'
 })
 
-export async function connect() {
+let connected;
+const state = onboard.state.select();
+const { unsubscribe } = state.subscribe(async (update) => {
+	// console.log('state update: ', update);
 
-	// console.log('connect');
-
-	const wallets = await onboard.connectWallet()
+	const wallets = update.wallets;
 
 	// console.log(wallets)
 
 	if (wallets[0]) {
+		if (connected) return;
+		connected = true;
 	  // create an ethers provider with the last connected wallet provider
 	  const ethersProvider = new ethers.providers.Web3Provider(wallets[0].provider, 'any')
 
@@ -87,7 +90,7 @@ export async function connect() {
 
 	  chainId.set(network.chainId);
 
-	  console.log('network.chainId', network.chainId);
+	  // console.log('network.chainId', network.chainId);
 
 	  if (network.chainId != DEFAULT_CHAIN_ID) {
 	  	provider.set(ethersProvider);
@@ -95,15 +98,18 @@ export async function connect() {
 	  	getMarketInfo('all');
 	  }
 
+	} else {
+		connected = false;
+		// disconnection
+		signer.set(null);
+		address.set(null);
 	}
 
+});
+
+export async function connect() {
+	await onboard.connectWallet()
 }
-
-
-
-
-
-
 
 
 let _walletConnect;
