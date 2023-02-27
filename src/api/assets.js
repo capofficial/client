@@ -1,6 +1,7 @@
 import { get } from 'svelte/store'
 import { ethers } from 'ethers'
 import { CURRENCY_DECIMALS } from '@lib/config'
+import { updateBalances } from '@lib/connect'
 import { getContract } from '@lib/contracts'
 import { formatUnits, parseUnits } from '@lib/formatters'
 import { address, provider, balances, selectedAsset, allowances } from '@lib/stores'
@@ -31,6 +32,8 @@ export async function getUserAssetBalances(assets) {
 			return bls;
 		});
 	}
+	// also update blocknative account center
+	updateBalances();
 }
 
 export async function getAllowance(assetLabel, spenderName) {

@@ -1,5 +1,6 @@
 
 <script>
+  import { address } from '@lib/stores'
 	const d = new Date();
 	const year = d.getFullYear();
 </script>
@@ -315,10 +316,12 @@ footer {
 
   <header>
     <img src='im/logo-full.svg'>
+    {#if !$address}
     <nav class='right'>
       <a href='https://discord.gg/zkdr8vnujz' target='_blank'>Discord</a>
       <a href='https://docs.cap.io'>Docs</a>
     </nav>
+    {/if}
   </header>
 
   <div class='hero'>

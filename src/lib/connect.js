@@ -1,5 +1,5 @@
 import { ethers } from 'ethers'
-
+import { get } from 'svelte/store'
 import { DEFAULT_CHAIN_ID, CHAINDATA, ALCHEMY_SETTINGS } from './config'
 import { chainId, signer, provider, address } from './stores'
 import { showToast, hideModal } from './ui'
@@ -66,6 +66,7 @@ const onboard = Onboard({
 })
 
 let connected;
+let lastChainId = DEFAULT_CHAIN_ID;
 const state = onboard.state.select();
 const { unsubscribe } = state.subscribe(async (update) => {
 	// console.log('state update: ', update);
@@ -75,25 +76,28 @@ const { unsubscribe } = state.subscribe(async (update) => {
 	// console.log(wallets)
 
 	if (wallets[0]) {
-		if (connected) return;
-		connected = true;
+		
 	  // create an ethers provider with the last connected wallet provider
 	  const ethersProvider = new ethers.providers.Web3Provider(wallets[0].provider, 'any')
 
-	  const _signer = ethersProvider.getSigner()
+	  const _signer = ethersProvider.getSigner(wallets[0]?.accounts?.[0]?.address)
 
 	  // console.log('_signer', _signer);
 	  signer.set(_signer);
 	  address.set(await _signer.getAddress());
 
+	  // console.log('addr', get(address));
+
 	  const network = await ethersProvider.getNetwork()
 
 	  chainId.set(network.chainId);
 
+	  provider.set(ethersProvider);
+
 	  // console.log('network.chainId', network.chainId);
 
-	  if (network.chainId != DEFAULT_CHAIN_ID) {
-	  	provider.set(ethersProvider);
+	  if (network.chainId != lastChainId) {
+	  	lastChainId = network.chainId;
 	  	bustCache();
 	  	getMarketInfo('all');
 	  }
@@ -109,6 +113,10 @@ const { unsubscribe } = state.subscribe(async (update) => {
 
 export async function connect() {
 	await onboard.connectWallet()
+}
+
+export async function updateBalances() {
+	onboard.state.actions.updateBalances();
 }
 
 
