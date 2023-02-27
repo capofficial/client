@@ -51,6 +51,7 @@
 		height: 48px;
 		position: relative;
 		font-size: 90%;
+		z-index: 0;
 	}
 	.input-wrapper.invalid {
 		animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;

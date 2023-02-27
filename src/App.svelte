@@ -99,7 +99,22 @@
 
 		--accent: blue; /*neutral, can be used for info, etc.*/
 
+		--account-center-position-top: -6px;
+		--account-center-position-right: -0.5rem;
+		--account-center-z-index: 1000;
+		--account-center-border: transparent;
+		--account-center-border-radius: 6px;
+		--account-center-minimized-background: transparent;
+		--account-center-minimized-chain-select-background: rgb(199,199,204);
 
+		--onboard-account-select-modal-z-index: 1000;
+		--onboard-login-modal-z-index: 1000;
+		--onboard-modal-z-index: 1000;
+		--account-select-modal-margin-4: 1rem;
+		--account-select-modal-margin-5: 0.5rem;
+
+		--account-select-modal-font-family-normal: 'Inter', sans-serif;
+		--account-select-modal-font-family-light: 'Inter', sans-serif;
 
 		/* Old below */
 
@@ -135,6 +150,12 @@
 
 		
 
+	}
+
+	@media all and (max-width: 600px) {
+		:global(:root) {
+			--account-center-position-right: 0;
+		}
 	}
 
 	:global(html) {

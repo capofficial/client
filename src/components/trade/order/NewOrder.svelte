@@ -17,6 +17,7 @@
 	import { formatForDisplay } from '@lib/formatters'
 	import { focusInput, showModal } from '@lib/ui'
 	import {getUserSetting, saveUserSetting, getSize} from '@lib/utils'
+	import { connect } from '@lib/connect'
 
 	import {
 		address,
@@ -423,7 +424,7 @@
 					<Button isLoading={$submittingOrder} isRed={!$isLong} label={`${$isLong ? 'Buy / Long' : 'Sell / Short'}`} />
 					{/if}
 				{:else}
-					<Button noSubmit={true} isRed={!$isLong} label={`Connect Wallet`} on:click={() => {showModal('Connect')}} />
+					<Button noSubmit={true} isRed={!$isLong} label={`Connect Wallet`} on:click={() => {connect()}} />
 				{/if}
 			</div>
 

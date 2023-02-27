@@ -165,6 +165,9 @@
 	}
 
 	@media all and (max-width: 600px) {
+		.leverage {
+			display: none;
+		}
 		.selected-market {
 			width: auto;
 		}

@@ -9,8 +9,9 @@
 
 	import tooltip from '@lib/tooltip'
 
+	import { DEFAULT_CHAIN_ID } from '@lib/config'
 	import { TABLE_ICON, FILTER_ICON, XMARK_ICON, TROPHY_ICON } from '@lib/icons'
-	import { address, ordersSorted, positionsSorted } from '@lib/stores'
+	import { address, chainId, ordersSorted, positionsSorted } from '@lib/stores'
 	import { showModal } from '@lib/ui'
 
 	import { cancelMultipleOrders, getUserOrders } from '@api/orders'
@@ -204,7 +205,7 @@
 		<div class='nav'>
 			<a class:active={panel == 'positions'} on:click={() => {panel = 'positions'}}>Positions{#if $positionsSorted.length}<span class='count'>{$positionsSorted.length}</span>{/if}</a>
 			<a class:active={panel == 'orders'} on:click={() => {panel = 'orders'}}>Orders{#if $ordersSorted.length}<span class='count'>{$ordersSorted.length}</span>{/if}</a>
-			<a class:active={panel == 'history'} on:click={() => {panel = 'history'}}>History</a>
+			{#if $chainId == DEFAULT_CHAIN_ID}<a class:active={panel == 'history'} on:click={() => {panel = 'history'}}>History</a>{/if}
 		</div>
 		<div class='tools'>
 			<!-- <a class='leaderboard-link' href='/leaderboard'>{@html TROPHY_ICON} <span class='text'>Leaderboard</span></a> -->

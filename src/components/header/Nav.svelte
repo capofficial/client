@@ -41,7 +41,8 @@
 			grid-gap: 0;
 		}
 		a {
-			padding: 6px 10px;
+			font-size: 90%;
+			padding: 6px 8px;
 		}
 	}
 

@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte'
 
 	import { CHECKMARK_CIRCLE_ICON, GEAR_ICON } from '@lib/icons'
-	import { checkMetamaskSession, switchChains } from '@lib/connect'
+	import { connect, checkMetamaskSession, switchChains } from '@lib/connect'
 	import { address, unsupportedNetwork } from '@lib/stores'
 	import { showModal } from '@lib/ui'
 	import { shortAddress } from '@lib/utils'
@@ -88,6 +88,10 @@
 		.address-body {
 			display: none;
 		}
+		a.connect {
+			padding: 8px;
+			font-size: 90%;
+		}
 	}
 
 </style>
@@ -95,7 +99,7 @@
 <div class='connect'>
 
 	{#if $address}
-		{#if $unsupportedNetwork}
+		<!-- {#if $unsupportedNetwork}
 		<div class='address wrong-network' on:click={() => {switchChains()}}>
 			Wrong Network
 		</div>
@@ -104,11 +108,11 @@
 			{@html CHECKMARK_CIRCLE_ICON}
 			<span class='address-body'>{shortAddress($address)}</span>
 		</div>
-		{/if}
+		{/if} -->
 
 	{:else}
-		<a class='connect' on:click|stopPropagation={() => {showModal('Connect')}}>Connect</a>
+		<a class='connect' on:click|stopPropagation={() => {connect()}}>Connect</a>
 	{/if}
 
-	<a class='settings' on:click|stopPropagation={() => {showModal('Settings')}}>{@html GEAR_ICON}</a>
+	<!-- <a class='settings' on:click|stopPropagation={() => {showModal('Settings')}}>{@html GEAR_ICON}</a> -->
 </div>

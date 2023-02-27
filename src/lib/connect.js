@@ -6,11 +6,105 @@ import { showToast, hideModal } from './ui'
 import { getMarketInfo } from '@api/markets'
 import { bustCache } from './contracts'
 
+import Onboard from '@web3-onboard/core'
+import injectedModule from '@web3-onboard/injected-wallets'
+import coinbaseModule from '@web3-onboard/coinbase'
+import walletConnectModule from '@web3-onboard/walletconnect'
+
 // set default provider, when user is not connected
 chainId.set(DEFAULT_CHAIN_ID);
 // let _provider = new ethers.providers.JsonRpcProvider(CHAINDATA[DEFAULT_CHAIN_ID].rpc);
 let _provider = new ethers.providers.AlchemyProvider(ALCHEMY_SETTINGS.network, ALCHEMY_SETTINGS.apiKey);
 provider.set(_provider);
+
+const injected = injectedModule()
+const coinbaseWallet = coinbaseModule()
+const walletConnect = walletConnectModule({
+    connectFirstChainId: true
+  })
+
+const appMetadata = {
+  name: 'CAP',
+  icon: '/im/logo.svg',
+  logo: '/im/logo.svg',
+  description: 'Decentralized Perps',
+  recommendedInjectedWallets: [
+    { name: 'Coinbase', url: 'https://wallet.coinbase.com/' },
+    { name: 'MetaMask', url: 'https://metamask.io' },
+    { name: 'WalletConnect', url: 'https://walletconnect.org' },
+  ],
+  agreement: {
+    version: '1.0.0',
+    termsUrl: 'https://docs.cap.io/legal/terms-of-use',
+    privacyUrl: 'https://docs.cap.io/legal/risk-disclosure'
+  },
+  gettingStartedGuide: 'https://docs.cap.io',
+  explore: 'https://docs.cap.io/other/contracts'
+}
+
+const onboard = Onboard({
+  wallets: [injected, coinbaseWallet, walletConnect],
+  chains: [
+	  {
+	  	id: 42161,
+	  	token: 'ETH',
+	  	label: 'Arbitrum',
+	  	rpcUrl: 'https://arb1.arbitrum.io/rpc'
+	  },
+	  {
+	  	id: 84531,
+	  	token: 'ETH',
+	  	label: 'Base Goerli',
+	  	rpcUrl: 'https://goerli.base.org'
+	  }
+  ],
+  connect: {
+  	// autoConnectLastWallet: true
+  },
+  appMetadata,
+  theme: 'dark'
+})
+
+export async function connect() {
+
+	// console.log('connect');
+
+	const wallets = await onboard.connectWallet()
+
+	// console.log(wallets)
+
+	if (wallets[0]) {
+	  // create an ethers provider with the last connected wallet provider
+	  const ethersProvider = new ethers.providers.Web3Provider(wallets[0].provider, 'any')
+
+	  const _signer = ethersProvider.getSigner()
+
+	  // console.log('_signer', _signer);
+	  signer.set(_signer);
+	  address.set(await _signer.getAddress());
+
+	  const network = await ethersProvider.getNetwork()
+
+	  chainId.set(network.chainId);
+
+	  console.log('network.chainId', network.chainId);
+
+	  if (network.chainId != DEFAULT_CHAIN_ID) {
+	  	provider.set(ethersProvider);
+	  	bustCache();
+	  	getMarketInfo('all');
+	  }
+
+	}
+
+}
+
+
+
+
+
+
+
 
 let _walletConnect;
 
@@ -152,6 +246,5 @@ export async function switchChains() {
 
 async function handleAccountsChanged() {
 	const _signer = _provider.getSigner();
-	signer.set(_signer);
-	address.set(await _signer.getAddress());
+	
 }

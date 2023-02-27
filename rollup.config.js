@@ -11,6 +11,7 @@ import replace from '@rollup/plugin-replace';
 import gzipPlugin from 'rollup-plugin-gzip';
 import { brotliCompressSync } from 'zlib';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
+import json from '@rollup/plugin-json';
 
 const production = !process.env.ROLLUP_WATCH;
 const hash = String(require('child_process').execSync('git rev-parse --short HEAD')).trim(); // append short git commit to bundles
@@ -73,6 +74,7 @@ export default {
 			dedupe: ['svelte']
 		}),
 		commonjs(),
+		json(),
 
 		nodePolyfills(),
 

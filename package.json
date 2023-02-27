@@ -23,6 +23,7 @@
   "devDependencies": {
     "@rollup/plugin-alias": "^3.1.9",
     "@rollup/plugin-commonjs": "^22.0.2",
+    "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-node-resolve": "^14.1.0",
     "@rollup/plugin-replace": "^4.0.0",
     "chart.js": "^3.9.1",
@@ -42,6 +43,10 @@
   },
   "dependencies": {
     "@pythnetwork/pyth-common-js": "^1.4.0",
+    "@web3-onboard/coinbase": "^2.2.0",
+    "@web3-onboard/core": "^2.15.2",
+    "@web3-onboard/injected-wallets": "^2.8.0",
+    "@web3-onboard/walletconnect": "^2.2.2",
     "alchemy-sdk": "^2.2.3",
     "buffer": "^6.0.3",
     "lightweight-charts": "^3.8.0",
