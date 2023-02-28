@@ -98,8 +98,10 @@ const { unsubscribe } = state.subscribe(async (update) => {
 
 	  if (network.chainId != lastChainId) {
 	  	lastChainId = network.chainId;
-	  	bustCache();
-	  	getMarketInfo('all');
+	  	setTimeout(() => {
+		  	bustCache();
+		  	getMarketInfo('all');
+	  	}, 3000);
 	  }
 
 	} else {
