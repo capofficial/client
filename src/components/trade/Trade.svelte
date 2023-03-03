@@ -24,6 +24,19 @@
 		closeSocket();
 	});
 
+	let isMobile = false;
+
+	function resize() {
+		if (document.documentElement.clientWidth <= 600) {
+			isMobile = true;
+		} else {
+			isMobile = false;
+		}
+	}
+
+	window.addEventListener("resize", resize);
+	resize();
+
 	let mobilePage = 'chart';
 
 </script>
@@ -96,7 +109,7 @@
 	}
 	@media all and (max-width: 600px) {
 		.grid {
-			grid-template-rows: 72px auto 50px;
+			grid-template-rows: 70px auto 50px;
 			grid-template-columns: 100%;
 			grid-template-areas: 
 				"ticker"
@@ -118,17 +131,23 @@
 
 <div class='grid' style={`--account-height: ${$accountHeight}px`}>
 	<div class='ticker'><Ticker /></div>
-	<div class='content'>
-		{#if mobilePage == 'chart'}<Chart/>{/if}
-		{#if mobilePage == 'new-order'}<NewOrder/>{/if}
-		{#if mobilePage == 'account'}<Account/>{/if}
-	</div>
-	<!-- svelte-ignore a11y-missing-attribute -->
-	<div class='nav'>
-		<div class='nav-inner'>
-			<a class:active={mobilePage == 'chart'} on:click={() => {mobilePage = 'chart'}}>Chart</a>
-			<a class:active={mobilePage == 'new-order'} on:click={() => {mobilePage = 'new-order'}}>New Order</a>
-			<a class:active={mobilePage == 'account'} on:click={() => {mobilePage = 'account'}}>Account</a>
+	{#if isMobile}
+		<div class='content'>
+			{#if mobilePage == 'chart'}<Chart/>{/if}
+			{#if mobilePage == 'new-order'}<NewOrder/>{/if}
+			{#if mobilePage == 'account'}<Account/>{/if}
 		</div>
-	</div>
+		<!-- svelte-ignore a11y-missing-attribute -->
+		<div class='nav'>
+			<div class='nav-inner'>
+				<a class:active={mobilePage == 'chart'} on:click={() => {mobilePage = 'chart'}}>Chart</a>
+				<a class:active={mobilePage == 'new-order'} on:click={() => {mobilePage = 'new-order'}}>New Order</a>
+				<a class:active={mobilePage == 'account'} on:click={() => {mobilePage = 'account'}}>Account</a>
+			</div>
+		</div>
+	{:else}
+		<div class='chart'><Chart /></div>
+		<div class='sidebar'><NewOrder /></div>
+		<div class='account'><Account /></div>
+	{/if}
 </div>
