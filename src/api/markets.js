@@ -52,7 +52,7 @@ export async function getFundingRate24h(asset, market) {
 	const contract = await getContract('Funding');
 	const assetAddress = getAssetAddress(asset);
 	const accruedFunding = await contract.getAccruedFunding(assetAddress, market, 24);
-	fundingRate24h.set(-1 * formatUnits(accruedFunding, 18) / BPS_DIVIDER);
+	fundingRate24h.set(formatUnits(accruedFunding, 18) / BPS_DIVIDER);
 }
 
 export async function getFundingTracker(asset, market) {
