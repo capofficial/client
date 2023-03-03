@@ -24,6 +24,8 @@
 		closeSocket();
 	});
 
+	let mobilePage = 'chart';
+
 </script>
 
 <style>
@@ -47,22 +49,6 @@
 			--account-height: 200px;
 		}
 	}*/
-
-	@media all and (max-width: 600px) {
-		.grid {
-			grid-template-rows: auto 300px 300px auto var(--account-height);
-			grid-template-columns: 100%;
-			grid-template-areas: 
-				"ticker"
-				"chart"
-				"sidebar"
-				"account";
-			grid-gap: 1px;
-			height: auto;
-			overflow: initial; /* overflow fix */
-			width: 100%;
-		}
-	}
 	
 	.ticker {
 		grid-area: ticker;
@@ -82,11 +68,67 @@
 		grid-area: sidebar;
 		background-color: var(--layer0);
 	}
+	.content {
+		grid-area: content;
+		background-color: var(--layer0);
+		display: none;
+	}
+	.nav {
+		grid-area: nav;
+		background-color: var(--layer0);
+		display: none;
+	}
+	.nav-inner {
+		display: grid;
+		height: 100%;
+		grid-template-columns: 1fr 1fr 1fr;
+		grid-gap: 1px;
+	}
+	.nav-inner a {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 100%;
+		background-color: var(--layer25);
+	}
+	.nav-inner a.active {
+		background-color: var(--layer100);
+	}
+	@media all and (max-width: 600px) {
+		.grid {
+			grid-template-rows: 72px auto 50px;
+			grid-template-columns: 100%;
+			grid-template-areas: 
+				"ticker"
+				"content"
+				"nav";
+			grid-gap: 1px;
+			height: calc(100vh - 80px);
+			overflow: initial; /* overflow fix */
+			width: 100%;
+		}
+		.content, .nav {
+			display: block;
+		}
+		.chart, .account {
+			display: none;
+		}
+	}
 </style>
 
 <div class='grid' style={`--account-height: ${$accountHeight}px`}>
 	<div class='ticker'><Ticker /></div>
-	<div class='chart'><Chart /></div>
-	<div class='sidebar'><NewOrder /></div>
-	<div class='account'><Account /></div>
+	<div class='content'>
+		{#if mobilePage == 'chart'}<Chart/>{/if}
+		{#if mobilePage == 'new-order'}<NewOrder/>{/if}
+		{#if mobilePage == 'account'}<Account/>{/if}
+	</div>
+	<!-- svelte-ignore a11y-missing-attribute -->
+	<div class='nav'>
+		<div class='nav-inner'>
+			<a class:active={mobilePage == 'chart'} on:click={() => {mobilePage = 'chart'}}>Chart</a>
+			<a class:active={mobilePage == 'new-order'} on:click={() => {mobilePage = 'new-order'}}>New Order</a>
+			<a class:active={mobilePage == 'account'} on:click={() => {mobilePage = 'account'}}>Account</a>
+		</div>
+	</div>
 </div>
