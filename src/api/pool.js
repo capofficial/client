@@ -42,7 +42,7 @@ export async function getPoolWithdrawalFee(asset) {
 	const assetAddress = getAssetAddress(asset);
 	const fee = await contract.getWithdrawalFee(assetAddress);
 	poolWithdrawalFees.update((pwf) => {
-		pwf[asset] = Math.round(fee * 100 / BPS_DIVIDER) / 100;
+		pwf[asset] = Math.round(fee * 100 / BPS_DIVIDER);
 		return pwf;
 	});
 	return true;
