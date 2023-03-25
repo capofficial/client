@@ -546,7 +546,7 @@ footer {
         <div class='item'><a href='https://discord.gg/zkdr8vnujz' target='_blank'>Discord</a></div>
         <div class='item'><a href='https://twitter.com/CapDotFinance' target='_blank'>Twitter</a></div>
         <div class='item'><a href='https://capfinance.medium.com/' target='_blank'>Medium</a></div>
-        <div class='item'><a href='https://github.com/0xcap' target='_blank'>Github</a></div>
+        <div class='item'><a href='https://github.com/capofficial' target='_blank'>Github</a></div>
       </div>
 
       <div class='column'>
