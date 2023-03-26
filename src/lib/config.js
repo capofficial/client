@@ -1,7 +1,7 @@
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';
 
 export const ALCHEMY_SETTINGS = {
-	apiKey: "gDY8gANK8VJAg508BzJbdCpmZ4N43IZP",
+	apiKey: "CdI49q_GlwzjwXao9eyBBxU4qmpVnR2y",
 	network: "arbitrum"
 };
 
