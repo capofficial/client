@@ -9,16 +9,18 @@
 
 	import { BPS_DIVIDER } from '@lib/config'
 	import { numberWithCommas } from '@lib/formatters'
-	import { deposit, getPoolWithdrawalFee } from '@api/pool'
+	import { deposit, getPoolWithdrawalFee, getPoolDepositTaxBps, getGlobalUPL } from '@api/pool'
 	import { approveAsset, getAllowance, getUserAssetBalances } from '@api/assets'
-	import { allowances, poolWithdrawalFees, balances } from '@lib/stores'
+	import { allowances, poolDepositTaxes, globalUPLs, poolWithdrawalFees, balances } from '@lib/stores'
 	import { focusInput, hideModal } from '@lib/ui'
 	import { getAssets } from '@lib/utils'
 
-	let amount, asset, depositFeeBps, isSubmitting;
+	let amount, asset, isSubmitting;
 
 	async function selectAsset(_asset) {
 		asset = _asset;
+		getGlobalUPL(_asset);
+		getPoolDepositTaxBps(_asset);
 		getPoolWithdrawalFee(_asset);
 	}
 
@@ -92,9 +94,10 @@
 			<LabelValue label='Available' value={numberWithCommas($balances[asset])} isClickable={true} on:click={() => {amount = $balances[asset]}} />
 		</div>
 
-		{#if $poolWithdrawalFees[asset]}
-		<div class='note'>There are no deposit fees. The withdrawal fee is currently {$poolWithdrawalFees[asset]}%.</div>
-		{/if}
+		<div class="group">
+			<LabelValue label='Total Trader UP/L' value={numberWithCommas($globalUPLs[asset])} />
+			<LabelValue label='Deposit Cost' value={`${$poolDepositTaxes[asset] || 0}%`} />
+		</div>
 
 		<div>
 			{#if asset != 'ETH' && $allowances[asset]?.['FundStore'] * 1 <= amount * 1}

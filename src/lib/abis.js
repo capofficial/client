@@ -214,8 +214,10 @@ export const ABIS = {
 	Pool: [
 		`function deposit(address asset, uint256 amount) payable`,
 		`function withdraw(address asset, uint256 amount)`,
-		`function getDepositFee(address asset) view returns(uint256)`,
+		`function getDepositTaxBps(address asset) view returns(uint256)`,
+		`function getWithdrawalTaxBps(address asset) view returns(uint256)`,
 		`function getWithdrawFee(address asset) view returns(uint256)`,
+		`function getGlobalUPL(address asset) view returns (int256)`
 	].concat(EVENT_ABIS),
 	PoolStore: [
 		`function getBalances(address[] _assets) view returns(uint256[] memory)`,
