@@ -2,8 +2,8 @@
 	import { onDestroy } from 'svelte'
 	import Button from '@components/layout/Button.svelte'
 
-	import { getPoolBalances, getBufferBalances, getUserPoolStakes } from '@api/pool'
-	import { address, poolBalances, bufferBalances, prices, poolStakes } from '@lib/stores'
+	import { getPoolBalances, getBufferBalances, getUserPoolStakes, getGlobalUPL } from '@api/pool'
+	import { address, poolBalances, bufferBalances, prices, poolStakes, globalUPLs } from '@lib/stores'
 	import { getAssets, getAmountInUsd, getTotalAmountInUsd  } from '@lib/utils'
 	import { formatForDisplay, numberWithCommas } from '@lib/formatters'
 	import { showModal } from '@lib/ui'
@@ -17,6 +17,8 @@
 		const done = await getPoolBalances();
 		getBufferBalances();
 		getUserPoolStakes();
+		getGlobalUPL('ETH');
+		getGlobalUPL('USDC');
 		if (done) isLoading = false;
 	}
 	$: fetchData($address);
@@ -36,7 +38,7 @@
 	}
 
 	.table {
-		--grid-template: repeat(6, 1fr);
+		--grid-template: repeat(7, 1fr);
 	}
 
 	.header {
@@ -112,6 +114,11 @@
 		display: block;
 	}
 
+	.footnote {
+		padding-top: 25px;
+		color: var(--text300);
+		font-size: 80%;
+	}
 </style>
 
 <div class='pools'>
@@ -136,7 +143,8 @@
 			<div class='cell la'>Asset</div>
 			<div class='cell'>Balance</div>
 			<div class='cell'>Historical APY</div>
-			<div class='cell'>Buffer Balance</div>
+			<div class='cell'>Trader UP/L ¹</div>
+			<div class='cell'>Buffer</div>
 			<div class='cell highlighted'>Your Balance</div>
 			<div class='cell highlighted'>% of Pool</div>
 		</div>
@@ -146,6 +154,7 @@
 				<div class='cell la'><img src={`/asset-logos/${asset}.svg`} /> {asset}</div>
 				<div class='cell'><span>{numberWithCommas($poolBalances[asset]) || 0}<br/><span class='grayed'>${formatForDisplay(getAmountInUsd(asset, $poolBalances[asset], $prices))}</span></span></div>
 				<div class='cell'>20% - 60%</div>
+				<div class='cell'>{numberWithCommas($globalUPLs[asset])}</div>
 				<div class='cell'>{numberWithCommas($bufferBalances[asset])}</div>
 				<div class='cell highlighted'><span>{numberWithCommas($poolStakes[asset]) || 0}<br><span class='grayed'>${getAmountInUsd(asset, $poolStakes[asset], $prices)}</span></span></div>
 				<div class='cell highlighted'>{$poolBalances[asset] == 0 ? 'N/A' : formatForDisplay(($poolStakes[asset])/$poolBalances[asset]  *100 )+ '%'}</div>
@@ -156,9 +165,12 @@
 				<div class='cell'>${numberWithCommas(getTotalAmountInUsd($poolBalances, $prices))}</div>
 				<div class='cell'>-</div>
 				<div class='cell'>-</div>
+				<div class='cell'>-</div>
 				<div class='cell highlighted'>${numberWithCommas(getTotalAmountInUsd($poolStakes, $prices))}</div>
 				<div class='cell highlighted'>-</div>
 			</div>
 		</div>
 	</div>
+
+	<div class='footnote'>¹ Updated every ~15min.</div>
 </div>

@@ -71,6 +71,9 @@
 		font-size: 80%;
 		padding-bottom: 20px;
 	}
+	.group-row {
+		padding-bottom: 12px;
+	}
 
 </style>
 
@@ -91,11 +94,10 @@
 		</div>
 
 		<div class="group">
-			<LabelValue label='Available' value={numberWithCommas($balances[asset])} isClickable={true} on:click={() => {amount = $balances[asset]}} />
-		</div>
-
-		<div class="group">
-			<LabelValue label='Total Trader UP/L' value={numberWithCommas($globalUPLs[asset])} />
+			<div class='group-row'>
+				<LabelValue label='Available' value={numberWithCommas($balances[asset])} isClickable={true} on:click={() => {amount = $balances[asset]}} />
+			</div>
+			<div class='group-row'><LabelValue label='Total Trader UP/L' value={numberWithCommas($globalUPLs[asset])} /></div>
 			<LabelValue label='Deposit Cost' value={`${$poolDepositTaxes[asset] || 0}%`} />
 		</div>
 
