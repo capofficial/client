@@ -11,7 +11,7 @@
 	import { poolStakes, poolWithdrawalTaxes, globalUPLs } from '@lib/stores'
 	import { withdraw, getPoolWithdrawalTaxBps, getGlobalUPL } from '@api/pool'
 	import { focusInput, hideModal } from '@lib/ui'
-	import { formatForDisplay } from '@lib/formatters'
+	import { formatForDisplay, numberWithCommas } from '@lib/formatters'
 	import { getAssets } from '@lib/utils'
 
 	let amount, asset, withdrawFeeBps, isSubmitting;
