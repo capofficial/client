@@ -2,7 +2,7 @@ import { get } from 'svelte/store'
 import { CURRENCY_DECIMALS, BPS_DIVIDER } from '@lib/config'
 import { getContract } from '@lib/contracts'
 import { formatUnits, parseUnits } from '@lib/formatters'
-import { address, poolBalances, bufferBalances, poolStakes, poolStatsDaily, poolStatsWeekly, poolWithdrawalFees } from '@lib/stores'
+import { address, poolBalances, bufferBalances, poolStakes, poolStatsDaily, poolStatsWeekly, poolWithdrawalFees, poolDepositTaxes, poolWithdrawalTaxes, globalUPLs } from '@lib/stores'
 import { getAssetAddress, getAssetAddresses, getLabelForAsset, getChainData } from '@lib/utils'
 import { showToast, showError } from '@lib/ui'
 
@@ -34,6 +34,39 @@ export async function getBufferBalances() {
 		i++;
 	}
 	bufferBalances.set(_bufferBalances);
+	return true;
+}
+
+export async function getGlobalUPL(asset) {
+	const contract = await getContract('Pool');
+	const assetAddress = getAssetAddress(asset);
+	const upl = await contract.getGlobalUPL(assetAddress);
+	globalUPLs.update((gupl) => {
+		gupl[asset] = formatUnits(upl, CURRENCY_DECIMALS[asset]);
+		return gupl;
+	});
+	return true;
+}
+
+export async function getPoolDepositTaxBps(asset) {
+	const contract = await getContract('Pool');
+	const assetAddress = getAssetAddress(asset);
+	const taxBps = await contract.getDepositTaxBps(assetAddress);
+	poolDepositTaxes.update((pdt) => {
+		pdt[asset] = Math.round(taxBps * 100 / BPS_DIVIDER);
+		return pdt;
+	});
+	return true;
+}
+
+export async function getPoolWithdrawalTaxBps(asset) {
+	const contract = await getContract('Pool');
+	const assetAddress = getAssetAddress(asset);
+	const taxBps = await contract.getWithdrawalTaxBps(assetAddress);
+	poolWithdrawalTaxes.update((pwt) => {
+		pwt[asset] = Math.round(taxBps * 100 / BPS_DIVIDER);
+		return pwt;
+	});
 	return true;
 }
 

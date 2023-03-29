@@ -8,8 +8,8 @@
 	import { onMount } from 'svelte'
 
 	import { BPS_DIVIDER } from '@lib/config'
-	import { poolStakes, poolWithdrawalFees } from '@lib/stores'
-	import { withdraw, getPoolWithdrawalFee } from '@api/pool'
+	import { poolStakes, poolWithdrawalTaxes, globalUPLs } from '@lib/stores'
+	import { withdraw, getPoolWithdrawalTaxBps, getGlobalUPL } from '@api/pool'
 	import { focusInput, hideModal } from '@lib/ui'
 	import { formatForDisplay } from '@lib/formatters'
 	import { getAssets } from '@lib/utils'
@@ -18,7 +18,8 @@
 
 	async function selectAsset(_asset) {
 		asset = _asset;
-		getPoolWithdrawalFee(_asset);
+		getGlobalUPL(_asset);
+		getPoolWithdrawalTaxBps(_asset);
 	}
 
 	async function submit() {
@@ -80,9 +81,10 @@
 				<LabelValue label='Available' value={formatForDisplay($poolStakes[asset])} isClickable={true} on:click={() => {amount = $poolStakes[asset]}} />
 			</div>
 
-			{#if $poolWithdrawalFees[asset]}
-			<div class='note'>The withdrawal fee is currently {$poolWithdrawalFees[asset]}%.</div>
-			{/if}
+			<div class="group">
+				<LabelValue label='Total Trader UP/L' value={numberWithCommas($globalUPLs[asset])} />
+				<LabelValue label='Withdrawal Cost' value={`${$poolWithdrawalTaxes[asset] || 0}%`} />
+			</div>
 
 			<div>
 				<Button isLoading={isSubmitting} label={`Withdraw`} />
