@@ -19,6 +19,7 @@
 
 	async function selectAsset(_asset) {
 		asset = _asset;
+		getGlobalUPL(_asset);
 		getPoolDepositTaxBps(_asset);
 		getPoolWithdrawalFee(_asset);
 	}
