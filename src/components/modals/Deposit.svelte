@@ -15,13 +15,11 @@
 	import { focusInput, hideModal } from '@lib/ui'
 	import { getAssets } from '@lib/utils'
 
-	let amount, asset, isSubmitting;
+	let amount, asset, isSubmitting, costBps;
 
 	async function selectAsset(_asset) {
 		asset = _asset;
 		getGlobalUPL(_asset);
-		getPoolDepositTaxBps(_asset);
-		getPoolWithdrawalFee(_asset);
 	}
 
 	async function submit() {
@@ -36,6 +34,16 @@
 		isSubmitting = false;
 
 	}
+
+	let t;
+	async function calculateDepositCost() {
+		clearTimeout(t);
+		t = setTimeout(async () => {
+			costBps = await getPoolDepositTaxBps(asset, amount);
+		}, 1000);
+	}
+
+	$: calculateDepositCost(asset, amount);
 
 	let assets = getAssets();
 
@@ -98,7 +106,7 @@
 				<LabelValue label='Available' value={numberWithCommas($balances[asset])} isClickable={true} on:click={() => {amount = $balances[asset]}} />
 			</div>
 			<div class='group-row'><LabelValue label='Total Trader UP/L' value={numberWithCommas($globalUPLs[asset])} /></div>
-			<LabelValue label='Deposit Cost' value={`${$poolDepositTaxes[asset] || 0}%`} />
+			<LabelValue label='Deposit Cost' value={`${costBps || 0}%`} />
 		</div>
 
 		<div>

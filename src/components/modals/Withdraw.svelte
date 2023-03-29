@@ -8,18 +8,17 @@
 	import { onMount } from 'svelte'
 
 	import { BPS_DIVIDER } from '@lib/config'
-	import { poolStakes, poolWithdrawalTaxes, globalUPLs } from '@lib/stores'
+	import { poolStakes, globalUPLs } from '@lib/stores'
 	import { withdraw, getPoolWithdrawalTaxBps, getGlobalUPL } from '@api/pool'
 	import { focusInput, hideModal } from '@lib/ui'
 	import { formatForDisplay, numberWithCommas } from '@lib/formatters'
 	import { getAssets } from '@lib/utils'
 
-	let amount, asset, withdrawFeeBps, isSubmitting;
+	let amount, asset, costBps, isSubmitting;
 
 	async function selectAsset(_asset) {
 		asset = _asset;
 		getGlobalUPL(_asset);
-		getPoolWithdrawalTaxBps(_asset);
 	}
 
 	async function submit() {
@@ -34,6 +33,16 @@
 		isSubmitting = false;
 
 	}
+
+	let t;
+	async function calculateDepositCost() {
+		clearTimeout(t);
+		t = setTimeout(async () => {
+			costBps = await getPoolWithdrawalTaxBps(asset, amount);
+		}, 1000);
+	}
+
+	$: calculateDepositCost(asset, amount);
 
 	let assets = getAssets();
 
@@ -83,7 +92,7 @@
 			<div class="group">
 				<div class='group-row'><LabelValue label='Available' value={formatForDisplay($poolStakes[asset])} isClickable={true} on:click={() => {amount = $poolStakes[asset]}} /></div>
 					<div class='group-row'><LabelValue label='Total Trader UP/L' value={numberWithCommas($globalUPLs[asset])} /></div>
-				<LabelValue label='Withdrawal Cost' value={`${$poolWithdrawalTaxes[asset] || 0}%`} />
+				<LabelValue label='Withdrawal Cost' value={`${costBps || 0}%`} />
 			</div>
 
 			<div class="group">

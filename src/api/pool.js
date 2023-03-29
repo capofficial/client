@@ -48,26 +48,22 @@ export async function getGlobalUPL(asset) {
 	return true;
 }
 
-export async function getPoolDepositTaxBps(asset) {
+export async function getPoolDepositTaxBps(asset, _amount) {
 	const contract = await getContract('Pool');
 	const assetAddress = getAssetAddress(asset);
-	const taxBps = await contract.getDepositTaxBps(assetAddress);
-	poolDepositTaxes.update((pdt) => {
-		pdt[asset] = Math.round(taxBps * 100 / BPS_DIVIDER);
-		return pdt;
-	});
-	return true;
+	if (!_amount) return 0;
+	const amount = parseUnits(_amount, CURRENCY_DECIMALS[asset]);
+	const taxBps = await contract.getDepositTaxBps(assetAddress, amount);
+	return Math.round(taxBps) / 100;
 }
 
-export async function getPoolWithdrawalTaxBps(asset) {
+export async function getPoolWithdrawalTaxBps(asset, _amount) {
 	const contract = await getContract('Pool');
 	const assetAddress = getAssetAddress(asset);
-	const taxBps = await contract.getWithdrawalTaxBps(assetAddress);
-	poolWithdrawalTaxes.update((pwt) => {
-		pwt[asset] = Math.round(taxBps * 100 / BPS_DIVIDER);
-		return pwt;
-	});
-	return true;
+	if (!_amount) return 0;
+	const amount = parseUnits(_amount, CURRENCY_DECIMALS[asset]);
+	const taxBps = await contract.getWithdrawalTaxBps(assetAddress, amount);
+	return Math.round(taxBps) / 100;
 }
 
 export async function getPoolWithdrawalFee(asset) {
