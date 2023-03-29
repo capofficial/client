@@ -29,7 +29,7 @@ const ERROR_STRINGS = {
 	'!pool-balance': 'Not enough balance is available in the pool.',
 	'!amount': 'Amount is invalid.',
 	'!position': 'Position not found.',
-	'!max-oi': 'Maximum open interest on this market has been reached. Please try again later.',
+	'!max-oi': 'Trading is super busy! Max open interest on this market has been reached. Please try again later.',
 	'!tax': 'Pool utilization is too high. Please try again later.',
 	'!upl': 'Unrealized P/L is not enough to cover margin removal.',
 	'!market-risk': 'The market risk threshold / profit limit has been reached.',
