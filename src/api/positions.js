@@ -1,6 +1,6 @@
 import { get } from 'svelte/store'
 import { getContract } from '@lib/contracts'
-import { address, positions, fundingTrackers, prices, oi, maxOI } from '@lib/stores'
+import { address, positions, fundingTrackers, prices, oi, maxOI, selectedAsset, selectedMarket } from '@lib/stores'
 import { ADDRESS_ZERO, CURRENCY_DECIMALS, BPS_DIVIDER } from '@lib/config'
 import { parseUnits, formatUnits, formatPosition } from '@lib/formatters'
 import { getLabelForAsset, getUPL, getAssetAddress } from '@lib/utils'

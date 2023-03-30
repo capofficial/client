@@ -35,10 +35,14 @@
 	let availableLiquidity = 0;
 
 	function calculateAvailableLiquidity() {
-		if (!$maxOI || $maxOI * 1 == 0 || isNaN($maxOI * 1)) availableLiquidity = '∞';
-		availableLiquidity = $maxOI * 1 - $oi * 1;
-		if (availableLiquidity * 1 < 0) availableLiquidity = 0;
-		if (isNaN(availableLiquidity)) availableLiquidity = $maxOI;
+		// console.log($maxOI, $oi);
+		if (!$maxOI || $maxOI * 1 == 0 || isNaN($maxOI * 1)) {
+			availableLiquidity = '∞';
+		} else {
+			availableLiquidity = $maxOI * 1 - $oi * 1;
+			if (availableLiquidity * 1 < 0) availableLiquidity = 0;
+			if (isNaN(availableLiquidity)) availableLiquidity = $maxOI;
+		}
 	}
 
 	$: calculateAvailableLiquidity($oi, $maxOI);
@@ -110,7 +114,7 @@
 		<div class='row gray'>
 			<LabelValue 
 				label='Available Liquidity' 
-				value={`${isLoading ? '-' : `${availableLiquidity == '∞' ? '∞' : labeledNumber(availableLiquidity)} ${asset}`}`}
+				value={`${isLoading ? '-' : `${availableLiquidity == '∞' ? '∞' : `${labeledNumber(availableLiquidity)} ${asset}`}`}`}
 			/>
 		</div>
 
