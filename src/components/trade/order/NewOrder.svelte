@@ -105,12 +105,34 @@
 
 	// $: console.log('$size', $size);
 
+	let tpProfitPercent, slLossPercent;
+	let tpPriceInputActive, tpPercentInputActive, slPriceInputActive, slPercentInputActive;
 	
 	function setPrice(percentDiff) {
 		if (!$prices[$selectedMarket]) return;
 		price.set(formatForDisplay($prices[$selectedMarket] * (1 + percentDiff/100)));
 		highlightedPriceButton = percentDiff;
 	}
+
+	function resetFieldsOnCheck() {
+		if ($hasTP || $hasSL) {
+			isReduceOnly.set(false);
+		}
+		if ($isReduceOnly) {
+			hasTP.set(false);
+			hasSL.set(false);
+		}
+		if (!$hasTP || $isReduceOnly) {
+			tpProfitPercent = undefined;
+			tpPrice.set();
+		}
+		if (!$hasSL || $isReduceOnly) {
+			slLossPercent = undefined;
+			slPrice.set();
+		}
+	}
+
+	$: resetFieldsOnCheck($hasTP, $hasSL, $isReduceOnly);
 	
   	// reset inputs on market change
 	function resetOrderFields() {
@@ -129,8 +151,7 @@
 	
 	$: resetOrderFields($selectedMarket);
 
-	let tpProfitPercent, slLossPercent;
-	let tpPriceInputActive, tpPercentInputActive, slPriceInputActive, slPercentInputActive;
+	
 
 	function calculateTPSLPercentFromPrices() {
 		const latestPrice = $price * 1 > 0 ? $price : $prices[$selectedMarket];
@@ -360,36 +381,40 @@
 					</div>
 				{/if}
 
-				<div class='semi-padding-bottom row tpsl-header'>
-					<Checkbox label='Take-Profit' bind:value={$hasTP} isSecondaryColor={!$isLong} />
-				</div>
+				{#if !$isReduceOnly}
 
-				{#if $hasTP}
-					<div>
-						<div class='semi-padding-bottom'>
-							<div class='semi-padding-bottom'>
-								<Input label='TP Price' bind:value={$tpPrice} isSecondaryColor={!$isLong} on:focus={() => {tpPriceInputActive = true}} on:blur={() => {tpPriceInputActive = false}} />
-							</div>
-							<Input label='Profit (%)' bind:value={tpProfitPercent} isSecondaryColor={!$isLong} on:focus={() => {tpPercentInputActive = true}} on:blur={() => {tpPercentInputActive = false}} />
-						</div>
-
+					<div class='semi-padding-bottom row tpsl-header'>
+						<Checkbox label='Take-Profit' bind:value={$hasTP} isSecondaryColor={!$isLong} />
 					</div>
-				{/if}
 
-				<div class='semi-padding-bottom row tpsl-header'>
-					<Checkbox label='Stop-Loss' bind:value={$hasSL} isSecondaryColor={!$isLong} />
-				</div>
-
-				{#if $hasSL}
-					<div>
+					{#if $hasTP}
 						<div>
 							<div class='semi-padding-bottom'>
-								<Input label='SL Price' bind:value={$slPrice} isSecondaryColor={!$isLong} on:focus={() => {slPriceInputActive = true}} on:blur={() => {slPriceInputActive = false}} />
+								<div class='semi-padding-bottom'>
+									<Input label='TP Price' bind:value={$tpPrice} isSecondaryColor={!$isLong} on:focus={() => {tpPriceInputActive = true}} on:blur={() => {tpPriceInputActive = false}} />
+								</div>
+								<Input label='Profit (%)' bind:value={tpProfitPercent} isSecondaryColor={!$isLong} on:focus={() => {tpPercentInputActive = true}} on:blur={() => {tpPercentInputActive = false}} />
 							</div>
-							<Input label='Loss (%)' bind:value={slLossPercent} isSecondaryColor={!$isLong} on:focus={() => {slPercentInputActive = true}} on:blur={() => {slPercentInputActive = false}} />
-						</div>
 
+						</div>
+					{/if}
+
+					<div class='semi-padding-bottom row tpsl-header'>
+						<Checkbox label='Stop-Loss' bind:value={$hasSL} isSecondaryColor={!$isLong} />
 					</div>
+
+					{#if $hasSL}
+						<div>
+							<div>
+								<div class='semi-padding-bottom'>
+									<Input label='SL Price' bind:value={$slPrice} isSecondaryColor={!$isLong} on:focus={() => {slPriceInputActive = true}} on:blur={() => {slPriceInputActive = false}} />
+								</div>
+								<Input label='Loss (%)' bind:value={slLossPercent} isSecondaryColor={!$isLong} on:focus={() => {slPercentInputActive = true}} on:blur={() => {slPercentInputActive = false}} />
+							</div>
+
+						</div>
+					{/if}
+
 				{/if}
 
 				{#if !$hasTP && !$hasSL}
