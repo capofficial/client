@@ -64,17 +64,3 @@ export async function getFundingTracker(asset, market) {
 		return fts;
 	});
 }
-
-export async function getOI(market, asset, noStore) {
-	if (!asset) asset = get(selectedAsset);
-	if (!market) market = get(selectedMarket);
-	if (!asset || !market) return;
-	const contract = await getContract('PositionStore');
-	const assetAddress = getAssetAddress(asset);
-	const _oi = await contract.getOI(assetAddress, market)
-	if (noStore) {
-		return _oi
-	} else {
-		oi.set(_oi);
-	}
-}

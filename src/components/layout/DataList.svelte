@@ -8,6 +8,9 @@
 </script>
 
 <style>
+	.wrapper {
+		padding: 10px 0;
+	}
 	.row {
 		display: flex;
 		align-items: center;

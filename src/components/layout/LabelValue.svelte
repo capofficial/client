@@ -28,7 +28,6 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		color: var(--text0);
 		flex: 1 1 auto;
 		font-size: 95%;
 	}

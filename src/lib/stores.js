@@ -170,6 +170,7 @@ export const selectedMarket = writable(getUserSetting('selectedMarket') || DEFAU
 export const showMarketList = writable(false);
 export const riskParams = writable([]);
 export const oi = writable(0); // for selected market and asset
+export const maxOI = writable(0); // for selected market and asset
 export const selectedMarketInfo = derived([marketInfos, selectedMarket], ([$marketInfos, $selectedMarket]) => {
 	return $marketInfos[$selectedMarket] || {};
 }, {});

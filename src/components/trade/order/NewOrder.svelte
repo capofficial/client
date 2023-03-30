@@ -14,7 +14,7 @@
 
 	import { BPS_DIVIDER } from '@lib/config'
 	import { CHEVRON_DOWN, XMARK_ICON, INFO_ICON_CIRCLE } from '@lib/icons'
-	import { formatForDisplay } from '@lib/formatters'
+	import { formatForDisplay, numberWithCommas } from '@lib/formatters'
 	import { focusInput, showModal } from '@lib/ui'
 	import {getUserSetting, saveUserSetting, getSize} from '@lib/utils'
 	import { connect } from '@lib/connect'
@@ -359,7 +359,7 @@
 			<div class='bottom-spacing bottom-border'>
 				<LabelValue 
 					label={`${$isLong ? 'Buying Power' : 'Selling Power'}`}
-					value={`${formatForDisplay($maxSize)} ${$selectedAsset}`}
+					value={`${numberWithCommas($maxSize)} ${$selectedAsset}`}
 					on:click={size.set(formatForDisplay($maxSize))}
 				/>
 			</div>

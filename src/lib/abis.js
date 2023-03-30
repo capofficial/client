@@ -237,7 +237,7 @@ export const ABIS = {
 		`function getMany(string[] _markets) view returns(${marketTuple}[])`,
 	],
 	RiskStore: [
-		`function getParams(address asset, string memory market) external view returns(uint256,uint256,int256,uint256,int256,uint256)`
+		`function getMaxOI(string memory market, address asset) external view returns(uint256)`
 	],
 	Staking: [
 		`function stake(uint256 amount)`,

@@ -129,6 +129,17 @@ export function numberWithCommas(amount) {
 	return formattedAmount.toLocaleString(get(locale));
 }
 
+export function labeledNumber(number) {
+	const suffixes = ["", "K", "M", "B", "T"];
+	let suffixIndex = 0;
+	while (number >= 1000 && suffixIndex < suffixes.length - 1) {
+		number /= 1000;
+		suffixIndex++;
+	}
+	return `${number.toFixed(1)}${suffixes[suffixIndex]}`;
+
+}
+
 export function formatCAPForDisplay(amountStr) {
 	const amount = amountStr * 1;
 	const digits = MAX_CAP_DISPLAY_DECIMALS;

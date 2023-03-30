@@ -1,9 +1,9 @@
 import { get } from 'svelte/store'
 import { getContract } from '@lib/contracts'
-import { address, positions, fundingTrackers, prices } from '@lib/stores'
+import { address, positions, fundingTrackers, prices, oi, maxOI } from '@lib/stores'
 import { ADDRESS_ZERO, CURRENCY_DECIMALS, BPS_DIVIDER } from '@lib/config'
-import { parseUnits, formatPosition } from '@lib/formatters'
-import { getLabelForAsset, getUPL } from '@lib/utils'
+import { parseUnits, formatUnits, formatPosition } from '@lib/formatters'
+import { getLabelForAsset, getUPL, getAssetAddress } from '@lib/utils'
 import { showToast, showError } from '@lib/ui'
 
 let isLoadingPositions = false;
@@ -77,6 +77,36 @@ export async function getUserPositions() {
 	positions.set(_positions);
 	isLoadingPositions = false;
 	return true;
+}
+
+export async function getOI(market, asset, noStore) {
+	if (!asset) asset = get(selectedAsset);
+	if (!market) market = get(selectedMarket);
+	if (!asset || !market) return;
+	const contract = await getContract('PositionStore');
+	const assetAddress = getAssetAddress(asset);
+	const assetDecimals = CURRENCY_DECIMALS[asset];
+	const _oi = formatUnits(await contract.getOI(assetAddress, market), assetDecimals);
+	if (noStore) {
+		return _oi
+	} else {
+		oi.set(_oi);
+	}
+}
+
+export async function getMaxOI(market, asset, noStore) {
+	if (!asset) asset = get(selectedAsset);
+	if (!market) market = get(selectedMarket);
+	if (!asset || !market) return;
+	const contract = await getContract('RiskStore');
+	const assetAddress = getAssetAddress(asset);
+	const assetDecimals = CURRENCY_DECIMALS[asset];
+	const _oi = formatUnits(await contract.getMaxOI(market, assetAddress), assetDecimals);
+	if (noStore) {
+		return _oi
+	} else {
+		maxOI.set(_oi);
+	}
 }
 
 export async function addMargin(market, asset, _margin) {
