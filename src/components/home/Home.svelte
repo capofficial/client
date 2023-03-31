@@ -117,15 +117,8 @@ h3 {
   background-color: var(--primary-hover);
 }
 
-.note {
-   margin-bottom: 96px;
-   line-height: 1.318;
-   color: var(--text1);
-   font-size: 90%;
-}
-
 .stats {
-   margin-bottom: 96px;
+   margin: 96px 0;
    display: grid;
    grid-template-columns: 1fr 1fr 1fr 1fr;
    grid-gap: 32px;
@@ -334,12 +327,10 @@ footer {
       <a class='button ' href='/trade'>Start Trading →</a>
     </div>
 
-    <div class='note'>Get 50% off fees until May 31.</div>
-
     <div class='stats'>
 
       <div class='stat'>
-        <div class='value' id='volumeValue'>$7B+</div>
+        <div class='value' id='volumeValue'>$8B+</div>
         <div class='label'>Volume</div>
       </div>
 
@@ -498,7 +489,7 @@ footer {
     </div>
 
     <div class='partners'>
-      <a href='https://defillama.com/protocol/cap' target='_blank'><img src='im/partners/defillama.webp'></a>
+      <a href='https://defillama.com/protocol/cap-finance' target='_blank'><img src='im/partners/defillama.webp'></a>
       <a href='https://www.coingecko.com/en/coins/cap' target='_blank'><img src='im/partners/coingecko.webp'></a>
       <a href='https://thegraph.com/hosted-service/subgraph/0xcap/cap3' target='_blank'><img src='im/partners/graph.png'></a>
     </div>

@@ -348,10 +348,11 @@
 
 		<form on:submit|preventDefault={submit}>
 
-			<div class='bottom-spacing'>
-				<Input label={`Size (${$selectedAsset})`} bind:value={$size} isSecondaryColor={!$isLong} placeholder={`0.0`} isInvalid={$maxSize && $size > formatForDisplay($maxSize) * 1} />
+			<div class='bottom-spacing' class:bottom-border={$isReduceOnly}>
+				<Input label={`Size (${$selectedAsset})`} bind:value={$size} isSecondaryColor={!$isLong} placeholder={`0.0`} isInvalid={$isReduceOnly ? false : $maxSize && $size > formatForDisplay($maxSize) * 1} />
 			</div>
 			
+			{#if !$isReduceOnly}
 			<div class='slider-container bottom-spacing'>
 				<Slider bind:value={$size} maxValue={$maxSize} bind:isActive={sizeHighlighted} isSecondaryColor={!$isLong} nullValue={true} />
 			</div>
@@ -363,6 +364,7 @@
 					on:click={size.set(formatForDisplay($maxSize))}
 				/>
 			</div>
+			{/if}
 
 			<div class='top-spacing bottom-spacing advanced-handle' on:click={() => showAdvanced = !showAdvanced}>
 				Options {#if showAdvanced}{@html XMARK_ICON}{:else}{@html CHEVRON_DOWN}{/if}
