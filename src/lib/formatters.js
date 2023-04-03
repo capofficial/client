@@ -117,7 +117,6 @@ export function formatForDisplay(amount, fix) {
 }
 
 export function formatPriceForDisplay(price) {
-	console.log('price', price);
 	if (!price || isNaN(price)) return 0;
 	if (Math.abs(price * 1) < 0.001) {
 		return (price * 1).toFixed(8);
