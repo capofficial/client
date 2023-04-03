@@ -108,15 +108,20 @@ export function formatForDisplay(amount, fix) {
 		return +(amount * 1).toFixed(4);
 	} else if (amount * 1 >= 0.01 || amount * 1 <= -0.01) {
 		return +(amount * 1).toFixed(5);
-	} else {
+	} else if (amount * 1 >= 0.001 || amount * 1 <= -0.001)  {
 		return +(amount * 1).toFixed(6);
+	} else {
+		return +(amount * 1).toFixed(8);
 	}
 
 }
 
 export function formatPriceForDisplay(price) {
+	console.log('price', price);
 	if (!price || isNaN(price)) return 0;
-	if (Math.abs(price * 1) < 10) {
+	if (Math.abs(price * 1) < 0.001) {
+		return (price * 1).toFixed(8);
+	} else if (Math.abs(price * 1) < 10) {
 		return (price * 1).toFixed(5);
 	} else {
 		return (price * 1).toFixed(2);
