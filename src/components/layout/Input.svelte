@@ -16,19 +16,6 @@
 	export let isHighlighted = false;
 	export let isInvalid = false;
 
-	function valueChecker(number) {
-
-		value = Number(parseFloat(number).toFixed(7))
-		
-		if (value > 10000000)
-		{
-			value = 10000000
-		}
-
-	}
-
-	$: valueChecker(value)
-
 </script>
 
 <style>
@@ -123,5 +110,5 @@
 	<label for={label} class='prefix'>
 		{label}
 	</label>
-	<input id={label} type='number' step="0.0000001" bind:value={value} min="0" max="10000000" maxlength="10" spellcheck="false" placeholder={placeholder || `0.0`} autocomplete="off" autocorrect="off" inputmode="decimal" lang="en" disabled={disabled}  class:secondaryColor={isSecondaryColor} class:highlighted={isHighlighted} on:focus on:blur>
+	<input id={label} type='number' step="any" bind:value={value} min="0" max="10000000" maxlength="10" spellcheck="false" placeholder={placeholder || `0.0`} autocomplete="off" autocorrect="off" inputmode="decimal" lang="en" disabled={disabled}  class:secondaryColor={isSecondaryColor} class:highlighted={isHighlighted} on:focus on:blur>
 </div>

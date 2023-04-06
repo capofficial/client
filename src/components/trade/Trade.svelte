@@ -109,16 +109,19 @@
 	}
 	@media all and (max-width: 600px) {
 		.grid {
-			grid-template-rows: 70px auto 50px;
+			position: absolute;
+			top: 76px;
+			bottom: 0;
+			left:0;
+			right: 0;
+			grid-template-rows: 70px 50px auto;
 			grid-template-columns: 100%;
 			grid-template-areas: 
 				"ticker"
-				"content"
-				"nav";
+				"nav"
+				"content";
 			grid-gap: 1px;
-			height: calc(100vh - 80px);
 			overflow: initial; /* overflow fix */
-			width: 100%;
 		}
 		.content, .nav {
 			display: block;
@@ -132,11 +135,6 @@
 <div class='grid' style={`--account-height: ${$accountHeight}px`}>
 	<div class='ticker'><Ticker /></div>
 	{#if isMobile}
-		<div class='content'>
-			{#if mobilePage == 'chart'}<Chart/>{/if}
-			{#if mobilePage == 'new-order'}<NewOrder/>{/if}
-			{#if mobilePage == 'account'}<Account/>{/if}
-		</div>
 		<!-- svelte-ignore a11y-missing-attribute -->
 		<div class='nav'>
 			<div class='nav-inner'>
@@ -144,6 +142,11 @@
 				<a class:active={mobilePage == 'new-order'} on:click={() => {mobilePage = 'new-order'}}>New Order</a>
 				<a class:active={mobilePage == 'account'} on:click={() => {mobilePage = 'account'}}>Account</a>
 			</div>
+		</div>
+		<div class='content'>
+			{#if mobilePage == 'chart'}<Chart/>{/if}
+			{#if mobilePage == 'new-order'}<NewOrder/>{/if}
+			{#if mobilePage == 'account'}<Account/>{/if}
 		</div>
 	{:else}
 		<div class='chart'><Chart /></div>
