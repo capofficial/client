@@ -121,7 +121,7 @@
 					{month} {year}
 				{/if}
 			</div>
-			<div class='subtitle'>Win prizes every month based on your trading P/L.</div>
+			<div class='subtitle'>Track your performance versus other traders.</div>
 		</div>
 		<div class='right buttons'>
 			<a class:active={showPreviousLeaderboard == false} on:click={() => {loadLeaderboard()}}>This Month</a>

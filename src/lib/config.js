@@ -40,6 +40,36 @@ export const USD_CONVERSION_MARKETS = {
 	WBTC: 'BTC-USD'
 };
 
+// Used to display discount
+export const BASE_FEES_BPS = {
+	'ETH-USD': 10,
+	'BTC-USD': 10,
+	'ARB-USD': 50,
+	'EUR-USD': 5,
+	'XAU-USD': 10,
+	'AAVE-USD': 50,
+	'DOGE-USD': 50,
+	'FLOKI-USD': 50,
+	'ADA-USD': 50,
+	'BNB-USD': 30,
+	'MATIC-USD': 40,
+	'NEAR-USD': 50,
+	'SOL-USD': 30,
+	'AUD-USD': 5,
+	'USD-CNH': 10,
+	'USD-CAD': 5,
+	'GBP-USD': 5,
+	'USD-JPY': 5,
+	'USD-CHF': 5,
+	'XAG-USD': 10,
+	'NZD-USD': 6,
+	'USD-MXN': 10,
+	'USD-SGD': 10,
+	'USD-ZAR': 10,
+	'SPY-USD': 10,
+	'QQQ-USD': 10
+};
+
 export const DEFAULT_CHAIN_ID = 42161;
 
 export const CHAINDATA = {
