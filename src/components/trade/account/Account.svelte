@@ -154,25 +154,6 @@
 		height: 16px;
 	}
 
-	.tools a.leaderboard-link {
-		text-decoration: none;
-		padding: 6px 8px;
-		background-color: var(--layer50);
-		border-radius: 5px;
-		color: gold;
-		font-size: 85%;
-	}
-	.leaderboard-link .text {
-		margin-left: 6px;
-	}
-	.tools a.leaderboard-link:hover {
-		background-color: var(--layer100);
-	}
-	.tools a.leaderboard-link :global(svg) {
-		fill: gold !important;
-		height: 12px;
-	}
-
 	.count {
 		font-size: 80%;
 		margin-left: 4px;
@@ -208,7 +189,6 @@
 			{#if $chainId == DEFAULT_CHAIN_ID}<a class:active={panel == 'history'} on:click={() => {panel = 'history'}}>History</a>{/if}
 		</div>
 		<div class='tools'>
-			<a class='leaderboard-link' href='/leaderboard'>{@html TROPHY_ICON} <span class='text'>Leaderboard</span></a>
 			{#if panel == 'history'}
 				<a on:click|stopPropagation={() => {showModal('HistoryOrderStatus')}} use:tooltip={{content: 'Filter history'}}>{@html FILTER_ICON}</a>
 			{/if}

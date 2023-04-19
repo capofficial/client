@@ -7,7 +7,7 @@
 
 	import { getLeaderboard } from '@api/leaderboard' 
 
-	import { leaderboard } from '@lib/stores'
+	import { leaderboard, loserboard } from '@lib/stores'
 	import { formatPnl, numberWithCommas } from '@lib/formatters'
 	import { shortAddress } from '@lib/utils'
 
@@ -20,9 +20,11 @@
 		if (isPrevious) {
 			showPreviousLeaderboard = true;
 			await getLeaderboard({previous: true});
+			await getLeaderboard({losers: true, previous: true});
 		} else {
 			showPreviousLeaderboard = false;
 			await getLeaderboard();
+			await getLeaderboard({losers: true});
 		}
 		isLoading = false;
 	}
@@ -108,6 +110,27 @@
 		display: block;
 	}
 
+	a {
+		color: var(--text0);
+		text-decoration: none;
+	}
+
+	h3 {
+		padding-top: 20px;
+	}
+
+	.tables {
+		display: flex;
+		gap: 20px;
+	}
+	.table {
+		flex: 1;
+	}
+	@media all and (max-width: 600px) {
+		.tables {
+			display: block;
+		}
+	}
 </style>
 
 <div class='wrapper'>
@@ -115,7 +138,7 @@
 	<div class='header'>
 		<div class='left'>
 			<div class='title'>
-				{#if showPreviousLeaderboard}
+				Leaderboard – {#if showPreviousLeaderboard}
 					{lastMonth} {lastMonthYear}
 				{:else}
 					{month} {year}
@@ -129,24 +152,60 @@
 		</div>
 	</div>
 
-	<Table
-		defaultSortKey={[]}
-		sortKey={['rank', false]}
-		columns={[
-		{key: 'Rank', gridTemplate: '70px', sortable: false},
-		{key: 'User', gridTemplate: '1fr', sortable: false},
-		{key: 'P/L ($)', gridTemplate: '1fr', sortable: false, rightAlign: true},
-	]}
-		isLoading={isLoading}
-		isEmpty={$leaderboard.length == 0}
-	>
-		{#each $leaderboard as { user, pnlUsd }, i }
-			<Row>
-				<Cell>{i+1}</Cell>
-				<Cell>{shortAddress(user)}</Cell>
-				<Cell rightAlign={true}><span class={`cell ${pnlUsd * 1 >= 0 ? 'green' : 'red'}`}>{@html formatPnl(pnlUsd)}</span></Cell>
-			</Row>
-		{/each}
-	</Table>
+	<div class='tables'>
+
+		<div class='table'>
+
+			<h3>Top Winners</h3>
+
+			<Table
+				defaultSortKey={[]}
+				sortKey={['rank', false]}
+				columns={[
+				{key: 'Rank', gridTemplate: '70px', sortable: false},
+				{key: 'User', gridTemplate: '1fr', sortable: false},
+				{key: 'Profit ($)', gridTemplate: '1fr', sortable: false, rightAlign: true},
+			]}
+				isLoading={isLoading}
+				isEmpty={$leaderboard.length == 0}
+			>
+				{#each $leaderboard as { user, pnlUsd }, i }
+					<Row>
+						<Cell>{i+1}</Cell>
+						<Cell><a href={`https://arbiscan.io/address/${user}`} target="_blank">{shortAddress(user)}</a></Cell>
+						<Cell rightAlign={true}><span class={`cell ${pnlUsd * 1 >= 0 ? 'green' : 'red'}`}>{@html formatPnl(pnlUsd)}</span></Cell>
+					</Row>
+				{/each}
+			</Table>
+
+		</div>
+
+		<div class='table'>
+
+			<h3>Top Losers</h3>
+
+			<Table
+				defaultSortKey={[]}
+				sortKey={['rank', false]}
+				columns={[
+				{key: 'Rank', gridTemplate: '70px', sortable: false},
+				{key: 'User', gridTemplate: '1fr', sortable: false},
+				{key: 'Loss ($)', gridTemplate: '1fr', sortable: false, rightAlign: true},
+			]}
+				isLoading={isLoading}
+				isEmpty={$loserboard.length == 0}
+			>
+				{#each $loserboard as { user, pnlUsd }, i }
+					<Row>
+						<Cell>{i+1}</Cell>
+						<Cell><a href={`https://arbiscan.io/address/${user}`} target="_blank">{shortAddress(user)}</a></Cell>
+						<Cell rightAlign={true}><span class={`cell ${pnlUsd * 1 >= 0 ? 'green' : 'red'}`}>{@html formatPnl(pnlUsd)}</span></Cell>
+					</Row>
+				{/each}
+			</Table>
+
+		</div>
+
+	</div>
 
 </div>

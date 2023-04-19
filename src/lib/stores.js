@@ -47,6 +47,7 @@ export const CAPPrice = writable();
 
 // Leaderboard
 export const leaderboard = writable([]);
+export const loserboard = writable([]);
 
 // Stats
 export const stats = writable([]);

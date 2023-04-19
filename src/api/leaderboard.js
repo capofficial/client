@@ -1,7 +1,7 @@
 import { get } from 'svelte/store'
 import { getChainData } from '@lib/utils'
 
-import { leaderboard } from '@lib/stores'
+import { leaderboard, loserboard } from '@lib/stores'
 
 export async function getLeaderboard(params) {
 
@@ -9,7 +9,7 @@ export async function getLeaderboard(params) {
 
 	if (!params) params = {};
 
-	let { previous } = params;
+	let { previous, losers } = params;
 
 	const now = new Date();
 
@@ -32,10 +32,19 @@ export async function getLeaderboard(params) {
 		end = endThisMonth;
 	}
 
+	let losersQuery = '';
+	if (losers) {
+		losersQuery = '&losers=true';
+	}
+
 	try {
-		const response = await fetch(`${dataEndpoint}/leaderboard?chain=arbitrum&start=${start}&end=${end}`);
+		const response = await fetch(`${dataEndpoint}/leaderboard?chain=arbitrum&start=${start}&end=${end}${losersQuery}`);
 		const items = await response.json() || [];
-		leaderboard.set(items);
+		if (losers) {
+			loserboard.set(items);
+		} else {
+			leaderboard.set(items);	
+		}
 	} catch(e) {
 		console.error('/leaderboard GET error', params, e);
 	}
