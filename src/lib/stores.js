@@ -37,6 +37,9 @@ export const chartLoading = writable(false);
 export const hoveredOHLC = writable();
 export const accountHeight = writable(getUserSetting('accountHeight') || 250);
 
+// Rewards
+export const reward = writable(0);
+
 // Prices
 export const prices = writable({}); // latest price for all markets
 export const priceTimestamps = writable({}); // latest price timestamps

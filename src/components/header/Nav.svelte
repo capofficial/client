@@ -1,5 +1,7 @@
 <script>
 
+	import Rewards from './Rewards.svelte'
+
 	import { pageName } from '@lib/stores'
 	import { TROPHY_ICON, BULLET_LIST_ICON } from '@lib/icons'
 
@@ -124,3 +126,5 @@
 <div class='mobile-button' on:click={toggleMobileNav}>
 	{@html BULLET_LIST_ICON}
 </div>
+
+<Rewards/>

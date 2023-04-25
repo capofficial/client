@@ -236,6 +236,12 @@ export const ABIS = {
 		`function get(string _market) view returns(${marketTuple})`,
 		`function getMany(string[] _markets) view returns(${marketTuple}[])`,
 	],
+	Rewards: [
+		`function claimReward()`
+	],
+	RewardStore: [
+		`function getReward(address user, address token) view returns (uint256)`
+	],
 	RiskStore: [
 		`function getMaxOI(string memory market, address asset) external view returns(uint256)`
 	],

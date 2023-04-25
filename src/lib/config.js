@@ -5,6 +5,8 @@ export const ALCHEMY_SETTINGS = {
 	network: "arbitrum"
 };
 
+export const ARB_TOKEN = '0x912CE59144191C1204E64559FE8253a0e49E6548';
+
 export const DEFAULT_LOCALE = 'en-GB';
 
 export const DEFAULT_MARKET = 'ETH-USD';
