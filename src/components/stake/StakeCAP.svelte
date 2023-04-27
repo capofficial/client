@@ -34,7 +34,7 @@
 	}
 	
 	.table {
-		--grid-template: repeat(6, 1fr);
+		--grid-template: repeat(7, 1fr);
 	}
 
 	.header {
@@ -137,6 +137,7 @@
 		<div class='table-header'>
 			<div class='cell la'>Asset</div>
 			<div class='cell'>Price</div>
+			<div class='cell'>Historical APY</div>
 			<div class='cell'>Total Supply</div>
 			<div class='cell'>Total Staked</div>
 			<div class='cell highlighted'>Your Stake</div>
@@ -146,6 +147,7 @@
 			<div class='row'>
 				<div class='cell la'><img src="{`/asset-logos/CAP.svg`}" alt="CAP" /> CAP</div>
 				<div class='cell'>${formatForDisplay($CAPPrice)}</div>
+				<div class='cell'>20% - 60%</div>
 				<div class='cell'>100,000</div>
 				<div class='cell'>{numberWithCommas($totalSupplyCAP)}</div>
 				<div class='cell highlighted'>{numberWithCommas($CAPStake)}</div>

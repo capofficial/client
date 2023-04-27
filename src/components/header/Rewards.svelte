@@ -1,5 +1,7 @@
 <script>
 
+	import tooltip from '@lib/tooltip'
+
 	import { onDestroy } from 'svelte'
 
 	import { GIFT_ICON } from '@lib/icons'
@@ -8,11 +10,10 @@
 
 	import { getReward, claimReward } from '@api/rewards'
 
-	let isLoading = true, t;
+	let isLoading = false, t;
 	async function fetchData() {
 		clearTimeout(t);
 		const done = await getReward();
-		isLoading = false;
 		t = setTimeout(fetchData, 10 * 1000);
 	}
 	$: fetchData($address);
@@ -28,8 +29,6 @@
 		isLoading = false;
 	}
 
-	let hovered;
-
 </script>
 
 <style>
@@ -40,9 +39,13 @@
 		padding: 8px;
 		background-color: gold;
 		margin-left: 12px;
-		border-radius: 5px;
+		border-radius: var(--base-radius);
 		color: #222;
 		cursor: pointer;
+		font-weight: 500;
+	}
+	.rewards:hover {
+		background-color: #F5D000;
 	}
 	.rewards :global(svg) {
 		height: 16px;
@@ -52,8 +55,6 @@
 
 </style>
 
-<div class='rewards' on:click={claim} on:mouseover={() => {hovered = true}} on:mouseout={() => {hovered = false}}>
-	{#if isLoading}...{:else}
-		{#if hovered}Claim Rewards{:else}{@html GIFT_ICON} {formatForDisplay($reward)} ARB{/if}
-	{/if}
+<div class='rewards' on:click={claim} use:tooltip={{content: 'Claim Rewards'}}>
+	{@html GIFT_ICON} {#if isLoading}Claiming…{:else}{formatForDisplay($reward)} ARB{/if}
 </div>

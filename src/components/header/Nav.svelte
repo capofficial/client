@@ -1,14 +1,14 @@
 <script>
 
+	import tooltip from '@lib/tooltip'
+
 	import Rewards from './Rewards.svelte'
 
-	import { pageName } from '@lib/stores'
+	import { pageName, showMobileNav } from '@lib/stores'
 	import { TROPHY_ICON, BULLET_LIST_ICON } from '@lib/icons'
 
-	let showMobileNav = false;
-
 	function toggleMobileNav() {
-		showMobileNav = !showMobileNav;
+		showMobileNav.set(!$showMobileNav);
 	}
 </script>
 
@@ -23,8 +23,8 @@
 	.nav {
 		display: flex;
 		align-items: center;
-		grid-gap: 12px;
-		gap: 12px;
+		grid-gap: 8px;
+		gap: 8px;
 	}
 
 	a {
@@ -33,12 +33,12 @@
 		padding: 8px 12px;
 		border-radius: var(--base-radius);
 		transition: all 100ms ease-in-out;
+		font-weight: 500;
 	}
 	a:hover  {
 		background-color: var(--layer1);
 	}
 	 a.active {
-	 	font-weight: 600;
 	 	color: var(--primary);
 		background-color: var(--primary-highlighted);
 	}
@@ -47,7 +47,6 @@
 		color: gold;
 		display: flex;
 		align-items: center;
-		background-color: #292200;
 	}
 	a.leaderboard-link.active {
 		color: var(--primary);
@@ -59,7 +58,16 @@
 	}
 
 	.mobile-nav {
-		display: none;
+		display: block;
+		position: absolute;
+		top: 70px;
+		left: 200px;
+		width: 160px;
+		z-index: 1000;
+		background-color: var(--layer0);
+		padding: 20px;
+		border: 1px solid var(--layer100);
+		border-radius: var(--base-radius);
 	}
 	.mobile-button {
 		display: none;
@@ -68,6 +76,19 @@
 	.mobile-button :global(svg) {
 		height: 20px;
 		fill: inherit;
+	}
+
+	.mobile-nav a {
+		display: none;
+		padding: 10px 8px;
+	}
+	.mobile-nav a.display-desktop {
+		display: block;
+	}
+	.mobile-nav a.close {
+		display: none;
+		font-size: 90%;
+		color: var(--text500);
 	}
 
 	@media all and (max-width: 600px) {
@@ -81,18 +102,12 @@
 			right: 0;
 			left: 0;
 			bottom: 0;
-			z-index: 1000;
-			background-color: var(--layer0);
-			padding: 20px;
+			width: 100%;
 		}
 		.mobile-nav a {
 			display: block;
-			padding: 16px 8px;
 			font-size: 120%;
-		}
-		.mobile-nav a.close {
-			font-size: 90%;
-			color: var(--text500);
+			padding: 16px 8px;
 		}
 		.mobile-button {
 			display: flex;
@@ -103,27 +118,25 @@
 </style>
 
 <div class='nav'>
-	<a class:active={$pageName == 'Leaderboard'} class='leaderboard-link' href='/leaderboard'>{@html TROPHY_ICON}</a>
 	<a class:active={$pageName == 'Trade'} href='/trade'>Trade</a>
-	<!-- <a class:active={$pageName == 'Earn'} href='/earn'>Earn</a> -->
 	<a class:active={$pageName == 'Pool'} href='/pool'>Pool</a>
 	<a class:active={$pageName == 'Stake'} href='/stake'>Stake</a>
-	<a href='https://docs.cap.io' target='_blank'>Docs</a>
+	<a on:click|stopPropagation={toggleMobileNav} class:active={$showMobileNav}>…</a>
 </div>
 
-{#if showMobileNav}
+{#if $showMobileNav}
 <div class='mobile-nav'>
 	<a on:click={toggleMobileNav} class='close'>Close</a>
 	<a on:click={toggleMobileNav} href='/'>Home</a>
-	<a on:click={toggleMobileNav} href='/leaderboard'>Leaderboard</a>
+	<a on:click={toggleMobileNav} href='/leaderboard' class='display-desktop'>Leaderboard</a>
 	<a on:click={toggleMobileNav} href='/trade'>Trade</a>
 	<a on:click={toggleMobileNav} href='/pool'>Pool</a>
 	<a on:click={toggleMobileNav} href='/stake'>Stake</a>
-	<a on:click={toggleMobileNav} href='https://docs.cap.io' target='_blank'>Docs</a>
+	<a on:click={toggleMobileNav} href='https://docs.cap.io' target='_blank' class='display-desktop'>Docs</a>
 </div>
 {/if}
 
-<div class='mobile-button' on:click={toggleMobileNav}>
+<div class='mobile-button' on:click|stopPropagation={toggleMobileNav}>
 	{@html BULLET_LIST_ICON}
 </div>
 
