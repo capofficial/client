@@ -98,7 +98,7 @@
 		isApproving = false;
 	}
 
-	$: getAllowance(data.position.asset, 'PositionStore');
+	$: getAllowance(data.position.asset, 'FundStore');
 
 	onMount(() => {
 		focusInput(`Add ${data.position.asset}`);
@@ -125,6 +125,13 @@
 
 	.button {
 		margin-top: 20px;
+	}
+
+	.note {
+		margin-top: 20px;
+		color: var(--text400);
+		font-size: 85%;
+		line-height: 1.318;
 	}
 
 </style>
@@ -155,6 +162,10 @@
 			<div class='row'>
 				<LabelValue label='New Margin' value={`${formatForDisplay(newMargin) || "-"}`} />
 			</div>
+
+			{#if selected=='Remove'}
+			<div class='note'>Margin removal is only available on markets with a Chainlink price.</div>
+			{/if}
 
 			<div class='button'>
 				{#if data.position.asset != 'ETH' && $allowances[data.position.asset]?.['FundStore'] * 1 <= margin * 1}

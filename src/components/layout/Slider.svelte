@@ -110,6 +110,7 @@
 	$: setProgressPercent(value, maxValue);
 
 	function handleBlur(e) {
+		if (!e || !e.path || !Array.isArray(e.path)) return;
 		for (const elem of e.path) {
 			if (elem.id == 'slider') return;
 		}
