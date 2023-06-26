@@ -148,7 +148,7 @@
 					{month} {year}
 				{/if}
 			</div>
-			<div class='subtitle'>Win $10,000+ worth of NFTs and ARB! <a href='https://twitter.com/CapDotFinance/status/1649056198308794369' target='_blank'>Learn more</a></div>
+			<div class='subtitle'>Compete for a chance to win a Milady! <a href='https://twitter.com/CapDotFinance/status/1673326985945182208' target='_blank'>Learn more</a></div>
 		</div>
 		<div class='right buttons'>
 			<a class:active={showPreviousLeaderboard == false} on:click={() => {loadLeaderboard()}}>This Month</a>
