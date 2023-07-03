@@ -20,8 +20,12 @@ provider.set(_provider);
 const injected = injectedModule()
 const coinbaseWallet = coinbaseModule()
 const walletConnect = walletConnectModule({
-    connectFirstChainId: true
-  })
+		version: 2,
+    connectFirstChainId: true,
+    handleUri: uri => console.log(uri),
+    projectId: '7a24d481deb5bf69fa79c9bb19268cbd', // ***New Param* Project ID associated with [WalletConnect account](https://cloud.walletconnect.com)
+    requiredChains: [1, 42161] // chains required to be supported by WC wallet
+})
 
 const appMetadata = {
   name: 'CAP',

@@ -44,9 +44,9 @@
   "dependencies": {
     "@pythnetwork/pyth-common-js": "^1.4.0",
     "@web3-onboard/coinbase": "^2.2.0",
-    "@web3-onboard/core": "^2.15.2",
+    "@web3-onboard/core": "^2.20.4",
     "@web3-onboard/injected-wallets": "^2.8.0",
-    "@web3-onboard/walletconnect": "^2.2.2",
+    "@web3-onboard/walletconnect": "^2.4.0",
     "alchemy-sdk": "^2.2.3",
     "buffer": "^6.0.3",
     "lightweight-charts": "^3.8.0",
