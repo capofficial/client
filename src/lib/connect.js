@@ -47,6 +47,16 @@ const appMetadata = {
 }
 
 const onboard = Onboard({
+	accountCenter: {
+      desktop: {
+        enabled: true,
+        position: 'topRight'
+      },
+      mobile: {
+        enabled: true,
+        position: 'topRight'
+      }
+    },
   wallets: [injected, coinbaseWallet, walletConnect],
   chains: [
 	  {
