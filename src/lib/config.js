@@ -99,6 +99,17 @@ export const CHAINDATA = {
 			USDC: '0xff970a61a04b1ca14834a43f5de4533ebddb5cc8'
 		}
 	},
+	8453: {
+		label: 'base',
+		explorer: 'https://basescan.org',
+		rpc: 'https://mainnet.base.org', // for walletconnect
+		dataEndpoint: 'https://data.cap.io/api',
+		dataStore: '0x95CFdb3aCA31FfA98D1a469a956746D468a71561',
+		cap: '0x031d35296154279dc1984dcd93e392b1f946737b',
+		assets: {
+			ETH: ADDRESS_ZERO
+		}
+	},
 	84531: {
 		label: 'base-goerli',
 		explorer: 'https://goerli.basescan.org',

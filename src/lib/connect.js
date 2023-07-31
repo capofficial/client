@@ -66,6 +66,12 @@ const onboard = Onboard({
 	  	rpcUrl: 'https://arb1.arbitrum.io/rpc'
 	  },
 	  {
+	  	id: 8453,
+	  	token: 'ETH',
+	  	label: 'Base',
+	  	rpcUrl: 'https://mainnet.base.org'
+	  },
+	  {
 	  	id: 84531,
 	  	token: 'ETH',
 	  	label: 'Base Goerli',
