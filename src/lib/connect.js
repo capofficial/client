@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 import { get } from 'svelte/store'
-import { DEFAULT_CHAIN_ID, CHAINDATA, ALCHEMY_SETTINGS } from './config'
+import { DEFAULT_CHAIN_ID, CHAINDATA, ALCHEMY_SETTINGS, WALLET_CONNECT_PROJECT_ID } from './config'
 import { chainId, signer, provider, address } from './stores'
 import { showToast, hideModal } from './ui'
 import { getMarketInfo } from '@api/markets'
@@ -13,23 +13,22 @@ import walletConnectModule from '@web3-onboard/walletconnect'
 
 // set default provider, when user is not connected
 chainId.set(DEFAULT_CHAIN_ID);
-// let _provider = new ethers.providers.JsonRpcProvider(CHAINDATA[DEFAULT_CHAIN_ID].rpc);
 let _provider = new ethers.providers.AlchemyProvider(ALCHEMY_SETTINGS.network, ALCHEMY_SETTINGS.apiKey);
 provider.set(_provider);
 
 const injected = injectedModule()
 const coinbaseWallet = coinbaseModule()
 const walletConnect = walletConnectModule({
-		version: 2,
+	version: 2,
     connectFirstChainId: true,
     handleUri: uri => console.log(uri),
-    projectId: '7a24d481deb5bf69fa79c9bb19268cbd', // ***New Param* Project ID associated with [WalletConnect account](https://cloud.walletconnect.com)
+    projectId: WALLET_CONNECT_PROJECT_ID,
     requiredChains: [1, 42161] // chains required to be supported by WC wallet
 })
 
 const appMetadata = {
   name: 'CAP',
-  icon: '/im/logo.svg',
+  icon: '/favicon/favicon-32x32.png',
   logo: '/im/logo.svg',
   description: 'Decentralized Perps',
   recommendedInjectedWallets: [
@@ -63,19 +62,19 @@ const onboard = Onboard({
 	  	id: 42161,
 	  	token: 'ETH',
 	  	label: 'Arbitrum',
-	  	rpcUrl: 'https://arb1.arbitrum.io/rpc'
+	  	rpcUrl: CHAINDATA[42161].rpc
 	  },
 	  {
 	  	id: 8453,
 	  	token: 'ETH',
 	  	label: 'Base',
-	  	rpcUrl: 'https://mainnet.base.org'
+	  	rpcUrl: CHAINDATA[8453].rpc
 	  },
 	  {
 	  	id: 84531,
 	  	token: 'ETH',
 	  	label: 'Base Goerli',
-	  	rpcUrl: 'https://goerli.base.org'
+	  	rpcUrl: CHAINDATA[84531].rpc
 	  }
   ],
   connect: {
@@ -116,6 +115,10 @@ const { unsubscribe } = state.subscribe(async (update) => {
 
 	  // console.log('network.chainId', network.chainId);
 
+	  if (network.chainId === 1 ) {
+		await onboard.setChain({ chainId: '0x' + DEFAULT_CHAIN_ID.toString(16) })
+	  }
+
 	  if (network.chainId != lastChainId) {
 	  	lastChainId = network.chainId;
 	  	setTimeout(() => {
@@ -140,9 +143,6 @@ export async function connect() {
 export async function updateBalances() {
 	onboard.state.actions.updateBalances();
 }
-
-
-let _walletConnect;
 
 export async function checkMetamaskSession() {
 	if (window.ethereum) connectMetamask(true);
@@ -185,65 +185,21 @@ export async function connectMetamask(resume) {
 
 }
 
-export async function connectWalletConnect() {
-
-	let script = document.createElement("script");
-	script.setAttribute("src", "https://unpkg.com/@walletconnect/web3-provider@1.6.6/dist/umd/index.min.js");
-	document.body.appendChild(script);
-
-	script.addEventListener("load", scriptLoaded, false);
-
-	async function scriptLoaded() {
-
-		_walletConnect = new WalletConnectProvider.default({
-			rpc: {
-				42161: CHAINDATA[42161].rpc,
-				84531: CHAINDATA[84531].rpc
-			}
-		});
-
-		await _walletConnect.enable();
-
-		hideModal();
-
-		_provider = new ethers.providers.Web3Provider(_walletConnect);
-
-		// provider.set(_provider);
-		const network = await _provider.getNetwork();
-		chainId.set(network.chainId);
-
-		handleAccountsChanged();
-
-		// Subscribe to accounts change
-		_walletConnect.on("accountsChanged", handleAccountsChanged);
-
-		// Subscribe to chainId change
-		_walletConnect.on("chainChanged", (chainId) => {
-			window.location.reload();
-		});
-
-		// Subscribe to session disconnection
-		_walletConnect.on("disconnect", (code, reason) => {
-			console.log('disconnect', code, reason);
-			window.location.reload();
-		});
-
-	}
-
-}
-
 export async function disconnectWallet(force) {
-	if (force && _walletConnect) await _walletConnect.disconnect();
+	const [primaryWallet] = onboard.state.get().wallets
+	if(force && primaryWallet) {
+		await onboard.disconnectWallet({ label: primaryWallet.label })
+	}
 	signer.set(null);
 }
 
 export async function switchChains() {
-
+	const [onboardWallet] = onboard.state.get().wallets
 	let wallet;
 	if (window.ethereum) {
 		wallet = window.ethereum;
 	} else {
-		wallet = _walletConnect;
+		wallet = onboardWallet;
 	}
 
 	if (!wallet) return showToast("Can't connect to wallet.");

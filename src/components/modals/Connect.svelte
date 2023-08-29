@@ -1,6 +1,6 @@
 <script>
 	import Modal from './Modal.svelte'
-	import { connectMetamask, connectWalletConnect } from '@lib/connect'
+	import { connectMetamask, connect } from '@lib/connect'
 </script>
 
 <style>
@@ -48,7 +48,7 @@
 		<div>MetaMask</div>
 	</div>
 
-	<div class='row' on:click|stopPropagation={() => {connectWalletConnect()}}>
+	<div class='row' on:click|stopPropagation={() => {connect()}}>
 		<img src='https://raw.githubusercontent.com/WalletConnect/walletconnect-assets/master/Icon/Blue%20(Default)/Icon.svg'>
 		<div>WalletConnect</div>
 	</div>
