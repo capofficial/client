@@ -66,3 +66,8 @@ button{
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none;  /* IE 10+ */
 }
+
+wcm-modal {
+  position: absolute;
+  z-index: 1000;
+}
