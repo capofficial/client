@@ -4,7 +4,6 @@ import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
 import livereload from 'rollup-plugin-livereload';
 import alias from '@rollup/plugin-alias';
-import { terser } from 'rollup-plugin-terser';
 import css from 'rollup-plugin-css-only';
 import copy from 'rollup-plugin-copy';
 import replace from '@rollup/plugin-replace';
@@ -12,9 +11,14 @@ import gzipPlugin from 'rollup-plugin-gzip';
 import { brotliCompressSync } from 'zlib';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
 import json from '@rollup/plugin-json';
+import child_process from 'child_process'
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const production = !process.env.ROLLUP_WATCH;
-const hash = String(require('child_process').execSync('git rev-parse --short HEAD')).trim(); // append short git commit to bundles
+const hash = String(child_process.execSync('git rev-parse --short HEAD')).trim(); // append short git commit to bundles
 
 const customResolver = resolve({
   extensions: ['.js', '.svelte']
@@ -41,7 +45,7 @@ function serve() {
 	return {
 		writeBundle() {
 			if (server) return;
-			server = require('child_process').spawn('npm', ['run', 'start', '--', '--dev'], {
+			server = child_process.spawn('npm', ['run', 'start', '--', '--dev'], {
 				stdio: ['ignore', 'inherit', 'inherit'],
 				shell: true
 			});
@@ -56,11 +60,12 @@ export default {
 	input: 'src/main.js',
 	output: {
 		sourcemap: !production,
-		format: 'iife',
+		format: 'es',
 		name: 'app',
 		file: 'build/bundle.' + hash + '.js',
 		inlineDynamicImports: true,
-		strict: false
+		strict: true,
+		compact: production
 	},
 	plugins: [
 
@@ -125,11 +130,7 @@ export default {
 
 		// Watch the `build` directory and refresh the
 		// browser on changes when not in production
-		!production && livereload('build'),
-
-		// If we're building for production (npm run build
-		// instead of npm run dev), minify
-		production && terser()
+		!production && livereload('build')
 	],
 	watch: {
 		clearScreen: false,
