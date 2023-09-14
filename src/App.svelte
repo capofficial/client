@@ -9,8 +9,8 @@
 	import Header from '@components/header/Header.svelte'
 
 	import { USD_CONVERSION_MARKETS } from '@lib/config'
-	import { loadRoute, catchLinks, navigateTo } from '@lib/routing'
-	import { component, address, pageName } from '@lib/stores'
+	import { checkCountry, loadRoute, catchLinks, navigateTo } from '@lib/routing'
+	import { component, address, pageName, countryDisallowed } from '@lib/stores'
 	import { hidePopoversOnKeydown, hidePopoversOnClick } from '@lib/ui'
 	import { runAndInterval, hashString, getChainData } from '@lib/utils'
 
@@ -21,6 +21,8 @@
 	let interval1;
 
 	onMount(async () => {
+
+		checkCountry();
 
 		loadRoute();
 		catchLinks((path) => navigateTo(path));
@@ -227,9 +229,26 @@
 		width: 120px;
 	}
 
+	.overlay {
+		position: fixed;
+		top: 0;
+		bottom:0;
+		right:0;
+		left:0;
+		z-index:10000;
+		background-color: #fff;
+		padding: 20px;
+		font-size: 22px;
+		color: #111;
+	}
+
 </style>
 
 <svelte:window on:keydown={hidePopoversOnKeydown} on:click={hidePopoversOnClick} />
+
+{#if $countryDisallowed}
+<div class='overlay'>You're trying to access this CAP UI from a restricted country. Check our <a href='https://docs.cap.io'>Help Center</a> for more information.</div>
+{/if}
 
 {#if $pageName != 'Home'}
 <Errors />

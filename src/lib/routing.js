@@ -8,7 +8,7 @@ import Pool from '@components/pool/Pool.svelte'
 import Stake from '@components/stake/Stake.svelte'
 
 import { formatUnits } from './formatters'
-import { component, pageName, selectedMarket, selectedMarketInfo, leverage } from './stores'
+import { component, pageName, selectedMarket, selectedMarketInfo, leverage, countryDisallowed } from './stores'
 import { setPageTitle } from './ui'
 import { getUserSetting, saveUserSetting } from './utils'
 
@@ -47,6 +47,22 @@ async function setMarket(market) {
 	// secondaryPath is a market id, load it
 	selectedMarket.set(market);
 	saveUserSetting('selectedMarket', market);
+
+}
+
+export async function checkCountry() {
+
+	try {
+		const response = await fetch(`http://ip-api.com/json/`);
+		const result = await response.json() || {};
+		console.log(result);
+		if (result && ["US", "CH", "CA", "CI", "CU", "BY", "RU", "IR", "IQ", "LR", "KP", "SD", "SY"].includes(result.countryCode)) {
+			console.log('disallowed');
+			countryDisallowed.set(true);
+		}
+	} catch(e) {
+		console.error('/ip-api error', e);
+	}
 
 }
 

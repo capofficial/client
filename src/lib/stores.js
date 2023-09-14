@@ -11,6 +11,7 @@ export const locale = writable(getUserSetting('locale') || DEFAULT_LOCALE);
 // Router
 export const component = writable();
 export const pageName = writable();
+export const countryDisallowed = writable(false);
 
 // Modal
 export const activeModal = writable();
