@@ -53,15 +53,15 @@ async function setMarket(market) {
 export async function checkCountry() {
 
 	try {
-		const response = await fetch(`http://ip-api.com/json/`);
+		const response = await fetch(`https://api.country.is/`);
 		const result = await response.json() || {};
 		console.log(result);
-		if (result && ["US", "CH", "CA", "CI", "CU", "BY", "RU", "IR", "IQ", "LR", "KP", "SD", "SY"].includes(result.countryCode)) {
+		if (result && ["US", "CH", "CA", "CI", "CU", "BY", "RU", "IR", "IQ", "LR", "KP", "SD", "SY"].includes(result.country)) {
 			console.log('disallowed');
 			countryDisallowed.set(true);
 		}
 	} catch(e) {
-		console.error('/ip-api error', e);
+		console.error('api.country.is error', e);
 	}
 
 }
