@@ -75,7 +75,10 @@ export const BASE_FEES_BPS = {
 export const DEFAULT_CHAIN_ID = 42161;
 
 // Project ID associated with [WalletConnect account](https://cloud.walletconnect.com)
-export const WALLET_CONNECT_PROJECT_ID = '7a24d481deb5bf69fa79c9bb19268cbd'
+//export const WALLET_CONNECT_PROJECT_ID = '7a24d481deb5bf69fa79c9bb19268cbd'
+
+// local development
+export const WALLET_CONNECT_PROJECT_ID = '209898b972e4c0172826d03bb23fb9cf'
 
 export const CHAINDATA = {
 	31337: {
