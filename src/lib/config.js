@@ -76,9 +76,12 @@ export const DEFAULT_CHAIN_ID = 42161;
 
 // Project ID associated with [WalletConnect account](https://cloud.walletconnect.com)
 //export const WALLET_CONNECT_PROJECT_ID = '7a24d481deb5bf69fa79c9bb19268cbd'
+//export const DAPP_URL = 'https://www.cap.io'
+
 
 // local development
 export const WALLET_CONNECT_PROJECT_ID = '80c159d7bd9feef4eeb47f1374fbfcae'
+export const DAPP_URL = 'https://cap.risastaking.com'
 
 export const CHAINDATA = {
 	31337: {
