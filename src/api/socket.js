@@ -38,7 +38,7 @@ export function connectSocket() {
 		return;
 	}
 
-	connection = new EvmPriceServiceConnection("https://xc-mainnet.pyth.network");
+	connection = new EvmPriceServiceConnection("https://hermes.pyth.network");
 
 	// map market => feedId and feedId => market
 	let priceIds = [];
