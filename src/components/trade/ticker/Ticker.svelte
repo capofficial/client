@@ -204,13 +204,13 @@
 	</div>
 	<div class='stats'>
 		<div class='box'>
-			<div class='label'>Last Price</div>
+			<div class='label'>Last Price (Pyth)</div>
 			<div class='value'>
 				<ColoredPrice price={$prices[$selectedMarket]} />
 			</div>
 		</div>
 		<div class='box no-1500 no-mobile'>
-			<div class='label'>Chainlink</div>
+			<div class='label'>Last Price (Chainlink)</div>
 			<div class='value'>
 				{formatPriceForDisplay($chainlinkPrice) || '-'}
 			</div>
