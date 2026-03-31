@@ -42,6 +42,8 @@ const ERROR_STRINGS = {
 export function parseError(e) {
 	console.log('e', typeof(e), e);
 	if (!e) return DEFAULT_ERROR;
+	// MetaMask / EIP-1193 user rejection error code
+	if (e.code === 4001 || e.code === 'ACTION_REJECTED') return null;
 	if (typeof(e) == 'string') return e;
 	let error_string = '';
 	if (e.data && e.data.message) {
