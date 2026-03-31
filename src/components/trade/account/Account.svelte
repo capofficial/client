@@ -10,7 +10,7 @@
 	import tooltip from '@lib/tooltip'
 
 	import { DEFAULT_CHAIN_ID } from '@lib/config'
-	import { TABLE_ICON, FILTER_ICON, XMARK_ICON, TROPHY_ICON } from '@lib/icons'
+	import { TABLE_ICON, FILTER_ICON, XMARK_ICON, TROPHY_ICON, DOWNLOAD_ICON } from '@lib/icons'
 	import { address, chainId, ordersSorted, positionsSorted } from '@lib/stores'
 	import { showModal } from '@lib/ui'
 
@@ -191,6 +191,7 @@
 		<div class='tools'>
 			{#if panel == 'history'}
 				<a on:click|stopPropagation={() => {showModal('HistoryOrderStatus')}} use:tooltip={{content: 'Filter history'}}>{@html FILTER_ICON}</a>
+				<a on:click|stopPropagation={() => {showModal('ExportHistoryCSV')}} use:tooltip={{content: 'Export to CSV'}}>{@html DOWNLOAD_ICON}</a>
 			{/if}
 			<a use:tooltip={{content: 'Customize columns'}} on:click|stopPropagation={() => {showModal('CustomizeColumns', {panel, allColumns: allColumns[panel]})}}>{@html TABLE_ICON}</a>
 			{#if panel == 'orders' && $ordersSorted.length}
