@@ -37,6 +37,7 @@ export const chartHeight = writable(getUserSetting('chartHeight') || 320);
 export const chartResolution = writable(getUserSetting('chartResolution') || 900)
 export const chartLoading = writable(false);
 export const hoveredOHLC = writable();
+export const chartMode = writable(getUserSetting('chartMode') || 'simple');
 export const accountHeight = writable(getUserSetting('accountHeight') || 250);
 
 // Rewards
