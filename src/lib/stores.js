@@ -37,6 +37,7 @@ export const chartHeight = writable(getUserSetting('chartHeight') || 320);
 export const chartResolution = writable(getUserSetting('chartResolution') || 900)
 export const chartLoading = writable(false);
 export const hoveredOHLC = writable();
+export const chartMode = writable(getUserSetting('chartMode') || 'simple');
 export const accountHeight = writable(getUserSetting('accountHeight') || 250);
 
 // Rewards
@@ -68,6 +69,7 @@ export const poolWithdrawalFees = writable({});
 export const claimableRewardsCAP = writable({});
 export const totalSupplyCAP = writable(0);
 export const CAPStake = writable(0);
+export const referralDiscount = writable(0); // referral discount in bps
 
 // Pool performance stats (including fees)
 function getPoolPerformance(stats, latestIndex, oldestIndex) {

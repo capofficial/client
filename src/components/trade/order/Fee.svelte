@@ -1,8 +1,9 @@
 <script>
 
 	import LabelValue from '@components/layout/LabelValue.svelte'
+	import FeeDiscountBreakdown from './FeeDiscountBreakdown.svelte'
 
-	import { BPS_DIVIDER } from '@lib/config'
+	import { BPS_DIVIDER, BASE_FEES_BPS } from '@lib/config'
 	import { marketInfos } from '@lib/stores'
 
 	import { formatForDisplay } from '@lib/formatters'
@@ -43,11 +44,15 @@
 	let feeAmount = 0;
 	$: feeAmount = getFeeAmount(totalSize, market, $marketInfos);
 
+	// Get base fee in bps for the market
+	$: baseFeeBps = BASE_FEES_BPS[market] || $marketInfos[market]?.fee || 10;
 
 </script>
 
-<LabelValue 
-	label={`Fee (${formatForDisplay(($marketInfos[market]?.fee || 0)/100)}%)`} 
-	value={`${feeAmount ? `${formatForDisplay(feeAmount)} ${asset}` : '-'}`}
-	isSecondaryColor={isSecondaryColor}
-/>
+<FeeDiscountBreakdown {market} {baseFeeBps} let:toggleDetails>
+	<LabelValue 
+		label={`Fee (${formatForDisplay(($marketInfos[market]?.fee || 0)/100)}%)`}
+		value={`${feeAmount ? `${formatForDisplay(feeAmount)} ${asset}` : '-'}`}
+		isSecondaryColor={isSecondaryColor}
+	/>
+</FeeDiscountBreakdown>
