@@ -3,13 +3,21 @@
 	import { onMount } from 'svelte'
 
 	import ChartBar from './ChartBar.svelte'
+	import TradingViewFullChart from './TradingViewFullChart.svelte'
 
 	import { initChart, loadCandles, onNewPrice } from '@lib/chart'
-	import { chartHeight, selectedMarket, hoveredOHLC, prices } from '@lib/stores'
+	import { chartHeight, selectedMarket, hoveredOHLC, prices, chartMode } from '@lib/stores'
 	import { setPageTitle } from '@lib/ui'
 	import { formatPriceForDisplay, formatMarketName, formatPnl } from '@lib/formatters'
+	import { saveUserSetting, getUserSetting } from '@lib/utils'
 
 	let chartConfigured = false;
+
+	// Get saved chart mode from localStorage
+	const savedChartMode = getUserSetting('chartMode') || 'simple';
+	import { writable } from 'svelte/store';
+	const localChartMode = writable(savedChartMode);
+
 	onMount(() => {
 		initChart(() => {
 			chartConfigured = true;
@@ -32,6 +40,15 @@
 	}
 
 	$: setNewPrice($prices);
+
+	function toggleChartMode() {
+		const newMode = $localChartMode === 'simple' ? 'full' : 'simple';
+		localChartMode.set(newMode);
+		saveUserSetting('chartMode', newMode);
+	}
+
+	// Sync with global store
+	$: chartMode.set($localChartMode);
 
 </script>
 
@@ -61,9 +78,58 @@
 		color: var(--layer300);
 		font-weight: 600;
 	}
+
+	.mode-toggle {
+		position: absolute;
+		top: 20px;
+		right: 25px;
+		z-index: 190;
+		display: flex;
+		align-items: center;
+		height: 38px;
+		grid-gap: 12px;
+		gap: 12px;
+		background-color: var(--layer50);
+		border-radius: var(--base-radius);
+		padding: 0 16px;
+		user-select: none;
+	}
+
+	.mode-toggle button {
+		font-size: 95%;
+		background: none;
+		border: none;
+		color: var(--text300);
+		cursor: pointer;
+		padding: 0;
+		transition: all 100ms ease-in-out;
+	}
+
+	.mode-toggle button:hover:not(.active) {
+		color: var(--text100);
+	}
+
+	.mode-toggle button.active {
+		color: var(--primary);
+		font-weight: 600;
+	}
+
+	.tv-chart {
+		height: 100%;
+		width: 100%;
+	}
+
 	@media all and (max-width: 1280px) {
 		.current-ohlc {
 			display: none;
+		}
+	}
+
+	@media all and (max-width: 768px) {
+		.mode-toggle {
+			top: 10px;
+			right: 15px;
+			font-size: 80%;
 		}
 	}
 </style>
@@ -71,7 +137,7 @@
 <div class='wrapper'>
 	<div class='chart-bar'>
 		<ChartBar />
-		{#if $hoveredOHLC}
+		{#if $hoveredOHLC && $localChartMode === 'simple'}
 		<div class='current-ohlc'>
 			<span class='label'>O:</span> <span class='value' class:green={$hoveredOHLC.open <= $hoveredOHLC.close} class:red={$hoveredOHLC.open > $hoveredOHLC.close}>{$hoveredOHLC.open}</span> 
 			<span class='label'>H:</span> <span class='value' class:green={$hoveredOHLC.open <= $hoveredOHLC.close} class:red={$hoveredOHLC.open > $hoveredOHLC.close}>{$hoveredOHLC.high}</span> 
@@ -87,5 +153,22 @@
 		</div>
 		{/if}
 	</div>
-	<div id='chart' class='chart'></div>
+
+	<div class='mode-toggle'>
+		<button class:active={$localChartMode === 'simple'} on:click={() => { localChartMode.set('simple'); saveUserSetting('chartMode', 'simple'); }}>
+			Simple
+		</button>
+		<span style="color: var(--layer300);">|</span>
+		<button class:active={$localChartMode === 'full'} on:click={() => { localChartMode.set('full'); saveUserSetting('chartMode', 'full'); }}>
+			Full
+		</button>
+	</div>
+
+	{#if $localChartMode === 'full'}
+		<div class='tv-chart'>
+			<TradingViewFullChart />
+		</div>
+	{:else}
+		<div id='chart' class='chart'></div>
+	{/if}
 </div>
