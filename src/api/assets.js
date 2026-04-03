@@ -71,6 +71,15 @@ export async function approveAsset(assetLabel, spenderName) {
 			return true;
 		}
 	} catch(e) {
-		showError(e);
+		// Don't show error for user rejection (e.g., waiting for wallet approval)
+		const isUserRejection = e.code === 'ACTION_REJECTED' || 
+			e.code === 4001 || 
+			e.message?.includes('user rejected') ||
+			e.message?.includes('User denied');
+		
+		if (!isUserRejection) {
+			showError(e);
+		}
+		return false;
 	}
 }
