@@ -17,6 +17,8 @@
 	import { getUserAssetBalances } from '@api/assets'
 	import { listenToEvents } from '@api/listener'
 	import { getMarketPrices } from '@api/prices'
+	import { showModal } from '@lib/ui'
+	import { getUserSetting } from '@lib/utils'
 
 	let interval1;
 
@@ -31,6 +33,14 @@
 		window.onpopstate = () => loadRoute();
 
 		getMarketPrices('all');
+
+		// Show welcome modal for first-time users
+		const welcomeCompleted = getUserSetting('welcomeCompleted');
+		if (!welcomeCompleted) {
+			setTimeout(() => {
+				showModal('Welcome');
+			}, 1000);
+		}
 	});
 
 	onDestroy(() => {
