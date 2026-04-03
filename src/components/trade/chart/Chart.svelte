@@ -3,13 +3,16 @@
 	import { onMount } from 'svelte'
 
 	import ChartBar from './ChartBar.svelte'
+	import IndicatorControls from './IndicatorControls.svelte'
 
-	import { initChart, loadCandles, onNewPrice } from '@lib/chart'
+	import { initChart, loadCandles, onNewPrice, toggleIndicator, clearIndicators } from '@lib/chart'
 	import { chartHeight, selectedMarket, hoveredOHLC, prices } from '@lib/stores'
 	import { setPageTitle } from '@lib/ui'
 	import { formatPriceForDisplay, formatMarketName, formatPnl } from '@lib/formatters'
 
 	let chartConfigured = false;
+	let showIndicators = true;
+	
 	onMount(() => {
 		initChart(() => {
 			chartConfigured = true;
@@ -32,6 +35,19 @@
 	}
 
 	$: setNewPrice($prices);
+	
+	function handleIndicatorToggle(event) {
+		const { indicator, enabled } = event.detail;
+		toggleIndicator(indicator, enabled);
+	}
+	
+	function handleToggleAll(event) {
+		const indicators = event.detail;
+		clearIndicators();
+		Object.entries(indicators).forEach(([key, enabled]) => {
+			if (enabled) toggleIndicator(key, true);
+		});
+	}
 
 </script>
 
@@ -73,10 +89,10 @@
 		<ChartBar />
 		{#if $hoveredOHLC}
 		<div class='current-ohlc'>
-			<span class='label'>O:</span> <span class='value' class:green={$hoveredOHLC.open <= $hoveredOHLC.close} class:red={$hoveredOHLC.open > $hoveredOHLC.close}>{$hoveredOHLC.open}</span> 
-			<span class='label'>H:</span> <span class='value' class:green={$hoveredOHLC.open <= $hoveredOHLC.close} class:red={$hoveredOHLC.open > $hoveredOHLC.close}>{$hoveredOHLC.high}</span> 
-			<span class='label'>L:</span> <span class='value' class:green={$hoveredOHLC.open <= $hoveredOHLC.close} class:red={$hoveredOHLC.open > $hoveredOHLC.close}>{$hoveredOHLC.low}</span> 
-			<span class='label'>C:</span> <span class='value' class:green={$hoveredOHLC.open <= $hoveredOHLC.close} class:red={$hoveredOHLC.open > $hoveredOHLC.close}>{$hoveredOHLC.close}</span> 
+			<span class='label'>O:</span> <span class='value' class:green={$hoveredOHLC.open <= $hoveredOHLC.close} class:red={$hoveredOHLC.open > $hoveredOHLC.close}>{$hoveredOHLC.open}</span>
+			<span class='label'>H:</span> <span class='value' class:green={$hoveredOHLC.open <= $hoveredOHLC.close} class:red={$hoveredOHLC.open > $hoveredOHLC.close}>{$hoveredOHLC.high}</span>
+			<span class='label'>L:</span> <span class='value' class:green={$hoveredOHLC.open <= $hoveredOHLC.close} class:red={$hoveredOHLC.open > $hoveredOHLC.close}>{$hoveredOHLC.low}</span>
+			<span class='label'>C:</span> <span class='value' class:green={$hoveredOHLC.open <= $hoveredOHLC.close} class:red={$hoveredOHLC.open > $hoveredOHLC.close}>{$hoveredOHLC.close}</span>
 				<br/>
 			<span class='label'>Change:</span> <span class='value' class:green={$hoveredOHLC.open <= $hoveredOHLC.close} class:red={$hoveredOHLC.open > $hoveredOHLC.close}>
 				{@html formatPnl($hoveredOHLC.close * 1 - $hoveredOHLC.open * 1)} ({@html formatPnl(100 * ($hoveredOHLC.close * 1 - $hoveredOHLC.open * 1) / $hoveredOHLC.open, true)})
@@ -87,5 +103,13 @@
 		</div>
 		{/if}
 	</div>
+	
+	{#if showIndicators && chartConfigured}
+	<IndicatorControls 
+		on:toggle={handleIndicatorToggle}
+		on:toggleAll={handleToggleAll}
+	/>
+	{/if}
+	
 	<div id='chart' class='chart'></div>
 </div>

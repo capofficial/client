@@ -7,6 +7,8 @@ import { selectedMarket, orders, positions, chartResolution, chartLoading, showO
 import { saveUserSetting, getPrecision } from './utils'
 
 import { getMarketCandles } from '@api/prices'
+import { calculateSMA, calculateEMA, calculateRSI, calculateMACD, calculateBollingerBands } from './indicators'
+import { getUserSetting } from './utils'
 
 let candles = []; // current candle set
 
@@ -154,6 +156,11 @@ export function initChart(cb) {
 	});
 
 	applyWatermark();
+	
+	// Load saved indicators after chart is initialized
+	setTimeout(() => {
+		loadSavedIndicators();
+	}, 500);
 
 	cb();
 
@@ -433,4 +440,204 @@ function clearPositionLines() {
 	}
 	candlestickSeries.setMarkers([]);
 	positionLines = [];
+}
+
+// Technical Indicators
+let indicatorSeries = {};
+
+const indicatorColors = {
+	ma20: '#ff6b6b',
+	ma50: '#4ecdc4',
+	ema12: '#ffe66d',
+	ema26: '#a8e6cf',
+	bbUpper: '#ffd93d',
+	bbLower: '#ffd93d',
+	bbMiddle: '#ff8b94'
+};
+
+export function toggleIndicator(indicator, enabled) {
+	if (!chart || !candlestickSeries || !candles.length) return;
+	
+	if (!enabled) {
+		// Remove indicator
+		if (indicatorSeries[indicator]) {
+			if (Array.isArray(indicatorSeries[indicator])) {
+				indicatorSeries[indicator].forEach(series => {
+					chart.removeSeries(series);
+				});
+			} else {
+				chart.removeSeries(indicatorSeries[indicator]);
+			}
+			delete indicatorSeries[indicator];
+		}
+		return;
+	}
+	
+	// Add indicator based on type
+	switch(indicator) {
+		case 'ma20':
+			addMA(20, 'ma20');
+			break;
+		case 'ma50':
+			addMA(50, 'ma50');
+			break;
+		case 'ema12':
+			addEMA(12, 'ema12');
+			break;
+		case 'ema26':
+			addEMA(26, 'ema26');
+			break;
+		case 'rsi':
+			addRSI();
+			break;
+		case 'macd':
+			addMACD();
+			break;
+		case 'bb':
+			addBollingerBands();
+			break;
+	}
+}
+
+function addMA(period, key) {
+	const maData = calculateSMA(candles, period);
+	if (!maData.length) return;
+	
+	const series = chart.addLineSeries({
+		color: indicatorColors[key],
+		lineWidth: 2,
+		priceLineVisible: false,
+		lastValueVisible: true,
+		title: `MA(${period})`
+	});
+	
+	series.setData(maData);
+	indicatorSeries[key] = series;
+}
+
+function addEMA(period, key) {
+	const emaData = calculateEMA(candles, period);
+	if (!emaData.length) return;
+	
+	const series = chart.addLineSeries({
+		color: indicatorColors[key],
+		lineWidth: 2,
+		priceLineVisible: false,
+		lastValueVisible: true,
+		title: `EMA(${period})`
+	});
+	
+	series.setData(emaData);
+	indicatorSeries[key] = series;
+}
+
+function addRSI() {
+	const rsiData = calculateRSI(candles, 14);
+	if (!rsiData.length) return;
+	
+	// Add RSI as a separate pane
+	const rsiSeries = chart.addLineSeries({
+		color: '#ff8b94',
+		lineWidth: 2,
+		priceLineVisible: false,
+		lastValueVisible: true,
+		title: 'RSI(14)',
+		priceScaleId: 'rsi',
+		scaleMargins: {
+			top: 0.8,
+			bottom: 0.95
+		}
+	});
+	
+	rsiSeries.setData(rsiData);
+	indicatorSeries['rsi'] = rsiSeries;
+}
+
+function addMACD() {
+	const { macdLine, signalLine, histogram } = calculateMACD(candles);
+	if (!macdLine.length) return;
+	
+	// Add MACD line
+	const macdSeries = chart.addLineSeries({
+		color: '#c7ceea',
+		lineWidth: 2,
+		priceLineVisible: false,
+		lastValueVisible: true,
+		title: 'MACD',
+		priceScaleId: 'macd',
+		scaleMargins: {
+			top: 0.85,
+			bottom: 0.95
+		}
+	});
+	macdSeries.setData(macdLine);
+	
+	// Add Signal line
+	const signalSeries = chart.addLineSeries({
+		color: '#ff8b94',
+		lineWidth: 2,
+		priceLineVisible: false,
+		lastValueVisible: true,
+		priceScaleId: 'macd'
+	});
+	signalSeries.setData(signalLine);
+	
+	indicatorSeries['macd'] = [macdSeries, signalSeries];
+}
+
+function addBollingerBands() {
+	const { middle, upper, lower } = calculateBollingerBands(candles);
+	if (!middle.length) return;
+	
+	const upperSeries = chart.addLineSeries({
+		color: indicatorColors.bbUpper,
+		lineWidth: 1,
+		priceLineVisible: false,
+		lastValueVisible: true,
+		title: 'BB Upper'
+	});
+	upperSeries.setData(upper);
+	
+	const middleSeries = chart.addLineSeries({
+		color: indicatorColors.bbMiddle,
+		lineWidth: 1,
+		priceLineVisible: false,
+		lastValueVisible: true,
+		title: 'BB Middle'
+	});
+	middleSeries.setData(middle);
+	
+	const lowerSeries = chart.addLineSeries({
+		color: indicatorColors.bbLower,
+		lineWidth: 1,
+		priceLineVisible: false,
+		lastValueVisible: true,
+		title: 'BB Lower'
+	});
+	lowerSeries.setData(lower);
+	
+	indicatorSeries['bb'] = [upperSeries, middleSeries, lowerSeries];
+}
+
+export function clearIndicators() {
+	Object.keys(indicatorSeries).forEach(key => {
+		if (Array.isArray(indicatorSeries[key])) {
+			indicatorSeries[key].forEach(series => {
+				chart.removeSeries(series);
+			});
+		} else {
+			chart.removeSeries(indicatorSeries[key]);
+		}
+	});
+	indicatorSeries = {};
+}
+
+// Load saved indicators on chart init
+export function loadSavedIndicators() {
+	const indicators = ['ma20', 'ma50', 'ema12', 'ema26', 'rsi', 'macd', 'bb'];
+	indicators.forEach(indicator => {
+		if (getUserSetting(`indicator_${indicator}`)) {
+			toggleIndicator(indicator, true);
+		}
+	});
 }
