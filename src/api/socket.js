@@ -1,6 +1,6 @@
 import { get } from 'svelte/store'
-import { PriceServiceConnection } from "@pythnetwork/pyth-common-js";
-import { Buffer } from "buffer";
+import { PriceServiceConnection } from '@pythnetwork/pyth-common-js';
+import { Buffer } from 'buffer';
 import { prices, marketInfos, priceTimestamps } from '@lib/stores'
 
 export class EvmPriceServiceConnection extends PriceServiceConnection {
@@ -14,7 +14,7 @@ export class EvmPriceServiceConnection extends PriceServiceConnection {
   async getPriceFeedsUpdateData(priceIds) {
     const latestVaas = await this.getLatestVaas(priceIds);
     return latestVaas.map(
-      (vaa) => "0x" + Buffer.from(vaa, "base64").toString("hex")
+      (vaa) => '0x' + Buffer.from(vaa, 'base64').toString('hex')
     );
   }
 }
@@ -38,7 +38,7 @@ export function connectSocket() {
 		return;
 	}
 
-	connection = new EvmPriceServiceConnection("https://hermes.pyth.network");
+	connection = new EvmPriceServiceConnection('https://hermes.pyth.network');
 
 	// map market => feedId and feedId => market
 	let priceIds = [];
@@ -54,8 +54,8 @@ export function connectSocket() {
 	// // TEST
 	// priceIds = [
 	//   // You can find the ids of prices at https://pyth.network/developers/price-feed-ids#pyth-evm-testnet
-	//   "0xf9c0172ba10dfa4d19088d94f5bf61d3b54d5bd7483a322a982e1373ee8ea31b", // BTC/USD price id in testnet
-	//   "0xca80ba6dc32e08d06f1aa886011eed1d77c77be9eb761cc10d72b7d0a2fd57a6", // ETH/USD price id in testnet
+	//   '0xf9c0172ba10dfa4d19088d94f5bf61d3b54d5bd7483a322a982e1373ee8ea31b', // BTC/USD price id in testnet
+	//   '0xca80ba6dc32e08d06f1aa886011eed1d77c77be9eb761cc10d72b7d0a2fd57a6', // ETH/USD price id in testnet
 	// ];
 	// pythFeedToMarket = {
 	// 	'0xf9c0172ba10dfa4d19088d94f5bf61d3b54d5bd7483a322a982e1373ee8ea31b': 'BTC-USD',
@@ -80,7 +80,7 @@ export function connectSocket() {
 				_prices[market] = price;
 				_priceTimestamps[market] = Date.now() / 1000;
 			} catch(e) {
-				console.error(e);
+				console.error('[Cap-Socket] Error:', e);
 			}
 
 		} // else price is stale
