@@ -10,6 +10,7 @@
 
 	import { DEFAULT_HISTORY_COUNT, DEFAULT_HISTORY_SORT_KEY } from '@lib/config'
 	import { 
+		getLabelForKey,
 		formatHistoryItem, 
 		formatPnl, 
 		formatForDisplay, 
@@ -23,7 +24,7 @@
 	import { showModal } from '@lib/ui'
 	import { saveUserSetting } from '@lib/utils'
 
-	import { getUserHistory } from '@api/history'
+	import { fetchUserHistoryPage, getUserHistory } from '@api/history'
 
 	export let allColumns;
 
@@ -106,6 +107,7 @@
 	$: formattedHistory = $historySorted.map((item) => formatHistoryItem(item));
 
 	let showDetails = {};
+	let exportFrom = '', exportTo = '', isExporting = false;
 
 	function getItemStatus(item) {
 		if (!item) return '';
@@ -117,9 +119,143 @@
 		return item.status;
 	}
 
+	function getExportValue(item, key) {
+		if (!item) return '';
+		if (key == 'id') return item.status == 'liquidated' ? 'liq' : item.orderId;
+		if (key == 'timestamp') return formatDate(item.timestamp) || '';
+		if (key == 'isLong') return formatSide(item.isLong, item.isReduceOnly);
+		if (key == 'market') return formatMarketName(item.market);
+		if (key == 'price') return item.price * 1 > 0 ? formatPriceForDisplay(item.price) : '';
+		if (key == 'size') return `${formatForDisplay(item.size)} ${item.asset}`;
+		if (key == 'margin') return `${formatForDisplay(item.margin)} ${item.asset}`;
+		if (key == 'leverage') return item.leverage ? `${formatForDisplay(item.leverage)}x` : '';
+		if (key == 'orderType') return formatOrderType(item.orderType);
+		if (key == 'isReduceOnly') return item.isReduceOnly ? 'Yes' : 'No';
+		if (key == 'status') return item.status;
+		if (key == 'reason') return item.reason || '';
+		if (key == 'pnl') return item.pnl ? `${formatPnl(item.pnl)} (${formatPnl(100 * item.pnl / item.margin, true)})` : '';
+		if (key == 'fee') return `${formatForDisplay(item.fee)} ${item.asset}`;
+		if (key == 'expiry') return formatDate(item.expiry) || '';
+		if (key == 'cancelOrderId') return item.cancelOrderId * 1 > 0 ? item.cancelOrderId : '';
+		return item[key] == undefined ? '' : item[key];
+	}
+
+	function createCsvWorker() {
+		const workerSource = `
+			self.onmessage = (event) => {
+				const { headers, rows } = event.data;
+				const escapeCell = (value) => {
+					if (value === undefined || value === null) return '';
+					const stringValue = String(value);
+					if (/[",\\n\\r]/.test(stringValue)) {
+						return '"' + stringValue.replace(/"/g, '""') + '"';
+					}
+					return stringValue;
+				};
+				const csv = [headers, ...rows].map((row) => row.map(escapeCell).join(',')).join('\\n');
+				self.postMessage(csv);
+			};
+		`;
+		const workerUrl = URL.createObjectURL(new Blob([workerSource], {type: 'text/javascript'}));
+		const worker = new Worker(workerUrl);
+		worker.cleanup = () => URL.revokeObjectURL(workerUrl);
+		return worker;
+	}
+
+	function downloadCsv(csv) {
+		const blob = new Blob([csv], {type: 'text/csv;charset=utf-8'});
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement('a');
+		link.href = url;
+		link.download = `cap-trading-history-${new Date().toISOString().slice(0, 10)}.csv`;
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+		URL.revokeObjectURL(url);
+	}
+
+	function isInExportRange(item) {
+		const timestamp = item.timestamp * 1000;
+		if (exportFrom && timestamp < new Date(`${exportFrom}T00:00:00`).getTime()) return false;
+		if (exportTo && timestamp > new Date(`${exportTo}T23:59:59`).getTime()) return false;
+		return true;
+	}
+
+	async function fetchHistoryForExport() {
+		let skip = 0;
+		let items = [];
+		while (true) {
+			const page = await fetchUserHistoryPage({first: DEFAULT_HISTORY_COUNT, skip});
+			if (!page.length) break;
+			items = items.concat(page);
+			if (page.length < DEFAULT_HISTORY_COUNT) break;
+			skip += DEFAULT_HISTORY_COUNT;
+		}
+		return items.filter(isInExportRange);
+	}
+
+	async function exportHistory() {
+		if (isExporting) return;
+		isExporting = true;
+
+		try {
+			const historyItems = await fetchHistoryForExport();
+			const exportColumns = allColumns.filter((item) => item.key != 'tools');
+			const headers = exportColumns.map((item) => getLabelForKey(item.key));
+			const rows = historyItems.map((item) => exportColumns.map((column) => getExportValue(formatHistoryItem(item), column.key)));
+			const worker = createCsvWorker();
+			worker.onmessage = (event) => {
+				downloadCsv(event.data);
+				worker.terminate();
+				worker.cleanup();
+				isExporting = false;
+			};
+			worker.onerror = () => {
+				worker.terminate();
+				worker.cleanup();
+				isExporting = false;
+			};
+			worker.postMessage({headers, rows});
+		} catch(e) {
+			console.error('history export error', e);
+			isExporting = false;
+		}
+	}
+
 </script>
 
 <style>
+	.export-tools {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 8px 25px;
+		border-bottom: 1px solid var(--layer100);
+		font-size: 85%;
+	}
+	.export-tools input {
+		height: 32px;
+		border-radius: 6px;
+		background-color: var(--layer50);
+		border: 1px solid var(--layer200);
+		color: var(--text1);
+		padding: 0 8px;
+	}
+	.export-tools button {
+		height: 32px;
+		padding: 0 12px;
+		border-radius: 6px;
+		font-weight: 600;
+		color: var(--primary-darkest);
+		background-color: var(--primary);
+	}
+	.export-tools button:disabled {
+		cursor: default;
+		opacity: 0.6;
+	}
+	.table-container {
+		height: calc(100% - 49px);
+	}
 	.item {
 		border-bottom: 1px solid var(--layer0);
 	}
@@ -232,15 +368,32 @@
 		font-size: 90%;
 	}
 	.wrapper {
-		max-height: calc(var(--account-height) - 50px - 39px);
+		max-height: calc(var(--account-height) - 50px - 39px - 49px);
 	}
 	@media all and (max-width: 600px) {
+		.export-tools {
+			flex-wrap: wrap;
+			padding: 8px;
+		}
+		.table-container {
+			height: auto;
+		}
 		.wrapper {
 			max-height: 100%;
 		}
 	}
 </style>
 
+<div class='export-tools'>
+	<span>Export</span>
+	<input type='date' bind:value={exportFrom} aria-label='Export from date'>
+	<input type='date' bind:value={exportTo} aria-label='Export to date'>
+	<button type='button' disabled={isExporting} on:click={exportHistory}>
+		{isExporting ? 'Exporting...' : 'Download CSV'}
+	</button>
+</div>
+
+<div class='table-container'>
 <Table
 	defaultSortKey={DEFAULT_HISTORY_SORT_KEY}
 	bind:sortKey={$historySortKey}
@@ -331,6 +484,7 @@
 	</div>	
 
 </Table>
+</div>
 
 <!-- {#if !isLoading && formattedHistory.length == 0}
 	<div class='empty'>Nothing to show.</div>

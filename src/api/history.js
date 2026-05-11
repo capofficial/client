@@ -4,7 +4,7 @@ import { DEFAULT_HISTORY_COUNT } from '@lib/config'
 import { address, history, lastHistoryItemsCount, historySortKey, historyOrderStatusToShow } from '@lib/stores'
 import { getLabelForAsset, getChainData } from '@lib/utils'
 
-export async function getUserHistory(params) {
+function getHistoryUrl(params) {
 
 	const dataEndpoint = getChainData('dataEndpoint');
 	
@@ -31,9 +31,28 @@ export async function getUserHistory(params) {
 	let sortBy = 'timestamp';
 	let sortDirection = 'desc';
 
+	return `${dataEndpoint}/history/${_address}?chain=arbitrum&limit=${first}&skip=${skip}&sortBy=${sortBy}&sortDirection=${sortDirection}&status=${statusesToShow.join(',')}`;
+}
+
+export async function fetchUserHistoryPage(params) {
+	const url = getHistoryUrl(params);
+	if (!url) return [];
+
+	const response = await fetch(url);
+	return await response.json() || [];
+}
+
+export async function getUserHistory(params) {
+
+	if (!params) params = {};
+
+	let {
+		skip,
+		diff
+	} = params;
+
 	try {
-		const response = await fetch(`${dataEndpoint}/history/${_address}?chain=arbitrum&limit=${first}&skip=${skip}&sortBy=${sortBy}&sortDirection=${sortDirection}&status=${statusesToShow.join(',')}`);
-		const orders = await response.json() || [];
+		const orders = await fetchUserHistoryPage(params);
 
 		lastHistoryItemsCount.set(orders.length);
 
