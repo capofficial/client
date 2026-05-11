@@ -7,7 +7,7 @@
 	import Button from '@components/layout/Button.svelte'
 	import LabelValue from '@components/layout/LabelValue.svelte'
 
-	import { ADDRESS_ZERO } from '@lib/config'
+	import { BPS_DIVIDER } from '@lib/config'
 	import { formatForDisplay } from '@lib/formatters'
 	import { approveAsset, getAllowance } from '@api/assets'
 	import { addMargin, removeMargin } from '@api/positions'
@@ -53,33 +53,39 @@
 	}
 
 	let funding = data.funding || 0;
-	let newLiqPrice = data.position.liqprice;
+	let currentEffectiveMargin = data.position.margin*1 + funding*1;
+	let currentLiqPrice = data.liqPrice || calculateLiquidationPrice(currentEffectiveMargin);
+	let newLiqPrice = currentLiqPrice;
 	let newMargin = 0;
+
+	function calculateLiquidationPrice(marginWithFunding) {
+		const liqThreshold = (data.marketInfo?.liqThreshold || $selectedMarketInfo?.liqThreshold || 0) / BPS_DIVIDER;
+		if (!liqThreshold || !data.position.size) return 0;
+
+		let liqPrice;
+		if (data.position.isLong) {
+			liqPrice = data.position.price * 1 - liqThreshold * marginWithFunding * data.position.price / data.position.size;
+		} else {
+			liqPrice = data.position.price * 1 + liqThreshold * marginWithFunding * data.position.price / data.position.size;
+		}
+		return Math.max(liqPrice, 0);
+	}
+
 	function calculateNewLiquidationPrice(marginDelta, mode) {
 
 		if (!marginDelta) marginDelta = 0;
 
 		if (mode == 'Add') {
-			newMargin = ((data.position.margin*1 + funding*1) + marginDelta);
-
-			if (data.position.isLong) {
-				newLiqPrice = data.position.price * 1 - newMargin * data.position.price / data.position.size;
-			} else {
-				newLiqPrice = data.position.price * 1 + newMargin * data.position.price / data.position.size;
-			}
-			if (newLiqPrice < 0) newLiqPrice = 0;
+			newMargin = (currentEffectiveMargin + marginDelta * 1);
+			newLiqPrice = calculateLiquidationPrice(newMargin);
 		} else {
-			if (marginDelta >= (data.position.margin*1 + funding*1)) {
+			if (marginDelta >= currentEffectiveMargin) {
 				newMargin = 0;
-				margin = (data.position.margin*1 + funding*1);
+				margin = currentEffectiveMargin;
 			} else {
-				newMargin = ((data.position.margin*1 + funding*1) - marginDelta);
+				newMargin = (currentEffectiveMargin - marginDelta * 1);
 			}
-			if (data.position.isLong) {
-				newLiqPrice = data.position.price * 1 - ((data.position.margin*1 + funding*1) - marginDelta) * data.position.price / data.position.size;
-			} else {
-				newLiqPrice = data.position.price * 1 + ((data.position.margin*1 + funding*1 - marginDelta)) * data.position.price / data.position.size;
-			}
+			newLiqPrice = calculateLiquidationPrice(newMargin);
 		}
 		calculateNewLeverage();
 	}
@@ -149,6 +155,10 @@
 			
 			<div class='group'>
 				<Input label={`${selected} ${data.position.asset}`} bind:value={margin} />
+			</div>
+
+			<div class='row'>
+				<LabelValue label='Current Liq. Price' value={`${formatForDisplay(currentLiqPrice) || "-"}`} />
 			</div>
 
 			<div class='row'>
