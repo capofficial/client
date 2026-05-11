@@ -90,28 +90,35 @@ export function letterify(amount) {
 	if (amount >= 10**3) return Math.round(amount/10**3) + 'K';
 }
 
+export function addCommas(x) {
+	if (x == null || isNaN(x) || typeof x === 'boolean') return x;
+	const parts = x.toString().split('.');
+	parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+	return parts.join('.');
+}
+
 export function formatForDisplay(amount, fix) {
 
 	amount = amount * 1;
 
 	if (!amount || isNaN(amount)) return 0;
 
-	if (!fix && (amount * 1).toFixed(6)*1 == Math.round(amount * 1)) return Math.round(amount);
+	if (!fix && (amount * 1).toFixed(6)*1 == Math.round(amount * 1)) return addCommas(Math.round(amount));
 	
-	if (fix) return (amount*1).toFixed(fix);
+	if (fix) return addCommas((amount*1).toFixed(fix));
 
 	if (amount * 1 >= 10000 || amount * 1 <= -10000) {
-		return Math.round(amount*1);
+		return addCommas(Math.round(amount*1));
 	} else if (amount * 1 >= 10 || amount * 1 <= -10) {
-		return (amount * 1).toFixed(2);
+		return addCommas((amount * 1).toFixed(2));
 	} else if (amount * 1 >= 1 || amount * 1 <= -1) {
-		return +(amount * 1).toFixed(4);
+		return addCommas(+(amount * 1).toFixed(4));
 	} else if (amount * 1 >= 0.01 || amount * 1 <= -0.01) {
-		return +(amount * 1).toFixed(5);
+		return addCommas(+(amount * 1).toFixed(5));
 	} else if (amount * 1 >= 0.001 || amount * 1 <= -0.001)  {
-		return +(amount * 1).toFixed(6);
+		return addCommas(+(amount * 1).toFixed(6));
 	} else {
-		return +(amount * 1).toFixed(8);
+		return addCommas(+(amount * 1).toFixed(8));
 	}
 
 }
