@@ -7,12 +7,11 @@
 	import Button from '@components/layout/Button.svelte'
 	import LabelValue from '@components/layout/LabelValue.svelte'
 
-	import { ADDRESS_ZERO } from '@lib/config'
-	import { formatForDisplay } from '@lib/formatters'
-	import { approveAsset, getAllowance } from '@api/assets'
+	import { formatForDisplay, numberWithCommas } from '@lib/formatters'
+	import { approveAsset, getAllowance, getUserAssetBalances } from '@api/assets'
 	import { addMargin, removeMargin } from '@api/positions'
 	import { focusInput, hideModal } from '@lib/ui'
-	import { allowances, selectedMarketInfo } from '@lib/stores'
+	import { allowances, balances } from '@lib/stores'
 
 	export let data;
 
@@ -53,6 +52,7 @@
 	}
 
 	let funding = data.funding || 0;
+	let availableMargin = Math.max((data.position.margin*1 + funding*1), 0);
 	let newLiqPrice = data.position.liqprice;
 	let newMargin = 0;
 	function calculateNewLiquidationPrice(marginDelta, mode) {
@@ -90,6 +90,11 @@
 	}
 
 	$: calculateNewLiquidationPrice(margin, selected)
+	$: walletBalance = $balances[data.position.asset] || 0;
+
+	function fillMaxMargin() {
+		margin = selected == 'Add' ? walletBalance : availableMargin;
+	}
 
 	let isApproving = false;
 	async function _approveAsset() {
@@ -102,6 +107,7 @@
 
 	onMount(() => {
 		focusInput(`Add ${data.position.asset}`);
+		getUserAssetBalances([data.position.asset]);
 	});
 
 </script>
@@ -149,6 +155,13 @@
 			
 			<div class='group'>
 				<Input label={`${selected} ${data.position.asset}`} bind:value={margin} />
+				<LabelValue
+					label={selected == 'Add' ? 'Wallet Balance' : 'Available To Remove'}
+					value={`${numberWithCommas(selected == 'Add' ? walletBalance : availableMargin)} ${data.position.asset}`}
+					isClickable={true}
+					hasSemiPadding={true}
+					on:click={fillMaxMargin}
+				/>
 			</div>
 
 			<div class='row'>
