@@ -7,12 +7,12 @@
 	import Button from '@components/layout/Button.svelte'
 	import LabelValue from '@components/layout/LabelValue.svelte'
 
-	import { ADDRESS_ZERO } from '@lib/config'
-	import { formatForDisplay } from '@lib/formatters'
+	import { BPS_DIVIDER } from '@lib/config'
+	import { formatForDisplay, formatPriceForDisplay } from '@lib/formatters'
 	import { approveAsset, getAllowance } from '@api/assets'
 	import { addMargin, removeMargin } from '@api/positions'
 	import { focusInput, hideModal } from '@lib/ui'
-	import { allowances, selectedMarketInfo } from '@lib/stores'
+	import { allowances, marketInfos } from '@lib/stores'
 
 	export let data;
 
@@ -53,43 +53,44 @@
 	}
 
 	let funding = data.funding || 0;
-	let newLiqPrice = data.position.liqprice;
+	let currentLiqPrice = 0;
+	let newLiqPrice = 0;
 	let newMargin = 0;
-	function calculateNewLiquidationPrice(marginDelta, mode) {
+	function calculateLiquidationPrice(marginValue, marketInfosByName) {
 
-		if (!marginDelta) marginDelta = 0;
+		const liqThreshold = (marketInfosByName[data.position.market]?.liqThreshold || BPS_DIVIDER) / BPS_DIVIDER;
+
+		if (data.position.isLong) {
+			return data.position.price * 1 - liqThreshold * marginValue * data.position.price / data.position.size;
+		}
+		return data.position.price * 1 + liqThreshold * marginValue * data.position.price / data.position.size;
+
+	}
+	function calculateNewLiquidationPrice(marginDelta, mode, marketInfosByName) {
+
+		const currentMargin = data.position.margin * 1 + funding * 1;
+		const parsedMarginDelta = Math.max(marginDelta * 1 || 0, 0);
+		const effectiveMarginDelta = mode == 'Remove' ? Math.min(parsedMarginDelta, currentMargin) : parsedMarginDelta;
+
+		currentLiqPrice = calculateLiquidationPrice(currentMargin, marketInfosByName);
 
 		if (mode == 'Add') {
-			newMargin = ((data.position.margin*1 + funding*1) + marginDelta);
-
-			if (data.position.isLong) {
-				newLiqPrice = data.position.price * 1 - newMargin * data.position.price / data.position.size;
-			} else {
-				newLiqPrice = data.position.price * 1 + newMargin * data.position.price / data.position.size;
-			}
-			if (newLiqPrice < 0) newLiqPrice = 0;
+			newMargin = currentMargin + effectiveMarginDelta;
 		} else {
-			if (marginDelta >= (data.position.margin*1 + funding*1)) {
-				newMargin = 0;
-				margin = (data.position.margin*1 + funding*1);
-			} else {
-				newMargin = ((data.position.margin*1 + funding*1) - marginDelta);
-			}
-			if (data.position.isLong) {
-				newLiqPrice = data.position.price * 1 - ((data.position.margin*1 + funding*1) - marginDelta) * data.position.price / data.position.size;
-			} else {
-				newLiqPrice = data.position.price * 1 + ((data.position.margin*1 + funding*1 - marginDelta)) * data.position.price / data.position.size;
-			}
+			newMargin = currentMargin - effectiveMarginDelta;
 		}
+
+		newLiqPrice = calculateLiquidationPrice(newMargin, marketInfosByName);
+		if (newLiqPrice < 0) newLiqPrice = 0;
 		calculateNewLeverage();
 	}
 
 	let newLeverage = 0;
 	function calculateNewLeverage() {
-		newLeverage = data.position.size / newMargin;
+		newLeverage = newMargin > 0 ? data.position.size / newMargin : 0;
 	}
 
-	$: calculateNewLiquidationPrice(margin, selected)
+	$: calculateNewLiquidationPrice(margin, selected, $marketInfos)
 
 	let isApproving = false;
 	async function _approveAsset() {
@@ -152,7 +153,11 @@
 			</div>
 
 			<div class='row'>
-				<LabelValue label='New Liq. Price' value={`${formatForDisplay(newLiqPrice) || "-"}`} />
+				<LabelValue label='Current Liq. Price' value={formatPriceForDisplay(currentLiqPrice) || "-"} />
+			</div>
+
+			<div class='row'>
+				<LabelValue label='New Liq. Price' value={formatPriceForDisplay(newLiqPrice) || "-"} />
 			</div>
 
 			<div class='row'>
