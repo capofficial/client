@@ -3,8 +3,9 @@ import { createChart, ColorType, LineStyle } from 'lightweight-charts'
 
 import { CURRENCY_DECIMALS } from './config'
 import { formatUnits, formatOrder, formatPosition, formatForDisplay, formatPriceForDisplay } from './formatters'
-import { selectedMarket, orders, positions, chartResolution, chartLoading, showOrdersOnChart, showPositionsOnChart, hoveredOHLC } from './stores'
+import { selectedMarket, orders, positions, chartResolution, chartLoading, showOrdersOnChart, showPositionsOnChart, hoveredOHLC, chartIndicators } from './stores'
 import { saveUserSetting, getPrecision } from './utils'
+import { calculateSMA, calculateEMA, calculateRSI, calculateMACD } from './indicators'
 
 import { getMarketCandles } from '@api/prices'
 
@@ -16,6 +17,8 @@ let earliestCandleDate;
 
 let chart;
 let candlestickSeries;
+let indicatorSeries = [];
+let chartIndicatorsUnsubscribe;
 
 // how much history to load for each resolution (in ms)
 const lookbacks = {
@@ -50,6 +53,7 @@ export function initChart(cb) {
 	const chartElem = document.getElementById('chart');
 
 	chart = createChart(chartElem);
+	indicatorSeries = [];
 
 	new ResizeObserver((entries) => {
 		if (entries.length === 0 || entries[0].target !== chartElem) return;
@@ -144,13 +148,12 @@ export function initChart(cb) {
 	});
 
 	chart.subscribeCrosshairMove(param => {
-		if (!param?.seriesPrices || param?.seriesPrices.size == 0) {
-			hoveredOHLC.set();
-		} else {
-			param?.seriesPrices.forEach((value) => {
-		    	hoveredOHLC.set(value);
-		    });
-		}
+		hoveredOHLC.set(param?.seriesPrices?.get(candlestickSeries));
+	});
+
+	if (chartIndicatorsUnsubscribe) chartIndicatorsUnsubscribe();
+	chartIndicatorsUnsubscribe = chartIndicators.subscribe(() => {
+		syncIndicators();
 	});
 
 	applyWatermark();
@@ -249,6 +252,7 @@ export async function loadCandles(_end) {
 
 	// set data
 	candlestickSeries.setData(candles || []);
+	syncIndicators();
 
 	// Set chart precision
 	if (candles.length) {
@@ -318,6 +322,125 @@ export function onNewPrice(price) {
 		candlestickSeries.update(lastCandle);
 	}
 
+	if (hasEnabledIndicators()) syncIndicators();
+
+}
+
+// Technical indicators
+
+export function setChartIndicator(indicator, enabled) {
+	const indicators = Object.assign({}, get(chartIndicators), {
+		[indicator]: enabled
+	});
+	chartIndicators.set(indicators);
+	saveUserSetting('chartIndicators', indicators);
+}
+
+function hasEnabledIndicators() {
+	return Object.values(get(chartIndicators) || {}).some(Boolean);
+}
+
+function syncIndicators() {
+	if (!chart) return;
+
+	clearIndicatorSeries();
+	if (!candles.length || !hasEnabledIndicators()) return;
+
+	const indicators = get(chartIndicators);
+
+	if (indicators.ma20) {
+		addLineIndicator(calculateSMA(candles, 20), {
+			color: '#f5b942',
+			lineWidth: 2,
+			title: 'MA 20'
+		});
+	}
+
+	if (indicators.ma50) {
+		addLineIndicator(calculateSMA(candles, 50), {
+			color: '#4bb3fd',
+			lineWidth: 2,
+			title: 'MA 50'
+		});
+	}
+
+	if (indicators.ema20) {
+		addLineIndicator(calculateEMA(candles, 20), {
+			color: '#b388ff',
+			lineWidth: 2,
+			title: 'EMA 20'
+		});
+	}
+
+	if (indicators.rsi) {
+		addLineIndicator(calculateRSI(candles), {
+			color: '#5ce1e6',
+			lineWidth: 2,
+			priceScaleId: 'rsi',
+			title: 'RSI 14'
+		});
+		chart.priceScale('rsi').applyOptions({
+			visible: false,
+			scaleMargins: {
+				top: indicators.macd ? 0.72 : 0.76,
+				bottom: indicators.macd ? 0.16 : 0.04
+			}
+		});
+	}
+
+	if (indicators.macd) {
+		const macd = calculateMACD(candles);
+		addHistogramIndicator(macd.histogram, {
+			priceScaleId: 'macd',
+			priceLineVisible: false,
+			lastValueVisible: false
+		});
+		addLineIndicator(macd.macd, {
+			color: '#ff8a65',
+			lineWidth: 2,
+			priceScaleId: 'macd',
+			title: 'MACD'
+		});
+		addLineIndicator(macd.signal, {
+			color: '#ffd54f',
+			lineWidth: 1,
+			priceScaleId: 'macd',
+			title: 'Signal'
+		});
+		chart.priceScale('macd').applyOptions({
+			visible: false,
+			scaleMargins: {
+				top: indicators.rsi ? 0.86 : 0.78,
+				bottom: 0.02
+			}
+		});
+	}
+}
+
+function addLineIndicator(data, options) {
+	if (!data.length) return;
+
+	const series = chart.addLineSeries(Object.assign({
+		priceLineVisible: false,
+		lastValueVisible: false
+	}, options));
+	series.setData(data);
+	indicatorSeries.push(series);
+}
+
+function addHistogramIndicator(data, options) {
+	if (!data.length) return;
+
+	const series = chart.addHistogramSeries(options);
+	series.setData(data);
+	indicatorSeries.push(series);
+}
+
+function clearIndicatorSeries() {
+	for (const series of indicatorSeries) {
+		chart.removeSeries(series);
+	}
+	indicatorSeries = [];
 }
 
 // Order and position lines
