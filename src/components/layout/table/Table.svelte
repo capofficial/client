@@ -84,7 +84,7 @@
 		.table-wrapper  {
 			max-width: 100%;
 			overflow-x: scroll;
-			scrollbar-color: var(--layer200);
+			scrollbar-color: var(--layer200) transparent;
 			scrollbar-width: thin;
 		}
 		.table-wrapper::-webkit-scrollbar-track {
@@ -104,7 +104,7 @@
 			overflow-x: visible;
 			overflow-y: visible !important;
 			scrollbar-width: unset;
-			scrollbar-color: transparent;
+			scrollbar-color: transparent transparent;
 		}
 		.table.min-width {
 			min-width: 1440px;
@@ -157,7 +157,7 @@
 	.data-wrapper {
 		height: calc(100% - 39px);
 		overflow-y: scroll;
-		scrollbar-color: var(--layer200);
+		scrollbar-color: var(--layer200) transparent;
 		scrollbar-width: thin;
 	}
 	.data-wrapper::-webkit-scrollbar-track {
