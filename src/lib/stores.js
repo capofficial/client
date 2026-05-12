@@ -37,6 +37,13 @@ export const chartHeight = writable(getUserSetting('chartHeight') || 320);
 export const chartResolution = writable(getUserSetting('chartResolution') || 900)
 export const chartLoading = writable(false);
 export const hoveredOHLC = writable();
+export const chartIndicators = writable(Object.assign({
+	ma20: false,
+	ma50: false,
+	ema20: false,
+	rsi: false,
+	macd: false
+}, getUserSetting('chartIndicators') || {}));
 export const accountHeight = writable(getUserSetting('accountHeight') || 250);
 
 // Rewards
