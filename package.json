@@ -6,6 +6,7 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
+    "test": "node tests/stake-cap-approval.test.mjs",
     "start": "sirv build --single",
     "deploy-ipfs": "npm run build && npx ipfs-deploy build",
     "postinstall": "patch-package"
