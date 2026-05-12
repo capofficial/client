@@ -5,10 +5,16 @@
 	import Rewards from './Rewards.svelte'
 
 	import { pageName, showMobileNav } from '@lib/stores'
+	import { showModal } from '@lib/ui'
 	import { TROPHY_ICON, BULLET_LIST_ICON } from '@lib/icons'
 
 	function toggleMobileNav() {
 		showMobileNav.set(!$showMobileNav);
+	}
+
+	function openWelcomeModal() {
+		showMobileNav.set(false);
+		showModal('Welcome');
 	}
 </script>
 
@@ -121,6 +127,7 @@
 	<a class:active={$pageName == 'Trade'} href='/trade'>Trade</a>
 	<a class:active={$pageName == 'Pool'} href='/pool'>Pool</a>
 	<a class:active={$pageName == 'Stake'} href='/stake'>Stake</a>
+	<a href='/guide' on:click|preventDefault|stopPropagation={openWelcomeModal}>Guide</a>
 	<a on:click|stopPropagation={toggleMobileNav} class:active={$showMobileNav}>…</a>
 </div>
 
@@ -132,6 +139,7 @@
 	<a on:click={toggleMobileNav} href='/trade'>Trade</a>
 	<a on:click={toggleMobileNav} href='/pool'>Pool</a>
 	<a on:click={toggleMobileNav} href='/stake'>Stake</a>
+	<a href='/guide' on:click|preventDefault|stopPropagation={openWelcomeModal}>Guide</a>
 	<a on:click={toggleMobileNav} href='https://docs.cap.io' target='_blank' class='display-desktop'>Docs</a>
 </div>
 {/if}

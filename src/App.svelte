@@ -1,6 +1,7 @@
 <script>
 
 	import { onMount, onDestroy } from 'svelte'
+	import { get } from 'svelte/store'
 
 	import Modals from '@components/layout/Modals.svelte'
 	import Errors from '@components/layout/Errors.svelte'
@@ -11,24 +12,40 @@
 	import { USD_CONVERSION_MARKETS } from '@lib/config'
 	import { checkCountry, loadRoute, catchLinks, navigateTo } from '@lib/routing'
 	import { component, address, pageName, countryDisallowed } from '@lib/stores'
-	import { hidePopoversOnKeydown, hidePopoversOnClick } from '@lib/ui'
-	import { runAndInterval, hashString, getChainData } from '@lib/utils'
+	import { hidePopoversOnKeydown, hidePopoversOnClick, showModal } from '@lib/ui'
+	import { runAndInterval, hashString, getChainData, getUserSetting } from '@lib/utils'
 
 	import { getUserAssetBalances } from '@api/assets'
 	import { listenToEvents } from '@api/listener'
 	import { getMarketPrices } from '@api/prices'
 
 	let interval1;
+	let welcomeModalShown = false;
+	let countryChecked = false;
+
+	function showWelcomeModalOnFirstDashboardVisit() {
+		if (!countryChecked || get(countryDisallowed) || welcomeModalShown || location.pathname == '/' || getUserSetting('welcomeModalDismissed')) return;
+		welcomeModalShown = true;
+		setTimeout(() => showModal('Welcome'), 0);
+	}
 
 	onMount(async () => {
 
-		checkCountry();
-
 		loadRoute();
-		catchLinks((path) => navigateTo(path));
+		checkCountry().finally(() => {
+			countryChecked = true;
+			showWelcomeModalOnFirstDashboardVisit();
+		});
+		catchLinks((path) => {
+			navigateTo(path);
+			showWelcomeModalOnFirstDashboardVisit();
+		});
 
 		// For back button functionality
-		window.onpopstate = () => loadRoute();
+		window.onpopstate = () => {
+			loadRoute();
+			showWelcomeModalOnFirstDashboardVisit();
+		};
 
 		getMarketPrices('all');
 	});
