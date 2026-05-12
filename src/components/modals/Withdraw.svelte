@@ -7,9 +7,8 @@
 	
 	import { onMount } from 'svelte'
 
-	import { BPS_DIVIDER } from '@lib/config'
 	import { poolStakes, globalUPLs } from '@lib/stores'
-	import { withdraw, getPoolWithdrawalTaxBps, getGlobalUPL } from '@api/pool'
+	import { withdraw, getPoolWithdrawalTaxBps, getGlobalUPL, getUserPoolStakes } from '@api/pool'
 	import { focusInput, hideModal } from '@lib/ui'
 	import { formatForDisplay, numberWithCommas } from '@lib/formatters'
 	import { getAssets } from '@lib/utils'
@@ -46,9 +45,14 @@
 
 	let assets = getAssets();
 
+	function withdrawMax() {
+		amount = $poolStakes[asset] || 0;
+	}
+
 	onMount(() => {
 		selectAsset('ETH');
 		focusInput('Amount');
+		getUserPoolStakes();
 	});
 
 </script>
@@ -90,7 +94,7 @@
 			</div>
 
 			<div class="group">
-				<div class='group-row'><LabelValue label='Available' value={formatForDisplay($poolStakes[asset])} isClickable={true} on:click={() => {amount = $poolStakes[asset]}} /></div>
+				<div class='group-row'><LabelValue label='Withdrawable' value={`${formatForDisplay($poolStakes[asset])} ${asset} (max)`} isClickable={true} on:click={withdrawMax} /></div>
 					<div class='group-row'><LabelValue label='Total Trader UP/L' value={numberWithCommas($globalUPLs[asset])} /></div>
 				<LabelValue label='Withdrawal Cost' value={`${costBps || 0}%`} />
 			</div>

@@ -7,11 +7,10 @@
 
 	import { onMount } from 'svelte'
 
-	import { BPS_DIVIDER } from '@lib/config'
 	import { numberWithCommas } from '@lib/formatters'
-	import { deposit, getPoolWithdrawalFee, getPoolDepositTaxBps, getGlobalUPL } from '@api/pool'
+	import { deposit, getPoolDepositTaxBps, getGlobalUPL } from '@api/pool'
 	import { approveAsset, getAllowance, getUserAssetBalances } from '@api/assets'
-	import { allowances, poolDepositTaxes, globalUPLs, poolWithdrawalFees, balances } from '@lib/stores'
+	import { allowances, globalUPLs, balances } from '@lib/stores'
 	import { focusInput, hideModal } from '@lib/ui'
 	import { getAssets } from '@lib/utils'
 
@@ -53,6 +52,10 @@
 
 	async function _approveAsset() {
 		const result = await approveAsset(asset, 'FundStore');
+	}
+
+	function depositMax() {
+		amount = $balances[asset] || 0;
 	}
 
 	$: checkAllowance(asset);
@@ -103,7 +106,7 @@
 
 		<div class="group">
 			<div class='group-row'>
-				<LabelValue label='Available' value={numberWithCommas($balances[asset])} isClickable={true} on:click={() => {amount = $balances[asset]}} />
+				<LabelValue label='Wallet Balance' value={`${numberWithCommas($balances[asset])} ${asset} (max)`} isClickable={true} on:click={depositMax} />
 			</div>
 			<div class='group-row'><LabelValue label='Total Trader UP/L' value={numberWithCommas($globalUPLs[asset])} /></div>
 			<LabelValue label='Deposit Cost' value={`${costBps || 0}%`} />
