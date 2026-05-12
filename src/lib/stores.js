@@ -68,6 +68,8 @@ export const poolWithdrawalFees = writable({});
 export const claimableRewardsCAP = writable({});
 export const totalSupplyCAP = writable(0);
 export const CAPStake = writable(0);
+export const poolTransactions = writable([]);
+export const lastPoolTransactionsCount = writable(0);
 
 // Pool performance stats (including fees)
 function getPoolPerformance(stats, latestIndex, oldestIndex) {

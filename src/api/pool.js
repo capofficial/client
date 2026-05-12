@@ -1,8 +1,8 @@
 import { get } from 'svelte/store'
-import { CURRENCY_DECIMALS, BPS_DIVIDER } from '@lib/config'
+import { CURRENCY_DECIMALS, BPS_DIVIDER, DEFAULT_POOL_TRANSACTIONS_COUNT } from '@lib/config'
 import { getContract } from '@lib/contracts'
 import { formatUnits, parseUnits } from '@lib/formatters'
-import { address, poolBalances, bufferBalances, poolStakes, poolStatsDaily, poolStatsWeekly, poolWithdrawalFees, poolDepositTaxes, poolWithdrawalTaxes, globalUPLs } from '@lib/stores'
+import { address, poolBalances, bufferBalances, poolStakes, poolStatsDaily, poolStatsWeekly, poolWithdrawalFees, poolDepositTaxes, poolWithdrawalTaxes, globalUPLs, poolTransactions, lastPoolTransactionsCount } from '@lib/stores'
 import { getAssetAddress, getAssetAddresses, getLabelForAsset, getChainData } from '@lib/utils'
 import { showToast, showError } from '@lib/ui'
 
@@ -130,4 +130,43 @@ export async function withdraw(_asset, _amount) {
 	} catch(e) {
 		showError(e);
 	}
+}
+
+export async function getPoolTransactions(params) {
+	const dataEndpoint = getChainData('dataEndpoint');
+	if (!dataEndpoint) return false;
+
+	if (!params) params = {};
+
+	let {
+		first,
+		skip
+	} = params;
+
+	if (!first) first = DEFAULT_POOL_TRANSACTIONS_COUNT;
+	if (!skip) skip = 0;
+
+	try {
+		const response = await fetch(`${dataEndpoint}/pool/transactions?chain=arbitrum&limit=${first}&skip=${skip}`);
+		if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+		const data = await response.json() || [];
+		const transactions = Array.isArray(data) ? data : data.transactions || [];
+		lastPoolTransactionsCount.set(transactions.length);
+
+		if (skip) {
+			let currentTransactions = get(poolTransactions);
+			poolTransactions.set(currentTransactions.concat(transactions));
+		} else {
+			poolTransactions.set(transactions);
+		}
+
+		return true;
+	} catch(e) {
+		console.error('/pool/transactions GET error', params, e);
+		lastPoolTransactionsCount.set(0);
+		if (!skip) poolTransactions.set([]);
+	}
+
+	return false;
 }
