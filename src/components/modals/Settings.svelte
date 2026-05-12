@@ -4,7 +4,7 @@
 	import LabelValue from '@components/layout/LabelValue.svelte'
 	import Checkbox from '@components/layout/Checkbox.svelte'
 
-	import { showOrdersOnChart, showPositionsOnChart, showTooltips } from '@lib/stores'
+	import { showOrdersOnChart, showPositionsOnChart, showLiquidationsOnChart, showTooltips } from '@lib/stores'
 	import { showToast } from '@lib/ui'
 	import { saveUserSetting } from '@lib/utils'
 
@@ -13,14 +13,15 @@
 		showToast('Settings reset.');
 	}
 
-	function saveSettings(soc, spc, st) {
-		// console.log('saveSettings', soc, spc, st);
+	function saveSettings(soc, spc, slc, st) {
+		// console.log('saveSettings', soc, spc, slc, st);
 		saveUserSetting('showOrdersOnChart', soc);
 		saveUserSetting('showPositionsOnChart', spc);
+		saveUserSetting('showLiquidationsOnChart', slc);
 		saveUserSetting('showTooltips', st);
 	}
 
-	$: saveSettings($showOrdersOnChart, $showPositionsOnChart, $showTooltips);
+	$: saveSettings($showOrdersOnChart, $showPositionsOnChart, $showLiquidationsOnChart, $showTooltips);
 
 </script>
 
@@ -37,6 +38,9 @@
 	</div>
 	<div class='row'>
 		<Checkbox hasPadding={true} label='Positions on chart' bind:value={$showPositionsOnChart} />
+	</div>
+	<div class='row'>
+		<Checkbox hasPadding={true} label='Liquidations on chart' bind:value={$showLiquidationsOnChart} />
 	</div><!-- 
 	<div class='row'>
 		<Checkbox hasPadding={true} label='Tooltips' bind:value={$showTooltips} />
