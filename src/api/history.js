@@ -1,39 +1,51 @@
 import { get } from 'svelte/store'
 
 import { DEFAULT_HISTORY_COUNT } from '@lib/config'
-import { address, history, lastHistoryItemsCount, historySortKey, historyOrderStatusToShow } from '@lib/stores'
+import { address, history, lastHistoryItemsCount, historyOrderStatusToShow } from '@lib/stores'
 import { getLabelForAsset, getChainData } from '@lib/utils'
 
-export async function getUserHistory(params) {
+export async function fetchUserHistoryPage(params) {
 
 	const dataEndpoint = getChainData('dataEndpoint');
 	
-	let _address = get(address);
+	if (!params) params = {};
+
+	let _address = params.address || get(address);
 	if (!_address) return;
 
 	_address = _address.toLowerCase();
 
-	if (!params) params = {};
-
 	let {
 		first,
 		skip,
-		diff
+		statusesToShow
 	} = params;
 
 	if (!first) first = DEFAULT_HISTORY_COUNT;
 	if (!skip) skip = 0;
 
-	const statusesToShow = get(historyOrderStatusToShow);
-
-	const sortKey = get(historySortKey); // [columnName, isDesc]
+	if (!statusesToShow) statusesToShow = get(historyOrderStatusToShow);
 
 	let sortBy = 'timestamp';
 	let sortDirection = 'desc';
 
+	const response = await fetch(`${dataEndpoint}/history/${_address}?chain=arbitrum&limit=${first}&skip=${skip}&sortBy=${sortBy}&sortDirection=${sortDirection}&status=${statusesToShow.join(',')}`);
+	const orders = await response.json() || [];
+
+	return orders;
+}
+
+export async function getUserHistory(params) {
+
+	if (!params) params = {};
+
+	let {
+		skip,
+		diff
+	} = params;
+
 	try {
-		const response = await fetch(`${dataEndpoint}/history/${_address}?chain=arbitrum&limit=${first}&skip=${skip}&sortBy=${sortBy}&sortDirection=${sortDirection}&status=${statusesToShow.join(',')}`);
-		const orders = await response.json() || [];
+		const orders = await fetchUserHistoryPage(params) || [];
 
 		lastHistoryItemsCount.set(orders.length);
 
