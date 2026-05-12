@@ -80,6 +80,27 @@
 		height: 100%;
 	}
 
+	.table-wrapper.scrollable {
+		scrollbar-color: var(--layer200) transparent;
+		scrollbar-width: thin;
+	}
+
+	.table-wrapper.scrollable::-webkit-scrollbar {
+		background-color: transparent;
+		height: 5px;
+		width: 5px;
+	}
+
+	.table-wrapper.scrollable::-webkit-scrollbar-track {
+		background-color: transparent;
+		border-radius: 6px;
+	}
+
+	.table-wrapper.scrollable::-webkit-scrollbar-thumb {
+		background-color: var(--layer200);
+		border-radius: 6px;
+	}
+
 	@media all and (max-width: 600px) {
 		.table-wrapper  {
 			max-width: 100%;
@@ -195,7 +216,7 @@
 
 </style>
 
-<div class='table-wrapper no-scrollbar'>
+<div class='table-wrapper scrollable'>
 
 <div class={`table ${minWidth ? 'min-width' :''}`} style={`--grid-template: ${gridTemplate};`}>
 	
