@@ -10,7 +10,7 @@
 
 
 	import { onDestroy } from 'svelte'
-	import { XMARK_ICON, PENCIL_ICON } from '@lib/icons'
+	import { XMARK_ICON, PENCIL_ICON, SHARE_ICON } from '@lib/icons'
 
 	import { DEFAULT_POSITIONS_SORT_KEY, BPS_DIVIDER } from '@lib/config'
 	import { 
@@ -42,7 +42,7 @@
 	$: fetchData($address);
 
 	let columns = [];
-	$: columns = allColumns.filter((item) => $positionsColumnsToShow.includes(item.key));
+	$: columns = allColumns.filter((item) => $positionsColumnsToShow.includes(item.key) || item.permanent);
 
 	let formattedPositions = [];
 	$: formattedPositions = $positionsSorted.map((pos) => formatPosition(pos));
@@ -146,6 +146,25 @@
 	$: calculateLiqPrices(formattedPositions, $marketInfos, fundings);
 
 	let showDetails = {};
+
+	function sharePosition(position) {
+		const pnl = totalUpls[`${position.asset}:${position.market}`] || 0;
+		const pnlPercent = position.margin ? 100 * pnl / position.margin : 0;
+		showModal('TradeShare', {
+			kind: 'position',
+			market: formatMarketName(position.market),
+			side: formatSide(position.isLong),
+			price: formatPriceForDisplay(position.price),
+			currentPrice: formatPriceForDisplay($prices[position.market]),
+			size: `${formatForDisplay(position.size)} ${position.asset}`,
+			margin: `${formatForDisplay(position.margin)} ${position.asset}`,
+			leverage: formatForDisplay(position.leverage),
+			pnl: formatPnl(pnl),
+			pnlPercent: formatPnl(pnlPercent, true),
+			pnlRaw: pnl,
+			time: formatDate(position.timestamp)
+		});
+	}
 
 </script>
 
@@ -334,6 +353,7 @@
 			{/if}
 
 			<Cell isTools={true}>
+				<a use:tooltip={{content: 'Share'}} on:click|stopPropagation={() => { sharePosition(position) }}>{@html SHARE_ICON}</a>
 				<a use:tooltip={{content: 'Edit'}} on:click|stopPropagation={() => { showModal('EditMargin', {position, funding: fundings[`${position.asset}:${position.market}`]}) }}>{@html PENCIL_ICON}</a>
 				<a use:tooltip={{content: 'Close'}} on:click|stopPropagation={() => { showModal('ClosePosition', position) }}>{@html XMARK_ICON}</a>
 			</Cell>

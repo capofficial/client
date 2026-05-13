@@ -159,7 +159,7 @@ export const positionsSorted = derived([positions, positionsSortKey], ([$positio
 
 // History
 export const history = writable([]);
-export const historyColumnsToShow = writable(getUserSetting('historyColumnsToShow') || ['isLong', 'market', 'price', 'size', 'status', 'reason', 'pnl']);
+export const historyColumnsToShow = writable(getUserSetting('historyColumnsToShow') || ['isLong', 'market', 'price', 'size', 'status', 'reason', 'pnl', 'tools']);
 export const historySortKey = writable(['timestamp', true]); // [columnName, isDesc]
 export const historySorted = derived([history, historySortKey], ([$history, $historySortKey]) => {
 	return sorter($history, $historySortKey);

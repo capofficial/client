@@ -6,7 +6,8 @@
 	import Cell from '@components/layout/table/Cell.svelte'
 
 	import { onMount, onDestroy } from 'svelte'
-	import { LOADING_ICON } from '@lib/icons'
+	import { LOADING_ICON, SHARE_ICON } from '@lib/icons'
+	import tooltip from '@lib/tooltip'
 
 	import { DEFAULT_HISTORY_COUNT, DEFAULT_HISTORY_SORT_KEY } from '@lib/config'
 	import { 
@@ -100,7 +101,7 @@
 	});
 
 	let columns = [];
-	$: columns = allColumns.filter((item) => $historyColumnsToShow.includes(item.key));
+	$: columns = allColumns.filter((item) => $historyColumnsToShow.includes(item.key) || item.permanent);
 
 	let formattedHistory = [];
 	$: formattedHistory = $historySorted.map((item) => formatHistoryItem(item));
@@ -115,6 +116,25 @@
 			return 'failed';
 		}
 		return item.status;
+	}
+
+	function shareHistoryItem(item) {
+		const pnl = item.pnl || 0;
+		const pnlPercent = item.margin ? 100 * pnl / item.margin : 0;
+		showModal('TradeShare', {
+			kind: 'history',
+			market: formatMarketName(item.market),
+			side: formatSide(item.isLong, item.isReduceOnly, item.pnl),
+			price: item.price * 1 > 0 ? formatPriceForDisplay(item.price) : '-',
+			size: `${formatForDisplay(item.size)} ${item.asset}`,
+			margin: `${formatForDisplay(item.margin)} ${item.asset}`,
+			leverage: item.leverage ? formatForDisplay(item.leverage) : '',
+			pnl: item.pnl ? formatPnl(item.pnl) : '-',
+			pnlPercent: item.pnl ? formatPnl(pnlPercent, true) : '',
+			pnlRaw: pnl,
+			status: getItemStatus(item),
+			time: formatDate(item.timestamp)
+		});
 	}
 
 </script>
@@ -323,6 +343,10 @@
 			{#if $historyColumnsToShow.includes('cancelOrderId')}
 				<Cell>{item.cancelOrderId * 1 > 0 ? item.cancelOrderId : '-'}</Cell>
 			{/if}
+
+			<Cell isTools={true}>
+				<a use:tooltip={{content: 'Share'}} on:click|stopPropagation={() => { shareHistoryItem(item) }}>{@html SHARE_ICON}</a>
+			</Cell>
 
 
 		</Row>
