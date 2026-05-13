@@ -94,21 +94,26 @@ export function formatForDisplay(amount, fix) {
 
 	amount = amount * 1;
 
-	if (!amount || isNaN(amount)) return 0;
+	if (Number.isNaN(amount) || !Number.isFinite(amount)) return 0;
 
-	if (!fix && (amount * 1).toFixed(6)*1 == Math.round(amount * 1)) return Math.round(amount);
-	
-	if (fix) return (amount*1).toFixed(fix);
+	if (fix) {
+		const fixed = (amount * 1).toFixed(fix);
+		return +fixed;
+	}
 
-	if (amount * 1 >= 10000 || amount * 1 <= -10000) {
-		return Math.round(amount*1);
-	} else if (amount * 1 >= 10 || amount * 1 <= -10) {
-		return (amount * 1).toFixed(2);
-	} else if (amount * 1 >= 1 || amount * 1 <= -1) {
+	if (Number.isInteger(amount)) {
+		return amount;
+	}
+
+	if (Math.abs(amount * 1) >= 10000) {
+		return Math.round(amount * 1);
+	} else if (Math.abs(amount * 1) >= 10) {
+		return +(amount * 1).toFixed(2);
+	} else if (Math.abs(amount * 1) >= 1) {
 		return +(amount * 1).toFixed(4);
-	} else if (amount * 1 >= 0.01 || amount * 1 <= -0.01) {
+	} else if (Math.abs(amount * 1) >= 0.01) {
 		return +(amount * 1).toFixed(5);
-	} else if (amount * 1 >= 0.001 || amount * 1 <= -0.001)  {
+	} else if (Math.abs(amount * 1) >= 0.001) {
 		return +(amount * 1).toFixed(6);
 	} else {
 		return +(amount * 1).toFixed(8);
@@ -202,7 +207,7 @@ export function formatMarket(market) {
 		'Max Deviation vs Chainlink': `${formatForDisplay(100 * market.maxDeviation / BPS_DIVIDER)}%`,
 		'Max Leverage': market.maxLeverage,
 		'Only Reduce-Only Allowed': market.isReduceOnly ? 'Yes' : 'No'
-	}
+	};
 
 }
 
