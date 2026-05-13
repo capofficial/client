@@ -14,6 +14,7 @@
 	import UnstakeCAP from '../modals/UnstakeCAP.svelte'
 	import HistoryOrderStatus from '../modals/HistoryOrderStatus.svelte'
 	import Settings from '../modals/Settings.svelte'
+	import TradeShare from '../modals/TradeShare.svelte'
 
 </script>
 
@@ -67,4 +68,8 @@
 
 {#if $activeModal && $activeModal.name == 'MarketInfo'}
 <MarketInfo data={$activeModal.data} />
+{/if}
+
+{#if $activeModal && $activeModal.name == 'TradeShare'}
+<TradeShare data={$activeModal.data} />
 {/if}
