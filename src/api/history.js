@@ -4,8 +4,7 @@ import { DEFAULT_HISTORY_COUNT } from '@lib/config'
 import { address, history, lastHistoryItemsCount, historySortKey, historyOrderStatusToShow } from '@lib/stores'
 import { getLabelForAsset, getChainData } from '@lib/utils'
 
-export async function getUserHistory(params) {
-
+async function fetchUserHistoryPage(params) {
 	const dataEndpoint = getChainData('dataEndpoint');
 	
 	let _address = get(address);
@@ -15,11 +14,7 @@ export async function getUserHistory(params) {
 
 	if (!params) params = {};
 
-	let {
-		first,
-		skip,
-		diff
-	} = params;
+	let { first, skip } = params;
 
 	if (!first) first = DEFAULT_HISTORY_COUNT;
 	if (!skip) skip = 0;
@@ -31,9 +26,24 @@ export async function getUserHistory(params) {
 	let sortBy = 'timestamp';
 	let sortDirection = 'desc';
 
+	const response = await fetch(`${dataEndpoint}/history/${_address}?chain=arbitrum&limit=${first}&skip=${skip}&sortBy=${sortBy}&sortDirection=${sortDirection}&status=${statusesToShow.join(',')}`);
+	return await response.json() || [];
+}
+
+export async function getUserHistory(params) {
+
+	if (!params) params = {};
+
+	let {
+		skip,
+		diff
+	} = params;
+
+	if (!skip) skip = 0;
+
 	try {
-		const response = await fetch(`${dataEndpoint}/history/${_address}?chain=arbitrum&limit=${first}&skip=${skip}&sortBy=${sortBy}&sortDirection=${sortDirection}&status=${statusesToShow.join(',')}`);
-		const orders = await response.json() || [];
+		const orders = await fetchUserHistoryPage(params);
+		if (!orders) return;
 
 		lastHistoryItemsCount.set(orders.length);
 
@@ -66,4 +76,35 @@ export async function getUserHistory(params) {
 	}
 
 	return true;
+}
+
+export async function exportUserHistory(params) {
+	if (!params) params = {};
+
+	const {
+		fromTimestamp,
+		pageSize = 500,
+		maxItems = 5000
+	} = params;
+
+	let skip = 0;
+	let exportedOrders = [];
+
+	while (exportedOrders.length < maxItems) {
+		const orders = await fetchUserHistoryPage({first: pageSize, skip});
+		if (!orders || orders.length == 0) break;
+
+		const filteredOrders = fromTimestamp
+			? orders.filter((order) => order.timestamp * 1 >= fromTimestamp)
+			: orders;
+
+		exportedOrders = exportedOrders.concat(filteredOrders);
+
+		if (orders.length < pageSize) break;
+		if (fromTimestamp && orders.every((order) => order.timestamp * 1 < fromTimestamp)) break;
+
+		skip += pageSize;
+	}
+
+	return exportedOrders.slice(0, maxItems);
 }

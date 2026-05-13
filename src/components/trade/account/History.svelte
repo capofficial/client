@@ -17,13 +17,14 @@
 		formatSide, 
 		formatDate,
 		formatMarketName,
-		formatPriceForDisplay
+		formatPriceForDisplay,
+		getLabelForKey
 	} from '@lib/formatters'
 	import { address, historySortKey, historySorted, historyColumnsToShow, lastHistoryItemsCount, orders } from '@lib/stores'
 	import { showModal } from '@lib/ui'
 	import { saveUserSetting } from '@lib/utils'
 
-	import { getUserHistory } from '@api/history'
+	import { exportUserHistory, getUserHistory } from '@api/history'
 
 	export let allColumns;
 
@@ -106,6 +107,97 @@
 	$: formattedHistory = $historySorted.map((item) => formatHistoryItem(item));
 
 	let showDetails = {};
+	let exportRange = '30d';
+	let isExporting = false;
+
+	function getExportFromTimestamp() {
+		const now = Math.floor(Date.now() / 1000);
+		if (exportRange == '7d') return now - 7 * 24 * 60 * 60;
+		if (exportRange == '30d') return now - 30 * 24 * 60 * 60;
+		if (exportRange == '90d') return now - 90 * 24 * 60 * 60;
+		return null;
+	}
+
+	function cleanCsvValue(value) {
+		if (value == undefined || value == null) return '';
+		return `${value}`.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+	}
+
+	function csvEscape(value) {
+		value = cleanCsvValue(value);
+		if (/[",\r\n]/.test(value)) return `"${value.replace(/"/g, '""')}"`;
+		return value;
+	}
+
+	function getCsvValue(item, key) {
+		switch (key) {
+			case 'id':
+				return item.status == 'liquidated' ? 'liq' : item.orderId;
+			case 'timestamp':
+				return formatDate(item.timestamp);
+			case 'isLong':
+				return formatSide(item.isLong, item.isReduceOnly);
+			case 'market':
+				return formatMarketName(item.market);
+			case 'price':
+				return item.price * 1 > 0 ? formatPriceForDisplay(item.price) : '';
+			case 'size':
+				return `${formatForDisplay(item.size)} ${item.asset}`;
+			case 'margin':
+				return `${formatForDisplay(item.margin)} ${item.asset}`;
+			case 'leverage':
+				return item.leverage ? `${formatForDisplay(item.leverage)}x` : 'N/A';
+			case 'orderType':
+				return formatOrderType(item.orderType);
+			case 'isReduceOnly':
+				return item.isReduceOnly ? 'Yes' : 'No';
+			case 'status':
+				return item.status;
+			case 'reason':
+				return item.reason || '';
+			case 'pnl':
+				return item.pnl ? `${formatPnl(item.pnl)} (${formatPnl(100*item.pnl/item.margin, true)})` : '';
+			case 'fee':
+				return `${formatForDisplay(item.fee)} ${item.asset}`;
+			case 'expiry':
+				return formatDate(item.expiry) || '';
+			case 'cancelOrderId':
+				return item.cancelOrderId * 1 > 0 ? item.cancelOrderId : '';
+			default:
+				return item[key];
+		}
+	}
+
+	function downloadCsv(rows) {
+		const headers = allColumns.map((column) => getLabelForKey(column.key));
+		const csvRows = [
+			headers.map(csvEscape).join(','),
+			...rows.map((item) => {
+				const formattedItem = formatHistoryItem(item);
+				return allColumns.map((column) => csvEscape(getCsvValue(formattedItem, column.key))).join(',');
+			})
+		];
+		const blob = new Blob([csvRows.join('\n')], {type: 'text/csv;charset=utf-8'});
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement('a');
+		link.href = url;
+		link.download = `cap-trading-history-${new Date().toISOString().slice(0, 10)}.csv`;
+		link.click();
+		URL.revokeObjectURL(url);
+	}
+
+	async function exportHistory() {
+		if (isExporting) return;
+		isExporting = true;
+		try {
+			const rows = await exportUserHistory({fromTimestamp: getExportFromTimestamp()});
+			if (rows && rows.length > 0) downloadCsv(rows);
+		} catch(e) {
+			console.error('History CSV export error', e);
+		} finally {
+			isExporting = false;
+		}
+	}
 
 	function getItemStatus(item) {
 		if (!item) return '';
@@ -234,6 +326,40 @@
 	.wrapper {
 		max-height: calc(var(--account-height) - 50px - 39px);
 	}
+	.history-panel {
+		height: 100%;
+	}
+	.export-tools {
+		height: 44px;
+		padding: 0 25px;
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		gap: 10px;
+		border-bottom: 1px solid var(--layer100);
+	}
+	.export-tools select, .export-tools button {
+		height: 28px;
+		border: 1px solid var(--layer200);
+		border-radius: 5px;
+		background: var(--layer50);
+		color: var(--text0);
+		font-size: 85%;
+	}
+	.export-tools select {
+		padding: 0 8px;
+	}
+	.export-tools button {
+		padding: 0 12px;
+		cursor: pointer;
+	}
+	.export-tools button:disabled {
+		cursor: default;
+		color: var(--text400);
+	}
+	.history-table {
+		height: calc(100% - 45px);
+	}
 	@media all and (max-width: 600px) {
 		.wrapper {
 			max-height: 100%;
@@ -241,6 +367,17 @@
 	}
 </style>
 
+<div class='history-panel'>
+<div class='export-tools'>
+	<select bind:value={exportRange} aria-label='Export history range'>
+		<option value='7d'>7 days</option>
+		<option value='30d'>30 days</option>
+		<option value='90d'>90 days</option>
+		<option value='all'>All</option>
+	</select>
+	<button on:click={exportHistory} disabled={isExporting}>{isExporting ? 'Exporting...' : 'Export CSV'}</button>
+</div>
+<div class='history-table'>
 <Table
 	defaultSortKey={DEFAULT_HISTORY_SORT_KEY}
 	bind:sortKey={$historySortKey}
@@ -331,6 +468,8 @@
 	</div>	
 
 </Table>
+</div>
+</div>
 
 <!-- {#if !isLoading && formattedHistory.length == 0}
 	<div class='empty'>Nothing to show.</div>
