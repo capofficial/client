@@ -102,12 +102,12 @@
 		</div>
 
 		<div class="group">
-			<div class='group-row'>
-				<LabelValue label='Available' value={numberWithCommas($balances[asset])} isClickable={true} on:click={() => {amount = $balances[asset]}} />
+				<div class='group-row'>
+					<LabelValue label='Wallet Balance' value={numberWithCommas($balances[asset])} isClickable={true} on:click={() => {amount = $balances[asset]}} />
+				</div>
+				<div class='group-row'><LabelValue label='Total Trader UP/L' value={numberWithCommas($globalUPLs[asset])} /></div>
+				<LabelValue label='Deposit Cost' value={`${costBps || 0}%`} />
 			</div>
-			<div class='group-row'><LabelValue label='Total Trader UP/L' value={numberWithCommas($globalUPLs[asset])} /></div>
-			<LabelValue label='Deposit Cost' value={`${costBps || 0}%`} />
-		</div>
 
 		<div>
 			{#if asset != 'ETH' && $allowances[asset]?.['FundStore'] * 1 <= amount * 1}
