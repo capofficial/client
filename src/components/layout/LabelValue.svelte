@@ -1,13 +1,14 @@
-<script>
+	<script>
 
-	import tooltip from '@lib/tooltip'
-	import { formatForDisplay } from '@lib/formatters'
-	import { PENCIL_ICON, RULER_ICON, RULER_FILLED_ICON } from '@lib/icons'
+		import tooltip from '@lib/tooltip'
+		import { formatForDisplay } from '@lib/formatters'
+		import { PENCIL_ICON, RULER_ICON, RULER_FILLED_ICON } from '@lib/icons'
+		import { createEventDispatcher } from 'svelte'
 
-	export let label;
-	export let value;
-	export let formatValue = false;
-	export let note = false;
+		export let label;
+		export let value;
+		export let formatValue = false;
+		export let note = false;
 	export let isClickable = false;
 	export let noPadding = false;
 	export let isSecondaryColor = false;
@@ -15,12 +16,19 @@
 	export let hasSemiPadding = false;
 	export let fullOpacityLabel = false;
 	
-	let tooltipOptions = {
-		content: note,
-		allowHTML: true
-	};
+		let tooltipOptions = {
+			content: note,
+			allowHTML: true
+		};
 
-</script>
+		const dispatch = createEventDispatcher();
+
+		function handleClick(event) {
+			if (!isClickable) return;
+			dispatch('click', event);
+		}
+
+	</script>
 
 <style>
 
@@ -70,13 +78,13 @@
 
 </style>
 
-<div class='flex-row' class:padded={hasPadding} class:semipadded={hasSemiPadding} class:noPadding={noPadding}>
-	<div class='label' class:fullOpacity={fullOpacityLabel} class:hasNote={note != false} use:tooltip={tooltipOptions}>{label}</div>
-	<div class='value' on:click|stopPropagation class:clickable={isClickable} class:secondary={isSecondaryColor}>
-		{#if formatValue} 
-			{formatForDisplay(value)}
-		{:else}
-			{@html value}
-		{/if}
+	<div class='flex-row' class:padded={hasPadding} class:semipadded={hasSemiPadding} class:noPadding={noPadding}>
+		<div class='label' class:fullOpacity={fullOpacityLabel} class:hasNote={note != false} use:tooltip={tooltipOptions}>{label}</div>
+		<div class='value' on:click|stopPropagation={handleClick} class:clickable={isClickable} class:secondary={isSecondaryColor}>
+			{#if formatValue} 
+				{formatForDisplay(value)}
+			{:else}
+				{@html value}
+			{/if}
 	</div>
 </div>
