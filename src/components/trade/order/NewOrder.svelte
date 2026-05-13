@@ -106,12 +106,107 @@
 	// $: console.log('$size', $size);
 
 	let tpProfitPercent, slLossPercent;
-	let tpPriceInputActive, tpPercentInputActive, slPriceInputActive, slPercentInputActive;
+	let tpProfitAmount, slLossAmount;
+	let highlightedTPButton, highlightedSLButton;
+	let tpPriceInputActive, tpPercentInputActive, tpAmountInputActive, slPriceInputActive, slPercentInputActive, slAmountInputActive;
+	const tpslPriceButtons = [1, 2, 5];
 	
 	function setPrice(percentDiff) {
 		if (!$prices[$selectedMarket]) return;
 		price.set(formatForDisplay($prices[$selectedMarket] * (1 + percentDiff/100)));
 		highlightedPriceButton = percentDiff;
+	}
+
+	function getReferencePrice() {
+		const referencePrice = $price * 1 > 0 ? $price * 1 : $prices[$selectedMarket] * 1;
+		return referencePrice > 0 ? referencePrice : undefined;
+	}
+
+	function calculateTPPercent(targetPrice) {
+		const latestPrice = getReferencePrice();
+		if (!(targetPrice > 0) || !(latestPrice > 0)) return;
+		let percent;
+		if ($isLong) {
+			percent = 100 * $leverage * (targetPrice - latestPrice) / targetPrice;
+		} else {
+			percent = 100 * $leverage * (latestPrice - targetPrice) / targetPrice;
+		}
+		return percent > 0 ? formatForDisplay(percent) : undefined;
+	}
+
+	function calculateSLPercent(targetPrice) {
+		const latestPrice = getReferencePrice();
+		if (!(targetPrice > 0) || !(latestPrice > 0)) return;
+		let percent;
+		if ($isLong) {
+			percent = 100 * $leverage * (latestPrice - targetPrice) / targetPrice;
+		} else {
+			percent = 100 * $leverage * (targetPrice - latestPrice) / targetPrice;
+		}
+		return percent > 0 ? formatForDisplay(percent) : undefined;
+	}
+
+	function calculateAmountFromPercent(percent) {
+		if (!(percent > 0) || !($margin > 0)) return;
+		return formatForDisplay($margin * percent / 100);
+	}
+
+	function calculatePercentFromAmount(amount) {
+		if (!(amount > 0) || !($margin > 0)) return;
+		return formatForDisplay(100 * amount / $margin);
+	}
+
+	function calculateTPPriceFromPercent(percent) {
+		const latestPrice = getReferencePrice();
+		if (!latestPrice || !(percent > 0)) return;
+		if ($isLong) {
+			return latestPrice + (latestPrice * ((percent / 100) / $leverage))
+		}
+		return latestPrice - (latestPrice * ((percent / 100) / $leverage))
+	}
+
+	function calculateSLPriceFromPercent(percent) {
+		const latestPrice = getReferencePrice();
+		if (!latestPrice || !(percent > 0)) return;
+		if ($isLong) {
+			return latestPrice - (latestPrice * ((percent / 100) / $leverage))
+		}
+		return latestPrice + (latestPrice * ((percent / 100) / $leverage))
+	}
+
+	function updateTPFromPercent() {
+		const nextPrice = calculateTPPriceFromPercent(tpProfitPercent);
+		if (nextPrice) {
+			tpPrice.set(formatForDisplay(nextPrice));
+		}
+		tpProfitAmount = calculateAmountFromPercent(tpProfitPercent);
+	}
+
+	function updateSLFromPercent() {
+		const nextPrice = calculateSLPriceFromPercent(slLossPercent);
+		if (nextPrice) {
+			slPrice.set(formatForDisplay(nextPrice));
+		}
+		slLossAmount = calculateAmountFromPercent(slLossPercent);
+	}
+
+	function setTPSLPrice(kind, percentDiff) {
+		const latestPrice = getReferencePrice();
+		if (!latestPrice) return;
+		const isTakeProfit = kind == 'tp';
+		const direction = isTakeProfit == $isLong ? 1 : -1;
+		const nextPrice = latestPrice * (1 + direction * percentDiff / 100);
+		if (isTakeProfit) {
+			tpPrice.set(formatForDisplay(nextPrice));
+			tpProfitPercent = calculateTPPercent(nextPrice);
+			tpProfitAmount = calculateAmountFromPercent(tpProfitPercent);
+			highlightedTPButton = percentDiff;
+		} else {
+			slPrice.set(formatForDisplay(nextPrice));
+			slLossPercent = calculateSLPercent(nextPrice);
+			slLossAmount = calculateAmountFromPercent(slLossPercent);
+			highlightedSLButton = percentDiff;
+		}
 	}
 
 	function resetFieldsOnCheck() {
@@ -124,10 +219,14 @@
 		}
 		if (!$hasTP || $isReduceOnly) {
 			tpProfitPercent = undefined;
+			tpProfitAmount = undefined;
+			highlightedTPButton = null;
 			tpPrice.set();
 		}
 		if (!$hasSL || $isReduceOnly) {
 			slLossPercent = undefined;
+			slLossAmount = undefined;
+			highlightedSLButton = null;
 			slPrice.set();
 		}
 	}
@@ -141,6 +240,12 @@
 		size.set();
 		tpPrice.set();
 		slPrice.set();
+		tpProfitPercent = undefined;
+		slLossPercent = undefined;
+		tpProfitAmount = undefined;
+		slLossAmount = undefined;
+		highlightedTPButton = null;
+		highlightedSLButton = null;
 		showAdvanced = false;
 		hasTrigger.set(false);
 		hasTP.set(false);
@@ -154,60 +259,57 @@
 	
 
 	function calculateTPSLPercentFromPrices() {
-		const latestPrice = $price * 1 > 0 ? $price : $prices[$selectedMarket];
-
 		if ($tpPrice > 0 && tpPriceInputActive) {
-			if ($isLong) {
-				tpProfitPercent = 100 * $leverage * ($tpPrice * 1 - latestPrice * 1) / $tpPrice;
-			} else {
-				tpProfitPercent = 100 * $leverage * (latestPrice * 1 - $tpPrice * 1) / $tpPrice;
-			}
-			if (tpProfitPercent <= 0) {
-				tpProfitPercent = undefined;
-				return;
-			}
-			tpProfitPercent = formatForDisplay(tpProfitPercent);
+			highlightedTPButton = null;
+			tpProfitPercent = calculateTPPercent($tpPrice * 1);
+			tpProfitAmount = calculateAmountFromPercent(tpProfitPercent);
 		}
 		if ($slPrice > 0 && slPriceInputActive) {
-			if ($isLong) {
-				slLossPercent = 100 * $leverage * (latestPrice * 1 - $slPrice * 1) / $slPrice;
-			} else {
-				slLossPercent = 100 * $leverage * ($slPrice * 1 - latestPrice * 1) / $slPrice;
-			}
-			if (slLossPercent <= 0) {
-				slLossPercent = undefined;
-				return;
-			}
-			slLossPercent = formatForDisplay(slLossPercent);
+			highlightedSLButton = null;
+			slLossPercent = calculateSLPercent($slPrice * 1);
+			slLossAmount = calculateAmountFromPercent(slLossPercent);
 		}
 
 	}
 
 	function calculateTPSLFromPercent() {
-		const latestPrice = $price * 1 > 0 ? $price : $prices[$selectedMarket];
-		
-		let _tpPrice, _slPrice;
 		if (tpProfitPercent > 0 && tpPercentInputActive) {
-			if ($isLong) {
-				_tpPrice = latestPrice + (latestPrice * ((tpProfitPercent / 100) / $leverage))
-			} else {
-				_tpPrice = latestPrice - (latestPrice * ((tpProfitPercent / 100) / $leverage))
-			}
-			tpPrice.set(formatForDisplay(_tpPrice));
+			highlightedTPButton = null;
+			updateTPFromPercent();
 		}
 		if (slLossPercent > 0 && slPercentInputActive) {
-			if ($isLong) {
-				_slPrice = latestPrice - (latestPrice * ((slLossPercent / 100) / $leverage))
-			} else {
-				_slPrice = latestPrice + (latestPrice * ((slLossPercent / 100) / $leverage))
-			}
-			slPrice.set(formatForDisplay(_slPrice));
+			highlightedSLButton = null;
+			updateSLFromPercent();
 		}
 
 	}
 
-	$: calculateTPSLPercentFromPrices($tpPrice, $slPrice);
-	$: calculateTPSLFromPercent(tpProfitPercent, slLossPercent);
+	function calculateTPSLFromAmounts() {
+		if (tpProfitAmount > 0 && tpAmountInputActive) {
+			highlightedTPButton = null;
+			tpProfitPercent = calculatePercentFromAmount(tpProfitAmount);
+			updateTPFromPercent();
+		}
+		if (slLossAmount > 0 && slAmountInputActive) {
+			highlightedSLButton = null;
+			slLossPercent = calculatePercentFromAmount(slLossAmount);
+			updateSLFromPercent();
+		}
+	}
+
+	function syncTPSLAmounts() {
+		if (!tpAmountInputActive) {
+			tpProfitAmount = calculateAmountFromPercent(tpProfitPercent);
+		}
+		if (!slAmountInputActive) {
+			slLossAmount = calculateAmountFromPercent(slLossPercent);
+		}
+	}
+
+	$: calculateTPSLPercentFromPrices($tpPrice, $slPrice, $price, $prices[$selectedMarket], $leverage, $isLong, $margin);
+	$: calculateTPSLFromPercent(tpProfitPercent, slLossPercent, $price, $prices[$selectedMarket], $leverage, $isLong, $margin);
+	$: calculateTPSLFromAmounts(tpProfitAmount, slLossAmount, $margin);
+	$: syncTPSLAmounts(tpProfitPercent, slLossPercent, $margin);
 
 	function _focusInput(name, isActive) {
 		if (!isActive) return;
@@ -334,6 +436,27 @@
 	.tpsl-help-button:hover {
 		background-color: var(--layer200);
 	}
+	.tpsl-buttons {
+		display: flex;
+		gap: 8px;
+		padding-bottom: 8px;
+	}
+	.tpsl-buttons button {
+		flex: 1;
+		text-align: center;
+		border: 1px solid var(--layer200);
+		padding: 8px 0;
+		cursor: pointer;
+		font-size: 80%;
+		font-weight: 600;
+		border-radius: var(--base-radius);
+		background: transparent;
+		color: inherit;
+	}
+	.tpsl-buttons button:hover,
+	.tpsl-buttons button.highlighted {
+		background-color: var(--layer100);
+	}
 
 </style>
 
@@ -392,10 +515,22 @@
 					{#if $hasTP}
 						<div>
 							<div class='semi-padding-bottom'>
+								<div class='tpsl-buttons'>
+									{#each tpslPriceButtons as percentDiff}
+										<button
+											type='button'
+											class:highlighted={highlightedTPButton == percentDiff}
+											on:click|stopPropagation={() => setTPSLPrice('tp', percentDiff)}
+										>+{percentDiff}%</button>
+									{/each}
+								</div>
 								<div class='semi-padding-bottom'>
 									<Input label='TP Price' bind:value={$tpPrice} isSecondaryColor={!$isLong} on:focus={() => {tpPriceInputActive = true}} on:blur={() => {tpPriceInputActive = false}} />
 								</div>
-								<Input label='Profit (%)' bind:value={tpProfitPercent} isSecondaryColor={!$isLong} on:focus={() => {tpPercentInputActive = true}} on:blur={() => {tpPercentInputActive = false}} />
+								<div class='semi-padding-bottom'>
+									<Input label='Profit (%)' bind:value={tpProfitPercent} isSecondaryColor={!$isLong} on:focus={() => {tpPercentInputActive = true}} on:blur={() => {tpPercentInputActive = false}} />
+								</div>
+								<Input label={`Profit (${$selectedAsset})`} bind:value={tpProfitAmount} isSecondaryColor={!$isLong} on:focus={() => {tpAmountInputActive = true}} on:blur={() => {tpAmountInputActive = false}} />
 							</div>
 
 						</div>
@@ -408,10 +543,22 @@
 					{#if $hasSL}
 						<div>
 							<div>
+								<div class='tpsl-buttons'>
+									{#each tpslPriceButtons as percentDiff}
+										<button
+											type='button'
+											class:highlighted={highlightedSLButton == percentDiff}
+											on:click|stopPropagation={() => setTPSLPrice('sl', percentDiff)}
+										>-{percentDiff}%</button>
+									{/each}
+								</div>
 								<div class='semi-padding-bottom'>
 									<Input label='SL Price' bind:value={$slPrice} isSecondaryColor={!$isLong} on:focus={() => {slPriceInputActive = true}} on:blur={() => {slPriceInputActive = false}} />
 								</div>
-								<Input label='Loss (%)' bind:value={slLossPercent} isSecondaryColor={!$isLong} on:focus={() => {slPercentInputActive = true}} on:blur={() => {slPercentInputActive = false}} />
+								<div class='semi-padding-bottom'>
+									<Input label='Loss (%)' bind:value={slLossPercent} isSecondaryColor={!$isLong} on:focus={() => {slPercentInputActive = true}} on:blur={() => {slPercentInputActive = false}} />
+								</div>
+								<Input label={`Loss (${$selectedAsset})`} bind:value={slLossAmount} isSecondaryColor={!$isLong} on:focus={() => {slAmountInputActive = true}} on:blur={() => {slAmountInputActive = false}} />
 							</div>
 
 						</div>
