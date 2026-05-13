@@ -13,9 +13,13 @@
 	import { focusInput, hideModal } from '@lib/ui'
 	import LabelValue from '../layout/LabelValue.svelte'
 
-	let amount, isSubmitting, walletBalance = "0.0";
+	let amount, isSubmitting, isApproving, isCheckingAllowance, walletBalance = "0.0";
+	const stakingSpender = 'Staking';
 
 	$: formattedWalletBalance = formatCAPForDisplay(walletBalance);
+	$: capAllowance = $allowances['CAP']?.[stakingSpender];
+	$: needsApproval = capAllowance == null || capAllowance * 1 <= amount * 1;
+	$: approveLabel = isCheckingAllowance ? 'Checking allowance' : 'Approve CAP';
 
 	async function submit() {
 
@@ -31,11 +35,24 @@
 	}
 
 	async function checkAllowance() {
-		await getAllowance('CAP', 'FundStore');
+		isCheckingAllowance = true;
+		try {
+			await getAllowance('CAP', stakingSpender);
+		} finally {
+			isCheckingAllowance = false;
+		}
 	}
 
 	async function _approveAsset() {
-		const result = await approveAsset('CAP', 'FundStore');
+		isApproving = true;
+		try {
+			const success = await approveAsset('CAP', stakingSpender);
+			if (success) {
+				getBalance();
+			}
+		} finally {
+			isApproving = false;
+		}
 	}
 
 	async function getBalance() {
@@ -74,8 +91,8 @@
 			</div>
 
 			<div>
-				{#if $allowances['CAP']?.['FundStore'] * 1 <= amount * 1}
-				<Button noSubmit={true} label={`Approve CAP`} on:click={_approveAsset} />
+				{#if needsApproval}
+				<Button noSubmit={true} isLoading={isCheckingAllowance || isApproving} label={approveLabel} on:click={_approveAsset} />
 				{:else}
 				<Button isLoading={isSubmitting} label={`Stake`} />
 				{/if}
