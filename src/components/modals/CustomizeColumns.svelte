@@ -26,6 +26,9 @@
 			isColumnShown[key] = true;
 		}
 	}
+	for (const col of data.allColumns) {
+		if (col.permanent) isColumnShown[col.key] = true;
+	}
 
 	function trackColumnShownChange(isColumnShown) {
 		// set store
