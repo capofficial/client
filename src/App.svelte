@@ -11,8 +11,8 @@
 	import { USD_CONVERSION_MARKETS } from '@lib/config'
 	import { checkCountry, loadRoute, catchLinks, navigateTo } from '@lib/routing'
 	import { component, address, pageName, countryDisallowed } from '@lib/stores'
-	import { hidePopoversOnKeydown, hidePopoversOnClick } from '@lib/ui'
-	import { runAndInterval, hashString, getChainData } from '@lib/utils'
+	import { hidePopoversOnKeydown, hidePopoversOnClick, showModal } from '@lib/ui'
+	import { runAndInterval, hashString, getChainData, getUserSetting } from '@lib/utils'
 
 	import { getUserAssetBalances } from '@api/assets'
 	import { listenToEvents } from '@api/listener'
@@ -26,6 +26,10 @@
 
 		loadRoute();
 		catchLinks((path) => navigateTo(path));
+
+		if (!getUserSetting('hasSeenWelcome')) {
+			showModal('Welcome');
+		}
 
 		// For back button functionality
 		window.onpopstate = () => loadRoute();
