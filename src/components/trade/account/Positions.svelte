@@ -10,7 +10,7 @@
 
 
 	import { onDestroy } from 'svelte'
-	import { XMARK_ICON, PENCIL_ICON } from '@lib/icons'
+	import { XMARK_ICON, PENCIL_ICON, SHARE_ICON } from '@lib/icons'
 
 	import { DEFAULT_POSITIONS_SORT_KEY, BPS_DIVIDER } from '@lib/config'
 	import { 
@@ -146,6 +146,26 @@
 	$: calculateLiqPrices(formattedPositions, $marketInfos, fundings);
 
 	let showDetails = {};
+
+	function showPositionShare(position) {
+		const key = `${position.asset}:${position.market}`;
+		const pnl = totalUpls[key] || 0;
+		showModal('ShareTrade', {
+			type: 'active',
+			status: 'Active',
+			market: position.market,
+			side: formatSide(position.isLong),
+			asset: position.asset,
+			entryPrice: position.price,
+			markPrice: $prices[position.market],
+			size: position.size,
+			margin: position.margin,
+			leverage: position.leverage,
+			pnl,
+			pnlPercent: position.margin ? 100 * pnl / position.margin : 0,
+			timestamp: position.timestamp
+		});
+	}
 
 </script>
 
@@ -334,6 +354,7 @@
 			{/if}
 
 			<Cell isTools={true}>
+				<a use:tooltip={{content: 'Share'}} on:click|stopPropagation={() => { showPositionShare(position) }}>{@html SHARE_ICON}</a>
 				<a use:tooltip={{content: 'Edit'}} on:click|stopPropagation={() => { showModal('EditMargin', {position, funding: fundings[`${position.asset}:${position.market}`]}) }}>{@html PENCIL_ICON}</a>
 				<a use:tooltip={{content: 'Close'}} on:click|stopPropagation={() => { showModal('ClosePosition', position) }}>{@html XMARK_ICON}</a>
 			</Cell>

@@ -4,9 +4,10 @@
 	import Table from '@components/layout/table/Table.svelte'
 	import Row from '@components/layout/table/Row.svelte'
 	import Cell from '@components/layout/table/Cell.svelte'
+	import tooltip from '@lib/tooltip'
 
 	import { onMount, onDestroy } from 'svelte'
-	import { LOADING_ICON } from '@lib/icons'
+	import { LOADING_ICON, SHARE_ICON } from '@lib/icons'
 
 	import { DEFAULT_HISTORY_COUNT, DEFAULT_HISTORY_SORT_KEY } from '@lib/config'
 	import { 
@@ -100,7 +101,7 @@
 	});
 
 	let columns = [];
-	$: columns = allColumns.filter((item) => $historyColumnsToShow.includes(item.key));
+	$: columns = allColumns.filter((item) => item.permanent || $historyColumnsToShow.includes(item.key));
 
 	let formattedHistory = [];
 	$: formattedHistory = $historySorted.map((item) => formatHistoryItem(item));
@@ -115,6 +116,26 @@
 			return 'failed';
 		}
 		return item.status;
+	}
+
+	function showHistoryShare(item) {
+		const pnl = item.pnl ? item.pnl : undefined;
+		showModal('ShareTrade', {
+			type: 'history',
+			status: getItemStatus(item),
+			market: item.market,
+			side: formatSide(item.isLong, item.isReduceOnly),
+			asset: item.asset,
+			price: item.price,
+			entryPrice: item.price,
+			size: item.size,
+			margin: item.margin,
+			leverage: item.leverage,
+			orderType: formatOrderType(item.orderType),
+			pnl,
+			pnlPercent: pnl && item.margin ? 100 * pnl / item.margin : undefined,
+			timestamp: item.timestamp
+		});
 	}
 
 </script>
@@ -324,6 +345,9 @@
 				<Cell>{item.cancelOrderId * 1 > 0 ? item.cancelOrderId : '-'}</Cell>
 			{/if}
 
+			<Cell isTools={true}>
+				<a use:tooltip={{content: 'Share'}} on:click|stopPropagation={() => { showHistoryShare(item) }}>{@html SHARE_ICON}</a>
+			</Cell>
 
 		</Row>
 

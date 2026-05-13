@@ -63,7 +63,8 @@
 			{key: 'pnl', gridTemplate: '1fr', sortable: true},
 			{key: 'fee', gridTemplate: '0.75fr', sortable: true},
 			{key: 'expiry', gridTemplate: '1fr', sortable: true},
-			{key: 'cancelOrderId', gridTemplate: '0.5fr', sortable: false}
+			{key: 'cancelOrderId', gridTemplate: '0.5fr', sortable: false},
+			{key: 'tools', gridTemplate: '30px', sortable: false, permanent: true}
 		]
 	};
 
