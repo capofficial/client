@@ -9,10 +9,10 @@
 
 	import { ADDRESS_ZERO } from '@lib/config'
 	import { formatForDisplay } from '@lib/formatters'
-	import { approveAsset, getAllowance } from '@api/assets'
+	import { approveAsset, getAllowance, getUserAssetBalances } from '@api/assets'
 	import { addMargin, removeMargin } from '@api/positions'
 	import { focusInput, hideModal } from '@lib/ui'
-	import { allowances, selectedMarketInfo } from '@lib/stores'
+	import { allowances, balances, selectedMarketInfo } from '@lib/stores'
 
 	export let data;
 
@@ -53,6 +53,8 @@
 	}
 
 	let funding = data.funding || 0;
+	$: removableMargin = Math.max((data.position.margin * 1 + funding * 1) || 0, 0);
+	$: availableMargin = selected == 'Add' ? $balances[data.position.asset] : removableMargin;
 	let newLiqPrice = data.position.liqprice;
 	let newMargin = 0;
 	function calculateNewLiquidationPrice(marginDelta, mode) {
@@ -102,6 +104,7 @@
 
 	onMount(() => {
 		focusInput(`Add ${data.position.asset}`);
+		getUserAssetBalances();
 	});
 
 </script>
@@ -152,6 +155,10 @@
 			</div>
 
 			<div class='row'>
+				<LabelValue label='Available' value={availableMargin == null ? '-' : formatForDisplay(availableMargin)} isClickable={availableMargin != null} on:click={() => {if (availableMargin != null) margin = availableMargin}} />
+			</div>
+
+			<div class='row'>
 				<LabelValue label='New Liq. Price' value={`${formatForDisplay(newLiqPrice) || "-"}`} />
 			</div>
 
@@ -168,7 +175,7 @@
 			{/if}
 
 			<div class='button'>
-				{#if data.position.asset != 'ETH' && $allowances[data.position.asset]?.['FundStore'] * 1 <= margin * 1}
+				{#if selected == 'Add' && data.position.asset != 'ETH' && $allowances[data.position.asset]?.['FundStore'] * 1 <= margin * 1}
 				<Button noSubmit={true} isLoading={isApproving} label={`Approve ${data.position.asset}`} on:click={_approveAsset} />
 				{:else}
 				<Button isLoading={isSubmitting} label={`${selected} Margin`} />
