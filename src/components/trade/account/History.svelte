@@ -4,6 +4,7 @@
 	import Table from '@components/layout/table/Table.svelte'
 	import Row from '@components/layout/table/Row.svelte'
 	import Cell from '@components/layout/table/Cell.svelte'
+	import Button from '@components/layout/Button.svelte'
 
 	import { onMount, onDestroy } from 'svelte'
 	import { LOADING_ICON } from '@lib/icons'
@@ -20,10 +21,10 @@
 		formatPriceForDisplay
 	} from '@lib/formatters'
 	import { address, historySortKey, historySorted, historyColumnsToShow, lastHistoryItemsCount, orders } from '@lib/stores'
-	import { showModal } from '@lib/ui'
+	import { showModal, showToast } from '@lib/ui'
 	import { saveUserSetting } from '@lib/utils'
 
-	import { getUserHistory } from '@api/history'
+	import { getUserHistory, getUserHistoryExport } from '@api/history'
 
 	export let allColumns;
 
@@ -104,6 +105,95 @@
 
 	let formattedHistory = [];
 	$: formattedHistory = $historySorted.map((item) => formatHistoryItem(item));
+
+	let isExporting = false;
+	let exportTimeframe = 'all';
+	const exportTimeframes = [
+		{value: 'all', label: 'All'},
+		{value: '7d', label: '7D', seconds: 7 * 24 * 60 * 60},
+		{value: '30d', label: '30D', seconds: 30 * 24 * 60 * 60},
+		{value: '90d', label: '90D', seconds: 90 * 24 * 60 * 60}
+	];
+
+	function getExportStart() {
+		const timeframe = exportTimeframes.find((item) => item.value == exportTimeframe);
+		if (!timeframe?.seconds) return;
+		return Math.floor(Date.now() / 1000) - timeframe.seconds;
+	}
+
+	function escapeCsv(value) {
+		if (value == undefined || value == null) value = '';
+		value = `${value}`;
+		return `"${value.replace(/"/g, '""')}"`;
+	}
+
+	function buildHistoryCsv(items) {
+		const columns = [
+			['Time', (item) => formatDate(item.timestamp)],
+			['Order ID', (item) => item.status == 'liquidated' ? 'liq' : item.orderId],
+			['Market', (item) => formatMarketName(item.market)],
+			['Side', (item) => formatSide(item.isLong, item.isReduceOnly, item.pnl)],
+			['Type', (item) => formatOrderType(item.orderType)],
+			['Status', (item) => item.status],
+			['Reason', (item) => item.reason],
+			['Price', (item) => item.price * 1 > 0 ? formatPriceForDisplay(item.price) : ''],
+			['Size', (item) => item.size],
+			['Margin', (item) => item.margin],
+			['Asset', (item) => item.asset],
+			['Leverage', (item) => item.leverage],
+			['P/L', (item) => item.pnl ? formatPnl(item.pnl) : ''],
+			['P/L %', (item) => item.pnl && item.margin ? formatPnl(100 * item.pnl / item.margin, true) : ''],
+			['Fee', (item) => item.fee],
+			['Expiry', (item) => formatDate(item.expiry)],
+			['OCO', (item) => item.cancelOrderId * 1 > 0 ? item.cancelOrderId : '']
+		];
+
+		const rows = [
+			columns.map(([label]) => escapeCsv(label)).join(',')
+		];
+
+		for (const item of items) {
+			rows.push(columns.map(([, getValue]) => escapeCsv(getValue(item))).join(','));
+		}
+
+		return rows.join('\n');
+	}
+
+	function downloadCsv(filename, contents) {
+		const blob = new Blob([contents], {type: 'text/csv;charset=utf-8;'});
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement('a');
+		link.href = url;
+		link.download = filename;
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+		URL.revokeObjectURL(url);
+	}
+
+	async function exportHistoryCsv() {
+		if (!$address) return showToast('Connect wallet before exporting history.');
+
+		isExporting = true;
+		try {
+			const rawHistory = await getUserHistoryExport({start: getExportStart()});
+			const exportRows = rawHistory.map((item) => formatHistoryItem(item));
+
+			if (!exportRows.length) {
+				showToast('No history found for that timeframe.', 2);
+				return;
+			}
+
+			const date = new Date().toISOString().slice(0, 10);
+			downloadCsv(`cap-history-${exportTimeframe}-${date}.csv`, buildHistoryCsv(exportRows));
+			showToast(`Exported ${exportRows.length} history rows.`, 1);
+		} catch(e) {
+			console.error('/history export error', e);
+			showToast('History export failed.');
+		} finally {
+			isExporting = false;
+		}
+	}
 
 	let showDetails = {};
 
@@ -234,13 +324,52 @@
 	.wrapper {
 		max-height: calc(var(--account-height) - 50px - 39px);
 	}
+	.history-panel {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		min-height: 0;
+	}
+	.history-toolbar {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		gap: var(--base-padding);
+		padding: 0 var(--base-padding) var(--semi-padding);
+	}
+	.history-toolbar select {
+		height: 38px;
+		color: var(--text0);
+		background-color: var(--layer25);
+		border: 1px solid var(--layer100);
+		border-radius: var(--base-radius);
+		padding: 0 12px;
+	}
+	.history-table {
+		flex: 1;
+		min-height: 0;
+	}
 	@media all and (max-width: 600px) {
 		.wrapper {
 			max-height: 100%;
 		}
+		.history-toolbar {
+			justify-content: flex-start;
+			overflow-x: auto;
+		}
 	}
 </style>
 
+<div class='history-panel'>
+<div class='history-toolbar'>
+	<select bind:value={exportTimeframe} aria-label='Export timeframe'>
+		{#each exportTimeframes as item}
+			<option value={item.value}>{item.label}</option>
+		{/each}
+	</select>
+	<Button noSubmit={true} isSmall={true} isLoading={isExporting} label='Export CSV' on:click={exportHistoryCsv} />
+</div>
+<div class='history-table'>
 <Table
 	defaultSortKey={DEFAULT_HISTORY_SORT_KEY}
 	bind:sortKey={$historySortKey}
@@ -331,6 +460,8 @@
 	</div>	
 
 </Table>
+</div>
+</div>
 
 <!-- {#if !isLoading && formattedHistory.length == 0}
 	<div class='empty'>Nothing to show.</div>
