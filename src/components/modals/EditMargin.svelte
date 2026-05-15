@@ -52,7 +52,8 @@
 		}, 50);
 	}
 
-	let funding = data.funding || 0;
+		let funding = data.funding || 0;
+	let currentLiqPrice = data.position.liqprice;
 	let newLiqPrice = data.position.liqprice;
 	let newMargin = 0;
 	function calculateNewLiquidationPrice(marginDelta, mode) {
@@ -149,6 +150,10 @@
 			
 			<div class='group'>
 				<Input label={`${selected} ${data.position.asset}`} bind:value={margin} />
+			</div>
+
+			<div class='row'>
+				<LabelValue label='Current Liq. Price' value={`${formatForDisplay(currentLiqPrice) || "-"}`} />
 			</div>
 
 			<div class='row'>
