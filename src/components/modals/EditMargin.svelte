@@ -12,7 +12,7 @@
 	import { approveAsset, getAllowance } from '@api/assets'
 	import { addMargin, removeMargin } from '@api/positions'
 	import { focusInput, hideModal } from '@lib/ui'
-	import { allowances, selectedMarketInfo } from '@lib/stores'
+	import { allowances, balances, selectedMarketInfo } from '@lib/stores'
 
 	export let data;
 
@@ -50,6 +50,18 @@
 		setTimeout(() => {
 			focusInput(`${selected} ${data.position.asset}`);
 		}, 50);
+	}
+
+	let walletBalance = 0;
+	let availableToRemove = 0;
+	let availableMargin = 0;
+	$: walletBalance = $balances[data.position.asset] || 0;
+	$: availableToRemove = Math.max((data.position.margin * 1 + funding * 1) || 0, 0);
+	$: availableMargin = selected == 'Add' ? walletBalance : availableToRemove;
+
+	function setMaxMargin() {
+		if (!availableMargin) return;
+		margin = availableMargin;
 	}
 
 	let funding = data.funding || 0;
@@ -149,6 +161,15 @@
 			
 			<div class='group'>
 				<Input label={`${selected} ${data.position.asset}`} bind:value={margin} />
+			</div>
+
+			<div class='row'>
+				<LabelValue
+					label={selected == 'Add' ? 'Wallet Balance' : 'Available To Remove'}
+					value={`${formatForDisplay(availableMargin) || "-"} ${data.position.asset}`}
+					isClickable={availableMargin > 0}
+					on:click={setMaxMargin}
+				/>
 			</div>
 
 			<div class='row'>
