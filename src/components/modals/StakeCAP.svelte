@@ -14,6 +14,7 @@
 	import LabelValue from '../layout/LabelValue.svelte'
 
 	let amount, isSubmitting, walletBalance = "0.0";
+	let isApproving = false;
 
 	$: formattedWalletBalance = formatCAPForDisplay(walletBalance);
 
@@ -35,7 +36,9 @@
 	}
 
 	async function _approveAsset() {
+		isApproving = true;
 		const result = await approveAsset('CAP', 'FundStore');
+		isApproving = false;
 	}
 
 	async function getBalance() {
@@ -75,7 +78,7 @@
 
 			<div>
 				{#if $allowances['CAP']?.['FundStore'] * 1 <= amount * 1}
-				<Button noSubmit={true} label={`Approve CAP`} on:click={_approveAsset} />
+				<Button noSubmit={true} isLoading={isApproving} label={`Approve CAP`} on:click={_approveAsset} />
 				{:else}
 				<Button isLoading={isSubmitting} label={`Stake`} />
 				{/if}

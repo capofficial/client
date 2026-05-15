@@ -71,6 +71,10 @@ export async function approveAsset(assetLabel, spenderName) {
 			return true;
 		}
 	} catch(e) {
+		if (e && e.code === 'ACTION_REJECTED' || e && e.code === 4001) {
+			// User rejected the wallet confirmation — not an error
+			return false;
+		}
 		showError(e);
 	}
 }
