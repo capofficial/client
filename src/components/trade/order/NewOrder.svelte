@@ -107,6 +107,8 @@
 
 	let tpProfitPercent, slLossPercent;
 	let tpPriceInputActive, tpPercentInputActive, slPriceInputActive, slPercentInputActive;
+	let tpProfitAmount, slLossAmount;
+	const tpslPriceSteps = [1, 2, 5];
 	
 	function setPrice(percentDiff) {
 		if (!$prices[$selectedMarket]) return;
@@ -183,6 +185,66 @@
 
 	}
 
+	function getTPSLPercentFromPrice(targetPrice, isTakeProfit) {
+		const latestPrice = $price * 1 > 0 ? $price : $prices[$selectedMarket];
+		if (!latestPrice || !targetPrice || !$leverage) return 0;
+
+		if (isTakeProfit) {
+			return $isLong
+				? 100 * $leverage * (targetPrice * 1 - latestPrice * 1) / targetPrice
+				: 100 * $leverage * (latestPrice * 1 - targetPrice * 1) / targetPrice;
+		}
+
+		return $isLong
+			? 100 * $leverage * (latestPrice * 1 - targetPrice * 1) / targetPrice
+			: 100 * $leverage * (targetPrice * 1 - latestPrice * 1) / targetPrice;
+	}
+
+	function getTPSLPriceFromMove(percentMove, isTakeProfit) {
+		const latestPrice = $price * 1 > 0 ? $price : $prices[$selectedMarket];
+		if (!latestPrice) return;
+
+		const direction = isTakeProfit
+			? ($isLong ? 1 : -1)
+			: ($isLong ? -1 : 1);
+
+		return latestPrice * (1 + direction * percentMove / 100);
+	}
+
+	function getTPSLButtonLabel(percentMove, isTakeProfit, isLongSide) {
+		const sign = isTakeProfit
+			? (isLongSide ? '+' : '-')
+			: (isLongSide ? '-' : '+');
+
+		return `${sign}${percentMove}%`;
+	}
+
+	function setTPSLPriceFromMove(percentMove, isTakeProfit) {
+		const targetPrice = getTPSLPriceFromMove(percentMove, isTakeProfit);
+		if (!targetPrice) return;
+
+		const percent = getTPSLPercentFromPrice(targetPrice, isTakeProfit);
+		if (percent <= 0) return;
+
+		if (isTakeProfit) {
+			tpPrice.set(formatForDisplay(targetPrice));
+			tpProfitPercent = formatForDisplay(percent);
+		} else {
+			slPrice.set(formatForDisplay(targetPrice));
+			slLossPercent = formatForDisplay(percent);
+		}
+	}
+
+	function calculateTPSLAmounts() {
+		tpProfitAmount = tpProfitPercent > 0 && $margin > 0
+			? formatForDisplay($margin * tpProfitPercent / 100)
+			: 0;
+
+		slLossAmount = slLossPercent > 0 && $margin > 0
+			? formatForDisplay($margin * slLossPercent / 100)
+			: 0;
+	}
+
 	function calculateTPSLFromPercent() {
 		const latestPrice = $price * 1 > 0 ? $price : $prices[$selectedMarket];
 		
@@ -208,6 +270,7 @@
 
 	$: calculateTPSLPercentFromPrices($tpPrice, $slPrice);
 	$: calculateTPSLFromPercent(tpProfitPercent, slLossPercent);
+	$: calculateTPSLAmounts(tpProfitPercent, slLossPercent, $margin);
 
 	function _focusInput(name, isActive) {
 		if (!isActive) return;
@@ -303,7 +366,7 @@
 		justify-content: space-between;
 		gap: 10px;
 	}
-	.price-buttons a {
+	.price-buttons button {
 		flex: 1;
 		text-align: center;
 		border: 1px solid var(--layer200);
@@ -312,9 +375,8 @@
 		font-size: 80%;
 		font-weight: 600;
 		border-radius: var(--base-radius);
-	}
-	.price-buttons a.highlighted {
-		background-color: var(--layer100);
+		color: var(--text0);
+		background: transparent;
 	}
 	.warning {
 		color: var(--error);
@@ -395,7 +457,15 @@
 								<div class='semi-padding-bottom'>
 									<Input label='TP Price' bind:value={$tpPrice} isSecondaryColor={!$isLong} on:focus={() => {tpPriceInputActive = true}} on:blur={() => {tpPriceInputActive = false}} />
 								</div>
+								<div class='semi-padding-bottom price-buttons'>
+									{#each tpslPriceSteps as percentMove}
+										<button type='button' on:click|stopPropagation={() => setTPSLPriceFromMove(percentMove, true)}>{getTPSLButtonLabel(percentMove, true, $isLong)}</button>
+									{/each}
+								</div>
 								<Input label='Profit (%)' bind:value={tpProfitPercent} isSecondaryColor={!$isLong} on:focus={() => {tpPercentInputActive = true}} on:blur={() => {tpPercentInputActive = false}} />
+								<div class='semi-padding-bottom'>
+									<LabelValue label='Est. Profit' value={`${tpProfitAmount ? `${tpProfitAmount} ${$selectedAsset} (${formatForDisplay(tpProfitPercent)}%)` : '-'}`} />
+								</div>
 							</div>
 
 						</div>
@@ -411,7 +481,15 @@
 								<div class='semi-padding-bottom'>
 									<Input label='SL Price' bind:value={$slPrice} isSecondaryColor={!$isLong} on:focus={() => {slPriceInputActive = true}} on:blur={() => {slPriceInputActive = false}} />
 								</div>
+								<div class='semi-padding-bottom price-buttons'>
+									{#each tpslPriceSteps as percentMove}
+										<button type='button' on:click|stopPropagation={() => setTPSLPriceFromMove(percentMove, false)}>{getTPSLButtonLabel(percentMove, false, $isLong)}</button>
+									{/each}
+								</div>
 								<Input label='Loss (%)' bind:value={slLossPercent} isSecondaryColor={!$isLong} on:focus={() => {slPercentInputActive = true}} on:blur={() => {slPercentInputActive = false}} />
+								<div class='semi-padding-bottom'>
+									<LabelValue label='Est. Loss' value={`${slLossAmount ? `${slLossAmount} ${$selectedAsset} (${formatForDisplay(slLossPercent)}%)` : '-'}`} />
+								</div>
 							</div>
 
 						</div>
