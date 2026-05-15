@@ -1,12 +1,13 @@
 import { get } from 'svelte/store'
 import { createChart, ColorType, LineStyle } from 'lightweight-charts'
 
-import { CURRENCY_DECIMALS } from './config'
+import { BPS_DIVIDER, CURRENCY_DECIMALS } from './config'
 import { formatUnits, formatOrder, formatPosition, formatForDisplay, formatPriceForDisplay } from './formatters'
-import { selectedMarket, orders, positions, chartResolution, chartLoading, showOrdersOnChart, showPositionsOnChart, hoveredOHLC } from './stores'
+import { selectedMarket, orders, positions, marketInfos, fundingTrackers, chartResolution, chartLoading, showOrdersOnChart, showPositionsOnChart, showLiquidationsOnChart, hoveredOHLC } from './stores'
 import { saveUserSetting, getPrecision } from './utils'
 
 import { getMarketCandles } from '@api/prices'
+import { getFundingTracker } from '@api/markets'
 
 let candles = []; // current candle set
 
@@ -140,6 +141,12 @@ export function initChart(cb) {
 		loadPositionLines(_positions);
 	});
 	showPositionsOnChart.subscribe(() => {
+		loadPositionLines();
+	});
+	showLiquidationsOnChart.subscribe(() => {
+		loadPositionLines();
+	});
+	fundingTrackers.subscribe(() => {
 		loadPositionLines();
 	});
 
@@ -375,7 +382,7 @@ function loadPositionLines(_positions) {
 	clearPositionLines();
 
 
-	if (!get(showPositionsOnChart)) return;
+	if (!get(showPositionsOnChart) && !get(showLiquidationsOnChart)) return;
 
 	let markers = [];
 
@@ -385,7 +392,8 @@ function loadPositionLines(_positions) {
 
 		if (_position.market != get(selectedMarket)) continue;
 
-		positionLines.push(
+		if (get(showPositionsOnChart)) {
+			positionLines.push(
 			candlestickSeries.createPriceLine({
 			    price: _position.price,
 			    color: _position.isLong ? '#00D604' : '#FF5000',
@@ -394,7 +402,24 @@ function loadPositionLines(_positions) {
 			    axisLabelVisible: true,
 			    title: `${_position.isLong ? '▲' : '▼'} ${formatForDisplay(_position.size)} ${_position.asset}`,
 			})
-		);
+			);
+		}
+
+		if (get(showLiquidationsOnChart)) {
+			const liquidationPrice = getLiquidationPrice(_position);
+			if (!liquidationPrice || isNaN(liquidationPrice)) continue;
+
+			positionLines.push(
+				candlestickSeries.createPriceLine({
+				    price: liquidationPrice,
+				    color: '#F5C542',
+				    lineWidth: 1,
+				    lineStyle: LineStyle.Dashed,
+				    axisLabelVisible: true,
+				    title: `Liq. ${formatForDisplay(_position.size)} ${_position.asset}`,
+				})
+			);
+		}
 
 		// markers.push({
 		// 	time: _position.timestamp.toNumber(),
@@ -418,6 +443,33 @@ function loadPositionLines(_positions) {
 
 	// candlestickSeries.setMarkers(markers);
 
+}
+
+function getPositionFunding(position) {
+	const fundingTracker = get(fundingTrackers)[position.asset]?.[position.market];
+	if (fundingTracker == undefined) {
+		getFundingTracker(position.asset, position.market);
+		return 0;
+	}
+
+	let fundingTrackerDiff = formatUnits(fundingTracker) * 1 - formatUnits(position.fundingTracker) * 1;
+	if (position.isLong) fundingTrackerDiff = fundingTrackerDiff * -1;
+
+	return position.size * fundingTrackerDiff / BPS_DIVIDER || 0;
+}
+
+function getLiquidationPrice(position) {
+	const marketInfo = get(marketInfos)[position.market];
+	if (!marketInfo || !position.size || !position.margin || !position.price) return;
+
+	const liqThreshold = marketInfo.liqThreshold / BPS_DIVIDER;
+	const funding = getPositionFunding(position);
+
+	if (position.isLong) {
+		return position.price * 1 - liqThreshold * (position.margin * 1 + funding * 1) * position.price / position.size;
+	}
+
+	return position.price * 1 + liqThreshold * (position.margin * 1 + funding * 1) * position.price / position.size;
 }
 
 function clearOrderLines() {
