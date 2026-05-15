@@ -29,10 +29,36 @@
 
 	let feeAPY = {};
 
+	const MONTHLY_FEES = {
+		ETH: 95,
+		USDC: 100000
+	};
+
+	function asNumber(value) {
+		const number = value * 1;
+		return Number.isFinite(number) ? number : 0;
+	}
+
+	function formatPercent(value) {
+		const number = asNumber(value);
+		return number ? `${formatForDisplay(number)}%` : '-';
+	}
+
+	function getTraderUplImpact(asset) {
+		const balance = asNumber($poolBalances[asset]);
+		if (!balance) return 0;
+		// Positive trader UP/L is owed by the pool, so it reduces pool performance.
+		return -asNumber($globalUPLs[asset]) / balance * 100;
+	}
+
 	function setFeeAPYs(_balances) {
 		if (!_balances) return;
-		if (_balances['ETH']) feeAPY['ETH'] = 100 * 95 * 12 / _balances['ETH']; // Approx 95 ETH per month in fees
-		if (_balances['USDC']) feeAPY['USDC'] = 100 * 100000 * 12 / _balances['USDC']; // Approx 100,000 USDC per month in fees
+		feeAPY = assets.reduce((apys, asset) => {
+			const balance = asNumber(_balances[asset]);
+			const monthlyFees = asNumber(MONTHLY_FEES[asset]);
+			apys[asset] = balance && monthlyFees ? 100 * monthlyFees * 12 / balance : 0;
+			return apys;
+		}, {});
 	}
 
 	$: setFeeAPYs($poolBalances);
@@ -165,10 +191,10 @@
 			<div class='row'>
 				<div class='cell la'><img src={`/asset-logos/${asset}.svg`} /> {asset}</div>
 				<div class='cell'><span>{numberWithCommas($poolBalances[asset]) || 0}<br/><span class='grayed'>${formatForDisplay(getAmountInUsd(asset, $poolBalances[asset], $prices))}</span></span></div>
-				<div class='cell'>{formatForDisplay(feeAPY[asset])}%</div>
-				<div class='cell'>30%+</div>
-				<div class='cell'>{numberWithCommas($globalUPLs[asset])}</div>
-				<div class='cell'>{numberWithCommas($bufferBalances[asset])}</div>
+				<div class='cell'>{formatPercent(feeAPY[asset])}</div>
+				<div class='cell'>{formatPercent(asNumber(feeAPY[asset]) + getTraderUplImpact(asset))}</div>
+				<div class='cell'><span>{numberWithCommas($globalUPLs[asset])}<br/><span class='grayed'>${formatForDisplay(getAmountInUsd(asset, $globalUPLs[asset], $prices))}</span></span></div>
+				<div class='cell'><span>{numberWithCommas($bufferBalances[asset])}<br/><span class='grayed'>${formatForDisplay(getAmountInUsd(asset, $bufferBalances[asset], $prices))}</span></span></div>
 				<div class='cell highlighted'><span>{numberWithCommas($poolStakes[asset]) || 0}<br><span class='grayed'>${getAmountInUsd(asset, $poolStakes[asset], $prices)}</span></span></div>
 				<div class='cell highlighted'>{$poolBalances[asset] == 0 ? 'N/A' : formatForDisplay(($poolStakes[asset])/$poolBalances[asset]  *100 )+ '%'}</div>
 			</div>
