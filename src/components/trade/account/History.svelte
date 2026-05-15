@@ -120,6 +120,24 @@
 </script>
 
 <style>
+	.export-bar {
+		display: flex;
+		justify-content: flex-end;
+		padding: 0 25px 8px;
+	}
+	.export-btn {
+		background: none;
+		border: 1px solid var(--layer100);
+		border-radius: 4px;
+		color: var(--text300);
+		padding: 4px 12px;
+		font-size: 80%;
+		cursor: pointer;
+	}
+	.export-btn:hover {
+		color: var(--text1);
+		border-color: var(--primary);
+	}
 	.item {
 		border-bottom: 1px solid var(--layer0);
 	}
@@ -240,6 +258,12 @@
 		}
 	}
 </style>
+
+{#if !$isLoading && $historySorted.length > 0}
+<div class='export-bar'>
+	<button class='export-btn' on:click={() => { showModal('ExportHistory') }}>Export CSV</button>
+</div>
+{/if}
 
 <Table
 	defaultSortKey={DEFAULT_HISTORY_SORT_KEY}
