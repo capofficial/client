@@ -86,6 +86,7 @@
 			overflow-x: scroll;
 			scrollbar-color: var(--layer200);
 			scrollbar-width: thin;
+			scrollbar-gutter: stable;
 		}
 		.table-wrapper::-webkit-scrollbar-track {
 			background-color: transparent;
@@ -159,6 +160,7 @@
 		overflow-y: scroll;
 		scrollbar-color: var(--layer200);
 		scrollbar-width: thin;
+		scrollbar-gutter: stable;
 	}
 	.data-wrapper::-webkit-scrollbar-track {
 		background-color: transparent;
