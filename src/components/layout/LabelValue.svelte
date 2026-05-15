@@ -1,5 +1,6 @@
 <script>
 
+	import { createEventDispatcher } from 'svelte'
 	import tooltip from '@lib/tooltip'
 	import { formatForDisplay } from '@lib/formatters'
 	import { PENCIL_ICON, RULER_ICON, RULER_FILLED_ICON } from '@lib/icons'
@@ -14,11 +15,17 @@
 	export let hasPadding = false;
 	export let hasSemiPadding = false;
 	export let fullOpacityLabel = false;
+
+	const dispatch = createEventDispatcher();
 	
 	let tooltipOptions = {
 		content: note,
 		allowHTML: true
 	};
+
+	function handleValueClick(event) {
+		if (isClickable) dispatch('click', event);
+	}
 
 </script>
 
@@ -72,7 +79,7 @@
 
 <div class='flex-row' class:padded={hasPadding} class:semipadded={hasSemiPadding} class:noPadding={noPadding}>
 	<div class='label' class:fullOpacity={fullOpacityLabel} class:hasNote={note != false} use:tooltip={tooltipOptions}>{label}</div>
-	<div class='value' on:click|stopPropagation class:clickable={isClickable} class:secondary={isSecondaryColor}>
+	<div class='value' on:click|stopPropagation={handleValueClick} class:clickable={isClickable} class:secondary={isSecondaryColor}>
 		{#if formatValue} 
 			{formatForDisplay(value)}
 		{:else}
