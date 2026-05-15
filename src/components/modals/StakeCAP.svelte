@@ -1,4 +1,4 @@
-<script>
+﻿<script>
 	
 	import Modal from './Modal.svelte'
 	import Input from '@components/layout/Input.svelte'
@@ -31,11 +31,11 @@
 	}
 
 	async function checkAllowance() {
-		await getAllowance('CAP', 'FundStore');
+		await getAllowance('CAP', 'Staking');
 	}
 
 	async function _approveAsset() {
-		const result = await approveAsset('CAP', 'FundStore');
+		const result = await approveAsset('CAP', 'Staking');
 	}
 
 	async function getBalance() {
@@ -74,7 +74,7 @@
 			</div>
 
 			<div>
-				{#if $allowances['CAP']?.['FundStore'] * 1 <= amount * 1}
+				{#if $allowances['CAP']?.['Staking'] * 1 <= amount * 1}
 				<Button noSubmit={true} label={`Approve CAP`} on:click={_approveAsset} />
 				{:else}
 				<Button isLoading={isSubmitting} label={`Stake`} />
