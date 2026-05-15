@@ -59,10 +59,16 @@ export async function getAllowance(assetLabel, spenderName) {
 }
 
 export async function approveAsset(assetLabel, spenderName) {
-	const contract = await getContract(assetLabel, true);
-	const spenderContract = await getContract(spenderName);
-	const spenderAddress = spenderContract.address;
 	try {
+		const contract = await getContract(assetLabel, true);
+		const spenderContract = await getContract(spenderName);
+
+		if (!contract || !spenderContract) {
+			showError('Contract not found. Please check your network connection.');
+			return;
+		}
+
+		const spenderAddress = spenderContract.address;
 		let tx = await contract.approve(spenderAddress, ethers.constants.MaxUint256);
 		let receipt = await tx.wait();
 		if (receipt && receipt.status == 1) {
@@ -71,6 +77,10 @@ export async function approveAsset(assetLabel, spenderName) {
 			return true;
 		}
 	} catch(e) {
+		// Suppress user-rejection errors (MetaMask throws on deny)
+		if (e?.code === 'ACTION_REJECTED' || e?.code === 4001) {
+			return;
+		}
 		showError(e);
 	}
 }
