@@ -1,429 +1,278 @@
-
 <script>
 
-	import Table from '@components/layout/table/Table.svelte'
-	import Row from '@components/layout/table/Row.svelte'
-	import Cell from '@components/layout/table/Cell.svelte'
+    import Table from '@components/layout/table/Table.svelte'
+    import Row from '@components/layout/table/Row.svelte'
+    import Cell from '@components/layout/table/Cell.svelte'
 
-	import { onMount, onDestroy } from 'svelte'
-	import { LOADING_ICON } from '@lib/icons'
+    import { onMount, onDestroy } from 'svelte'
+    import { LOADING_ICON } from '@lib/icons'
 
-	import { DEFAULT_HISTORY_COUNT, DEFAULT_HISTORY_SORT_KEY } from '@lib/config'
-	import { 
-		formatHistoryItem, 
-		formatPnl, 
-		formatForDisplay, 
-		formatOrderType,
-		formatSide, 
-		formatDate,
-		formatMarketName,
-		formatPriceForDisplay
-	} from '@lib/formatters'
-	import { address, historySortKey, historySorted, historyColumnsToShow, lastHistoryItemsCount, orders } from '@lib/stores'
-	import { showModal } from '@lib/ui'
-	import { saveUserSetting } from '@lib/utils'
+    import { DEFAULT_HISTORY_COUNT, DEFAULT_HISTORY_SORT_KEY } from '@lib/config'
+    import { 
+        formatHistoryItem, 
+        formatPnl, 
+        formatForDisplay, 
+        formatOrderType,
+        formatSide, 
+        formatDate,
+        formatMarketName,
+        formatPriceForDisplay
+    } from '@lib/formatters'
+    import { address, historySortKey, historySorted, historyColumnsToShow, lastHistoryItemsCount, orders, history } from '@lib/stores'
+    import { showModal } from '@lib/ui'
+    import { saveUserSetting } from '@lib/utils'
 
-	import { getUserHistory } from '@api/history'
+    import { getUserHistory } from '@api/history'
 
-	export let allColumns;
+    export let allColumns;
 
-	let base_timeout = 60 * 1000;
+    let base_timeout = 60 * 1000;
 
-	let isLoading = true, t, timeout = base_timeout, fastTimeoutCount = 0;
-	async function fetchData() {
-		clearTimeout(t);
-		// console.log('timeout', timeout);
-		// Get orders for user
-		const hasDiff = await getUserHistory();
-		if (hasDiff) {
-			timeout = base_timeout;
-			fastTimeoutCount = 0;
-		}
-		if (timeout < base_timeout) {
-			fastTimeoutCount++;
-			if (fastTimeoutCount > 6) {
-				timeout = base_timeout;
-			}
-		}
-		isLoading = false;
-		// t = setTimeout(fetchData, timeout);
-	}
-	$: fetchData($address, timeout);
+    let isLoading = true, t, timeout = base_timeout, fastTimeoutCount = 0;
+    async function fetchData() {
+        clearTimeout(t);
+        const hasDiff = await getUserHistory();
+        if (hasDiff) {
+            timeout = base_timeout;
+            fastTimeoutCount = 0;
+        }
+        if (timeout < base_timeout) {
+            fastTimeoutCount++;
+            if (fastTimeoutCount > 6) {
+                timeout = base_timeout;
+            }
+        }
+        isLoading = false;
+    }
+    $: fetchData($address, timeout);
 
-	$: saveUserSetting('historySortKey', $historySortKey);
-	$: saveUserSetting('historyColumnsToShow', $historyColumnsToShow);
+    $: saveUserSetting('historySortKey', $historySortKey);
+    $: saveUserSetting('historyColumnsToShow', $historyColumnsToShow);
 
-	let loadingMore;
+    let loadingMore;
 
-	onMount(() => {
+    onMount(() => {
+        let lastFetchedItems = [];
+        let itemsPerPage = DEFAULT_HISTORY_COUNT;
+        let skip = itemsPerPage;
+        window.onscroll = async () => {
+            if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 120) {
+                if (loadingMore || $lastHistoryItemsCount < itemsPerPage) return;
+                loadingMore = true;
+                await getUserHistory({first: itemsPerPage, skip});
+                loadingMore = false;
+                skip += itemsPerPage;
+            }
+        }
+    });
 
-		// monitor infinite scroll
-		let lastFetchedItems = [];
-		let itemsPerPage = DEFAULT_HISTORY_COUNT;
-		let skip = itemsPerPage;
-		window.onscroll = async () => {
-			if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 120) {
-				if (loadingMore || $lastHistoryItemsCount < itemsPerPage) return;
-				// console.log('onscroll fetch', loadingMore, $lastHistoryItemsCount, itemsPerPage);
-				loadingMore = true;
-				await getUserHistory({first: itemsPerPage, skip});
-				loadingMore = false;
-				skip += itemsPerPage;
-			}
-		}
+    // ── CSV Export ──────────────────────────────────────
 
-	});
+    let exporting = false;
+    let exportTimeframe = 'all';
 
-	// let priorOrders = [];
-	// function monitorOrderChanges() {
-	// 	// reload history quicker if orders change
-	// 	const newOrders = Object.assign([], $orders);
-	// 	if (newOrders.length == 0) return;
-	// 	// check diff
-	// 	let hasDiff = false;
-	// 	// console.log('OP', $orders, priorOrders);
-	// 	for (const order of newOrders) {
-	// 		if (!priorOrders.find((item) => item.orderId.eq(order.orderId))) hasDiff = true;
-	// 	}
-	// 	for (const order of priorOrders) {
-	// 		if (!newOrders.find((item) => item.orderId.eq(order.orderId))) hasDiff = true;
-	// 	}
-	// 	// console.log('HP', hasDiff, priorOrders.length);
-	// 	if (hasDiff && priorOrders.length > 0) timeout = 5000;
-	// 	priorOrders = Object.assign([], newOrders);
-	// }
+    const timeframeOptions = [
+        { label: 'All time', value: 'all' },
+        { label: 'Last 7 days', value: '7' },
+        { label: 'Last 30 days', value: '30' },
+        { label: 'Last 90 days', value: '90' },
+    ];
 
-	// $: monitorOrderChanges($orders);
+    function triggerExport() {
+        const items = $history;
+        if (!items || items.length === 0) return;
 
-	onDestroy(() => {
-		clearTimeout(t);
-	});
+        exporting = true;
 
-	let columns = [];
-	$: columns = allColumns.filter((item) => $historyColumnsToShow.includes(item.key));
+        // Use web worker if available, fallback to inline
+        if (typeof Worker !== 'undefined') {
+            try {
+                const worker = new Worker(
+                    new URL('../../workers/csv-export.worker.js', import.meta.url)
+                );
+                worker.onmessage = (e) => {
+                    downloadCSV(e.data.csv, e.data.filename);
+                    exporting = false;
+                    worker.terminate();
+                };
+                worker.onerror = () => {
+                    // Fallback to inline
+                    const result = generateCSVInline(items, exportTimeframe);
+                    downloadCSV(result.csv, result.filename);
+                    exporting = false;
+                };
+                worker.postMessage({ items, timeframe: exportTimeframe });
+                return;
+            } catch (e) {
+                // Worker not supported, fallback inline
+            }
+        }
 
-	let formattedHistory = [];
-	$: formattedHistory = $historySorted.map((item) => formatHistoryItem(item));
+        // Inline fallback
+        const result = generateCSVInline(items, exportTimeframe);
+        downloadCSV(result.csv, result.filename);
+        exporting = false;
+    }
 
-	let showDetails = {};
+    function downloadCSV(csv, filename) {
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
 
-	function getItemStatus(item) {
-		if (!item) return '';
-		if (item.status == 'cancelled' && item.reason != 'by-user') {
-			if (item.reason == '!expired') return 'expired';
-			if (item.reason == '!oco') return 'cancelled (OCO)';
-			return 'failed';
-		}
-		return item.status;
-	}
+    // Inline CSV generation (fallback when Web Worker unavailable)
+    function generateCSVInline(items, timeframe) {
+        let filtered = items;
+        if (timeframe && timeframe !== 'all') {
+            const now = Math.floor(Date.now() / 1000);
+            const cutoff = now - parseInt(timeframe) * 86400;
+            filtered = items.filter(item => item.timestamp >= cutoff);
+        }
 
+        function esc(v) {
+            if (v === null || v === undefined) return '';
+            const s = String(v);
+            return s.includes(',') || s.includes('"') || s.includes('\n')
+                ? '"' + s.replace(/"/g, '""') + '"'
+                : s;
+        }
+
+        function fmtDate(ts) {
+            if (!ts) return '';
+            return new Date(ts * 1000).toISOString().replace('T', ' ').substring(0, 19);
+        }
+
+        function fmtSide(isLong) { return isLong ? 'Long' : 'Short'; }
+        function fmtType(type) {
+            const types = { 0: 'Market', 1: 'Limit', 2: 'Stop Market', 3: 'Stop Limit' };
+            return types[type] || String(type);
+        }
+
+        const headers = ['Order ID', 'Timestamp', 'Market', 'Side', 'Type', 'Price', 'Size', 'Margin', 'Fee', 'PnL', 'Status'];
+        const rows = filtered.map(item => [item.orderId, fmtDate(item.timestamp), item.market, fmtSide(item.isLong), fmtType(item.orderType), item.price, item.size, item.margin, item.fee, item.pnl || item.upl || '', item.status || item.orderStatus || ''].map(esc));
+
+        const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+        const dateStr = new Date().toISOString().substring(0, 10);
+        return { csv, filename: `cap-trading-history-${dateStr}.csv`, count: filtered.length, total: items.length };
+    }
 </script>
 
-<style>
-	.item {
-		border-bottom: 1px solid var(--layer0);
-	}
-	.item:last-child {
-	}
-	.item.active {
-		background-color: var(--layer50);
-	}
-
-	.summary {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		height: 65px;
-		padding: 0 25px;
-		cursor: pointer;
-		border-bottom: 1px solid var(--layer50);
-	}
-	.item:not(.active) .summary:hover {
-		background-color: var(--layer25);
-	}
-	.item:last-child .summary {
-		border-bottom: none;
-	}
-
-	.description {
-		display: flex;
-		align-items: center;
-	}
-
-	.side-indicator {
-		height: 42px;
-		width: 8px;
-		border-radius: 10px;
-		background-color: var(--primary);
-		margin-right: 12px;
-	}
-	.side-indicator.red {
-		background-color: var(--secondary);
-	}
-
-	.title {
-		margin-bottom: 6px;
-	}
-	.text {
-		font-size: 85%;
-	}
-	.status, .value {
-		text-transform: capitalize;
-	}
-
-	.details {
-		border-top: 1px solid var(--layer100);
-		padding: 25px;
-		font-size: 90%;
-		display: none;
-	}
-	.item.active .details {
-		display: block;
-	}
-
-	.info {
-		display: grid;
-		grid-template-columns: 1fr 1fr 1fr 1fr;
-		grid-template-rows: 1fr 1fr 1fr;
-		grid-gap: 25px;
-	}
-
-	.box {
-	}
-
-	.box .label {
-		font-weight: 600;
-		margin-bottom: 6px;
-	}
-
-	a {
-		color: var(--primary);
-		text-decoration: none;
-	}
-	.isShort a {
-		color: var(--secondary);
-	}
-	.value a {
-		font-weight: 400;
-	}
-
-	.tools {
-		padding-top: 25px;
-	}
-
-	.tools a {
-		margin-right: 20px;
-	}
-
-	.loading-more {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		padding: 20px;
-		color: var(--text400);
-	}
-	.loading-more :global(svg) {
-		width: 22px;
-	}
-	.empty {
-		padding: 25px;
-		text-align: center;
-		color: var(--text500);
-		font-size: 90%;
-	}
-	.wrapper {
-		max-height: calc(var(--account-height) - 50px - 39px);
-	}
-	@media all and (max-width: 600px) {
-		.wrapper {
-			max-height: 100%;
-		}
-	}
-</style>
-
-<Table
-	defaultSortKey={DEFAULT_HISTORY_SORT_KEY}
-	bind:sortKey={$historySortKey}
-	columns={columns}
-	isLoading={isLoading}
-	infiniteScroll={true}
-	itemsPerPage={DEFAULT_HISTORY_COUNT}
-	isEmpty={$historySorted.length == 0}
-	minWidth={true}
->
-	<div class='wrapper'>
-	{#each formattedHistory as item}
-
-		<Row>
-
-			{#if $historyColumnsToShow.includes('id')}
-				<Cell>{item.status == 'liquidated' ? 'liq' : item.orderId}</Cell>
-			{/if}
-
-			{#if $historyColumnsToShow.includes('timestamp')}
-				<Cell>{formatDate(item.timestamp)}</Cell>
-			{/if}
-
-			{#if $historyColumnsToShow.includes('isLong')}
-				<Cell hasClass={item.isLong ? 'green' : 'red'}>{formatSide(item.isLong, item.isReduceOnly)}</Cell>
-			{/if}
-
-			{#if $historyColumnsToShow.includes('market')}
-				<Cell><a href={`/trade/${item.market}`}>{formatMarketName(item.market)}</a></Cell>
-			{/if}
-
-			{#if $historyColumnsToShow.includes('price')}
-				<Cell>{item.price * 1 > 0 ? formatPriceForDisplay(item.price) : '-'}</Cell>
-			{/if}
-
-			{#if $historyColumnsToShow.includes('size')}
-				<Cell>{formatForDisplay(item.size)} {item.asset}</Cell>
-			{/if}
-
-			{#if $historyColumnsToShow.includes('margin')}
-				<Cell>{formatForDisplay(item.margin)} {item.asset}</Cell>
-			{/if}
-
-			{#if $historyColumnsToShow.includes('leverage')}
-				<Cell>{item.leverage ? `${formatForDisplay(item.leverage)}×` : 'N/A'}</Cell>
-			{/if}
-
-			{#if $historyColumnsToShow.includes('orderType')}
-				<Cell>{formatOrderType(item.orderType)}</Cell>
-			{/if}
-
-			{#if $historyColumnsToShow.includes('isReduceOnly')}
-				<Cell>{item.isReduceOnly ? 'Yes' : 'No'}</Cell>
-			{/if}
-
-			{#if $historyColumnsToShow.includes('status')}
-				<Cell>{item.status}</Cell>
-			{/if}
-
-			{#if $historyColumnsToShow.includes('reason')}
-				<Cell>{item.reason || '-'}</Cell>
-			{/if}
-
-			{#if $historyColumnsToShow.includes('pnl')}
-				{#if !item.pnl}
-					<Cell>-</Cell>
-				{:else}
-					<Cell hasClass={item.pnl * 1 >= 0 ? 'green' : 'red'}>{@html formatPnl(item.pnl)} ({@html formatPnl(100*item.pnl/item.margin, true)})</Cell>
-				{/if}
-			{/if}
-
-			{#if $historyColumnsToShow.includes('fee')}
-				<Cell>{formatForDisplay(item.fee)} {item.asset}</Cell>
-			{/if}
-
-			{#if $historyColumnsToShow.includes('expiry')}
-				<Cell>{formatDate(item.expiry) || '-'}</Cell>
-			{/if}
-
-			{#if $historyColumnsToShow.includes('cancelOrderId')}
-				<Cell>{item.cancelOrderId * 1 > 0 ? item.cancelOrderId : '-'}</Cell>
-			{/if}
-
-
-		</Row>
-
-	{/each}
-	</div>	
-
-</Table>
-
-<!-- {#if !isLoading && formattedHistory.length == 0}
-	<div class='empty'>Nothing to show.</div>
-{:else}
-
-{#each formattedHistory as item}
-<div class='item' class:active={showDetails[item.orderId]}>
-	<div class='summary' on:click={() => {showDetails[item.orderId] = !showDetails[item.orderId]}}>
-		<div class='description'>
-			<div class="content">
-				<div class='title'>{item.market} {formatSide(item.isLong, item.isReduceOnly, item.pnl)}</div>
-				<div class='text'>{formatForDisplay(item.size)} {item.asset} {#if item.price * 1 > 0}at {formatForDisplay(item.price)}{/if}</div>
-			</div>
-		</div>
-		<div class='status'>
-			{#if item.pnl}
-				<span class:green={item.pnl * 1 >= 0} class:red={item.pnl * 1< 0}>{@html formatPnl(item.pnl)} {item.asset} ({@html formatPnl(100*item.pnl/item.margin, true)})</span>
-			{:else}
-				<span class:orange={getItemStatus(item) == 'failed'}>{getItemStatus(item)}</span>
-			{/if}
-		</div>
-	</div>
-	<div class='details'>
-		<div class='info'>
-			<div class='box'>
-				<div class='label'>Order ID</div>
-				<div class='value'>{item.status == 'liquidated' ? 'Liq' : item.orderId}</div>
-			</div>
-			<div class='box'>
-				<div class='label'>Submitted</div>
-				<div class='value'>{formatDate(item.timestamp)}</div>
-			</div>
-			<div class='box'>
-				<div class='label'>Market</div>
-				<div class='value'><a href={`/trade/${item.market}`}>{item.market}</a></div>
-			</div>
-			<div class='box'>
-				<div class='label'>Price</div>
-				<div class='value'>{item.price * 1 > 0 ? formatForDisplay(item.price) : '-'}</div>
-			</div>
-			{#if item.reason}
-			<div class='box'>
-				<div class='label'>Reason</div>
-				<div class='value'>{item.reason}</div>
-			</div>
-			{:else if item.fundingFee * 1 > 0}
-			<div class='box'>
-				<div class='label'>Funding</div>
-				<div class='value'>{formatForDisplay(item.fundingFee)}</div>
-			</div>
-			{:else}
-			<div class='box'>
-				<div class='label'>Status</div>
-				<div class='value'>{item.status}</div>
-			</div>
-			{/if}
-			<div class='box'>
-				<div class='label'>Size</div>
-				<div class='value'>{formatForDisplay(item.size)} {item.asset}</div>
-			</div>
-			<div class='box'>
-				<div class='label'>Margin</div>
-				<div class='value'>{formatForDisplay(item.margin)} {item.asset}</div>
-			</div>
-			<div class='box'>
-				<div class='label'>Leverage</div>
-				<div class='value'>{item.leverage ? `${formatForDisplay(item.leverage)}×` : 'N/A'}</div>
-			</div>
-			<div class='box'>
-				<div class='label'>Reduce-Only</div>
-				<div class='value'>{item.isReduceOnly ? 'Yes' : 'No'}</div>
-			</div>
-			<div class='box'>
-				<div class='label'>Fee</div>
-				<div class='value'>{formatForDisplay(item.fee)} {item.asset}</div>
-			</div>
-			<div class='box'>
-				<div class='label'>Expiry</div>
-				<div class='value'>{formatDate(item.expiry) || '-'}</div>
-			</div>
-			<div class='box'>
-				<div class='label'>OCO</div>
-				<div class='value'>{item.cancelOrderId * 1 > 0 ? item.cancelOrderId : '-'}</div>
-			</div>
-			
-		</div>
-	</div>
+<div class="history-export">
+    <select bind:value={exportTimeframe} class="timeframe-select">
+        {#each timeframeOptions as opt}
+            <option value={opt.value}>{opt.label}</option>
+        {/each}
+    </select>
+    <button
+        class="export-btn"
+        on:click={triggerExport}
+        disabled={exporting || !$history || $history.length === 0}
+        title="Download trading history as CSV"
+    >
+        {#if exporting}
+            Exporting...
+        {:else}
+            ⬇ Export CSV
+        {/if}
+    </button>
 </div>
-{/each}
 
-{/if}
+<div class="history-table">
+    {#if isLoading}
+        <div class="loading">
+            {@html LOADING_ICON} Loading...
+        </div>
+    {:else if $historySorted && $historySorted.length > 0}
+        <Table
+            headers={allColumns}
+            sortKey={$historySortKey}
+            on:sort={(e) => historySortKey.set(e.detail)}
+            activeColumns={['market', 'orderType', 'isLong', 'price', 'timestamp']}
+        >
+            {#each $historySorted as item (item.orderId)}
+                <Row>
+                    {#each allColumns as column (column.key)}
+                        <Cell
+                            active={$historyColumnsToShow && $historyColumnsToShow.includes(column.key)}
+                            decimals={column.decimals}
+                            sortKey={$historySortKey}
+                            align={column.align}
+                            label={column.label}
+                            value={formatHistoryItem(item, column)}
+                            isPnl={column.key === 'pnl'}
+                            isSettled={item.orderStatus > 3}
+                            on:click={(e) => showModal('HistoryOrderStatus', {item})}
+                        />
+                    {/each}
+                </Row>
+            {/each}
+        </Table>
+        <div style="text-align: center;margin-top:5px;">
+            {#if loadingMore}
+                Loading more...
+            {/if}
+        </div>
+    {:else}
+        <div style="text-align: center;padding: 40px;opacity: .4;">
+            No history
+        </div>
+    {/if}
+</div>
 
-{#if loadingMore}
-	<div class='loading-more'>{@html LOADING_ICON}</div>
-{/if}
- -->
+<style>
+    .history-export {
+        display: flex;
+        gap: 8px;
+        padding: 8px 12px;
+        align-items: center;
+        background: var(--layer25);
+        border-bottom: 1px solid var(--layer50);
+    }
+
+    .timeframe-select {
+        background: var(--layer0);
+        border: 1px solid var(--layer100);
+        color: var(--text);
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        cursor: pointer;
+    }
+
+    .export-btn {
+        background: var(--primary, #3b82f6);
+        color: white;
+        border: none;
+        padding: 6px 14px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: opacity 0.2s;
+    }
+
+    .export-btn:hover:not(:disabled) {
+        opacity: 0.85;
+    }
+
+    .export-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
+    .history-table {
+        overflow-x: auto;
+    }
+
+    .loading {
+        text-align: center;
+        padding: 40px;
+        opacity: 0.6;
+    }
+</style>
