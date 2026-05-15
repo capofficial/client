@@ -13,6 +13,7 @@
 	import StakeCAP from '../modals/StakeCAP.svelte'
 	import UnstakeCAP from '../modals/UnstakeCAP.svelte'
 	import HistoryOrderStatus from '../modals/HistoryOrderStatus.svelte'
+	import ExportHistory from '../modals/ExportHistory.svelte'
 	import Settings from '../modals/Settings.svelte'
 
 </script>
@@ -63,6 +64,10 @@
 
 {#if $activeModal && $activeModal.name == 'HistoryOrderStatus'}
 <HistoryOrderStatus />
+{/if}
+
+{#if $activeModal && $activeModal.name == 'ExportHistory'}
+<ExportHistory />
 {/if}
 
 {#if $activeModal && $activeModal.name == 'MarketInfo'}
