@@ -54,6 +54,10 @@
 		if (sizeToClosePercent > 100) sizeToClosePercent = 100;
 	}
 
+	function setMaxSizeToClose() {
+		amount = formatForDisplay(data.size);
+	}
+
 	$: setSizeToClosePercent(amount);
 
 	let isApproving = false;
@@ -96,7 +100,7 @@
 			</div>
 
 			<div class='row'>
-				<LabelValue label='Max' value={`${formatForDisplay(data.size)} ${data.asset}`} on:click={() => amount = data.size} isClickable={true} />
+				<LabelValue label='Max' value={`${formatForDisplay(data.size)} ${data.asset}`} on:click={setMaxSizeToClose} isClickable={true} />
 			</div>
 
 			<div class='row'>
