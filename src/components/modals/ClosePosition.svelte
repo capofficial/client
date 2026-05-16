@@ -96,7 +96,7 @@
 			</div>
 
 			<div class='row'>
-				<LabelValue label='Max' value={`${formatForDisplay(data.size)} ${data.asset}`} on:click={() => amount = data.size} isClickable={true} />
+				<LabelValue label='Max' value={`${formatForDisplay(data.size)} ${data.asset}`} on:click={() => { amount = formatForDisplay(data.size); }} isClickable={true} />
 			</div>
 
 			<div class='row'>
@@ -104,7 +104,7 @@
 			</div>
 
 			<div class='row'>
-				<LabelValue label='Size to Close (%)' value={`${formatForDisplay(sizeToClosePercent)}%`} />
+				<LabelValue label='Size to Close (%)' value={`${formatForDisplay(sizeToClosePercent, 2)}%`} />
 			</div>
 
 			<OrderDetails market={data.market} asset={data.asset} size={amount} isClose={true} clickableFee={false} />
