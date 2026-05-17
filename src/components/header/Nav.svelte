@@ -5,10 +5,16 @@
 	import Rewards from './Rewards.svelte'
 
 	import { pageName, showMobileNav } from '@lib/stores'
-	import { TROPHY_ICON, BULLET_LIST_ICON } from '@lib/icons'
+	import { TROPHY_ICON, BULLET_LIST_ICON, BOOK_ICON } from '@lib/icons'
+	import { showModal } from '@lib/ui'
 
 	function toggleMobileNav() {
 		showMobileNav.set(!$showMobileNav);
+	}
+
+	function openGuide() {
+		showMobileNav.set(false);
+		showModal('Welcome');
 	}
 </script>
 
@@ -27,18 +33,25 @@
 		gap: 8px;
 	}
 
-	a {
+	a,
+	button.nav-action {
 		color: var(--text0);
 		text-decoration: none;
 		padding: 8px 12px;
 		border-radius: var(--base-radius);
 		transition: all 100ms ease-in-out;
 		font-weight: 500;
+		border: none;
+		background: transparent;
+		font: inherit;
+		cursor: pointer;
 	}
-	a:hover  {
+	a:hover,
+	button.nav-action:hover  {
 		background-color: var(--layer1);
 	}
-	 a.active {
+	 a.active,
+	 button.nav-action.active {
 	 	color: var(--primary);
 		background-color: var(--primary-highlighted);
 	}
@@ -55,6 +68,16 @@
 	a.leaderboard-link :global(svg) {
 		fill: currentColor;
 		height: 18px;
+	}
+
+	button.guide-link {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+	}
+	button.guide-link :global(svg) {
+		fill: currentColor;
+		height: 16px;
 	}
 
 	.mobile-nav {
@@ -78,7 +101,8 @@
 		fill: inherit;
 	}
 
-	.mobile-nav a {
+	.mobile-nav a,
+	.mobile-nav button.nav-action {
 		display: none;
 		padding: 10px 8px;
 	}
@@ -104,7 +128,8 @@
 			bottom: 0;
 			width: 100%;
 		}
-		.mobile-nav a {
+		.mobile-nav a,
+		.mobile-nav button.nav-action {
 			display: block;
 			font-size: 120%;
 			padding: 16px 8px;
@@ -121,6 +146,7 @@
 	<a class:active={$pageName == 'Trade'} href='/trade'>Trade</a>
 	<a class:active={$pageName == 'Pool'} href='/pool'>Pool</a>
 	<a class:active={$pageName == 'Stake'} href='/stake'>Stake</a>
+	<button type='button' class='nav-action guide-link' on:click|stopPropagation={openGuide}>{@html BOOK_ICON}<span>Guide</span></button>
 	<a on:click|stopPropagation={toggleMobileNav} class:active={$showMobileNav}>…</a>
 </div>
 
@@ -132,6 +158,7 @@
 	<a on:click={toggleMobileNav} href='/trade'>Trade</a>
 	<a on:click={toggleMobileNav} href='/pool'>Pool</a>
 	<a on:click={toggleMobileNav} href='/stake'>Stake</a>
+	<button type='button' class='nav-action' on:click|stopPropagation={openGuide}>Guide</button>
 	<a on:click={toggleMobileNav} href='https://docs.cap.io' target='_blank' class='display-desktop'>Docs</a>
 </div>
 {/if}

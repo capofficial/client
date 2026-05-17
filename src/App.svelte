@@ -11,14 +11,24 @@
 	import { USD_CONVERSION_MARKETS } from '@lib/config'
 	import { checkCountry, loadRoute, catchLinks, navigateTo } from '@lib/routing'
 	import { component, address, pageName, countryDisallowed } from '@lib/stores'
-	import { hidePopoversOnKeydown, hidePopoversOnClick } from '@lib/ui'
-	import { runAndInterval, hashString, getChainData } from '@lib/utils'
+	import { hidePopoversOnKeydown, hidePopoversOnClick, showModal } from '@lib/ui'
+	import { runAndInterval, hashString, getChainData, getUserSetting } from '@lib/utils'
 
 	import { getUserAssetBalances } from '@api/assets'
 	import { listenToEvents } from '@api/listener'
 	import { getMarketPrices } from '@api/prices'
 
 	let interval1;
+	let checkedWelcome = false;
+
+	function maybeShowWelcome() {
+		if (checkedWelcome || $pageName == 'Home' || getUserSetting('hasSeenWelcome')) return;
+
+		checkedWelcome = true;
+		setTimeout(() => {
+			if (!getUserSetting('hasSeenWelcome')) showModal('Welcome');
+		}, 500);
+	}
 
 	onMount(async () => {
 
@@ -39,6 +49,7 @@
 
 	// Listener
 	$: listenToEvents($address);
+	$: if ($pageName) maybeShowWelcome();
 
 </script>
 

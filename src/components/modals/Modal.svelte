@@ -42,6 +42,8 @@
 
 	.modal {
 		width: var(--modal-width);
+		max-width: calc(100vw - (var(--base-padding) * 2));
+		box-sizing: border-box;
 		border-radius: var(--base-radius);
 		background-color: var(--layer25);
 		border: 1px solid var(--layer200);
