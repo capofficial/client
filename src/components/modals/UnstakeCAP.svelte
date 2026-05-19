@@ -41,7 +41,7 @@
 
 </style>
 
-<Modal title='Unstake CAP' width={280}>
+<Modal title='Unstake CAP' width={280} icon='/asset-logos/CAP.svg'>
 	
 	<div class='container'>
 

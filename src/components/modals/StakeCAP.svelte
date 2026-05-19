@@ -56,7 +56,7 @@
 
 </style>
 
-<Modal title='Stake CAP' width={280}>
+<Modal title='Stake CAP' width={280} icon='/asset-logos/CAP.svg'>
 	
 	<div class='container'>
 

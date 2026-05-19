@@ -12,6 +12,7 @@
 	export let showCancel = false;
 	export let width = 420;
 	export let doneButton = false;
+	export let icon = '';
 
 	let tooltipOptions = {
 		content: note,
@@ -63,6 +64,13 @@
 		font-weight: 600;
 		font-size: 18px;
 		flex: 1 1 auto;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+	.modal-title img {
+		width: 20px;
+		height: 20px;
 	}
 
 	.info {
@@ -108,7 +116,7 @@
 		{#if showHeader || title}
 		<div class='modal-header'>
 			<div class='top'>
-				<div class='modal-title'>{title}</div>
+				<div class='modal-title'>{#if icon}<img src={icon} alt='' />{/if}{title}</div>
 				{#if note}
 					<a class='info' use:tooltip={tooltipOptions}>{@html INFO_ICON}</a>
 				{/if}
