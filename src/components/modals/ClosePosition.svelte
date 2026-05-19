@@ -21,8 +21,36 @@
 
 	let amount, isSubmitting, sizeToClosePercent = 0;
 
+	function formatMaxCloseSize(size, maxDecimals = 8) {
+		if (!size) return '';
+		const sizeString = `${size}`.trim();
+
+		if (sizeString.includes('e')) {
+			const numericSize = Number(sizeString);
+			if (!Number.isFinite(numericSize) || numericSize <= 0) return '';
+			return numericSize.toFixed(18).replace(/\.?0+$/, '');
+		}
+
+		const [integerPart, decimalPart = ''] = sizeString.split('.');
+		let trimmedDecimal = decimalPart.slice(0, maxDecimals).replace(/0+$/, '');
+
+		if (!trimmedDecimal && decimalPart && Number(integerPart || 0) === 0 && Number(sizeString) > 0) {
+			trimmedDecimal = decimalPart.slice(0, 18).replace(/0+$/, '');
+		}
+
+		if (!trimmedDecimal) {
+			return integerPart || '0';
+		}
+
+		return `${integerPart || '0'}.${trimmedDecimal}`;
+	}
+
+	$: formattedMaxSize = formatMaxCloseSize(data.size);
+	$: amountIsTooLarge = amount && formattedMaxSize && amount * 1 > formattedMaxSize * 1;
+
 	async function submit() {
 		if (!amount) return focusInput('Size to Close');
+		if (amountIsTooLarge) return focusInput('Size to Close');
 		isSubmitting = true;
 		const success = await submitCloseOrder({
 			market: data.market,
@@ -92,11 +120,11 @@
 		<form on:submit|preventDefault={submit}>
 
 			<div class='group'>
-				<Input label='Size to Close' asset={data.asset} bind:value={amount} />
+				<Input label='Size to Close' asset={data.asset} bind:value={amount} max={formattedMaxSize || 10000000} isInvalid={amountIsTooLarge} />
 			</div>
 
 			<div class='row'>
-				<LabelValue label='Max' value={`${formatForDisplay(data.size)} ${data.asset}`} on:click={() => amount = data.size} isClickable={true} />
+				<LabelValue label='Max' value={`${formattedMaxSize || formatForDisplay(data.size)} ${data.asset}`} on:click={() => amount = formattedMaxSize} isClickable={true} />
 			</div>
 
 			<div class='row'>
