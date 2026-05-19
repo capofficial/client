@@ -11,13 +11,19 @@
 	import { getMarketInfo } from '@api/markets'
 	import { connectSocket, closeSocket } from '@api/socket'
 	import { selectedMarketInfo, accountHeight } from '@lib/stores'
-	import { setLeverageForSelectedMarket } from '@lib/utils'
+	import { getUserSetting, saveUserSetting, setLeverageForSelectedMarket } from '@lib/utils'
+	import { showModal } from '@lib/ui'
 
 	$: setLeverageForSelectedMarket($selectedMarketInfo);
 
 	onMount(() => {
 		// Connect websocket
 		connectSocket();
+
+		if (!getUserSetting('welcomeModalSeen')) {
+			showModal('Welcome');
+			saveUserSetting('welcomeModalSeen', true);
+		}
 	});
 
 	onDestroy(() => {
