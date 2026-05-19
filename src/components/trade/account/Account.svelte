@@ -139,17 +139,24 @@
 		margin-right: 10px;
 	}
 
-	.tools a {
+	.tools a,
+	.tools button {
 		display: flex;
 		align-items: center;
 		color: var(--text1);
 		margin-left: 16px;
 		padding: 4px 0;
 	}
-	.tools a:hover {
+	.tools button {
+		background: none;
+		font: inherit;
+	}
+	.tools a:hover,
+	.tools button:hover {
 		color: var(--text0);
 	}
-	.tools a:not(.leaderboard-link) :global(svg) {
+	.tools a:not(.leaderboard-link) :global(svg),
+	.tools button :global(svg) {
 		fill: currentColor;
 		height: 16px;
 	}
@@ -191,6 +198,7 @@
 		<div class='tools'>
 			{#if panel == 'history'}
 				<a on:click|stopPropagation={() => {showModal('HistoryOrderStatus')}} use:tooltip={{content: 'Filter history'}}>{@html FILTER_ICON}</a>
+				<button class='text' type='button' on:click|stopPropagation={() => {showModal('ExportHistory')}} use:tooltip={{content: 'Export history as CSV'}}>CSV</button>
 			{/if}
 			<a use:tooltip={{content: 'Customize columns'}} on:click|stopPropagation={() => {showModal('CustomizeColumns', {panel, allColumns: allColumns[panel]})}}>{@html TABLE_ICON}</a>
 			{#if panel == 'orders' && $ordersSorted.length}

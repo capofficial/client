@@ -4,10 +4,15 @@ import { DEFAULT_HISTORY_COUNT } from '@lib/config'
 import { address, history, lastHistoryItemsCount, historySortKey, historyOrderStatusToShow } from '@lib/stores'
 import { getLabelForAsset, getChainData } from '@lib/utils'
 
+function getHistoryUrl(params) {
+	const dataEndpoint = getChainData('dataEndpoint');
+	const statusesToShow = get(historyOrderStatusToShow);
+
+	return `${dataEndpoint}/history/${params.address}?chain=arbitrum&limit=${params.first}&skip=${params.skip}&sortBy=${params.sortBy}&sortDirection=${params.sortDirection}&status=${statusesToShow.join(',')}`;
+}
+
 export async function getUserHistory(params) {
 
-	const dataEndpoint = getChainData('dataEndpoint');
-	
 	let _address = get(address);
 	if (!_address) return;
 
@@ -24,15 +29,13 @@ export async function getUserHistory(params) {
 	if (!first) first = DEFAULT_HISTORY_COUNT;
 	if (!skip) skip = 0;
 
-	const statusesToShow = get(historyOrderStatusToShow);
-
 	const sortKey = get(historySortKey); // [columnName, isDesc]
 
 	let sortBy = 'timestamp';
 	let sortDirection = 'desc';
 
 	try {
-		const response = await fetch(`${dataEndpoint}/history/${_address}?chain=arbitrum&limit=${first}&skip=${skip}&sortBy=${sortBy}&sortDirection=${sortDirection}&status=${statusesToShow.join(',')}`);
+		const response = await fetch(getHistoryUrl({address: _address, first, skip, sortBy, sortDirection}));
 		const orders = await response.json() || [];
 
 		lastHistoryItemsCount.set(orders.length);
@@ -66,4 +69,43 @@ export async function getUserHistory(params) {
 	}
 
 	return true;
+}
+
+export async function getUserHistoryForExport(params) {
+	let _address = get(address);
+	if (!_address) return [];
+
+	if (!params) params = {};
+
+	const fromTimestamp = params.fromTimestamp || 0;
+	const toTimestamp = params.toTimestamp || Date.now() / 1000;
+	const pageSize = 500;
+	const maxPages = 200;
+	const sortBy = 'timestamp';
+	const sortDirection = 'desc';
+
+	_address = _address.toLowerCase();
+
+	let skip = 0;
+	let rows = [];
+
+	for (let page = 0; page < maxPages; page++) {
+		const response = await fetch(getHistoryUrl({address: _address, first: pageSize, skip, sortBy, sortDirection}));
+		const pageRows = await response.json() || [];
+
+		for (const row of pageRows) {
+			const timestamp = row.timestamp * 1;
+			if (!timestamp || timestamp > toTimestamp) continue;
+			if (timestamp >= fromTimestamp) rows.push(row);
+		}
+
+		if (pageRows.length < pageSize) break;
+
+		const oldestTimestamp = pageRows[pageRows.length - 1]?.timestamp * 1;
+		if (fromTimestamp && oldestTimestamp && oldestTimestamp < fromTimestamp) break;
+
+		skip += pageSize;
+	}
+
+	return rows;
 }
