@@ -71,3 +71,8 @@ wcm-modal {
   position: absolute;
   z-index: 1000;
 }
+/* Global scrollbar support for Firefox matching Webkit */
+* {
+  scrollbar-color: var(--grey-300, #4b5563) transparent;
+  scrollbar-width: thin;
+}
