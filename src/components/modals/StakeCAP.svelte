@@ -35,7 +35,16 @@
 	}
 
 	async function _approveAsset() {
-		const result = await approveAsset('CAP', 'FundStore');
+		isSubmitting = true;
+		try {
+			const result = await approveAsset('CAP', 'FundStore');
+			if (result) {
+				await checkAllowance();
+			}
+		} catch(e) {
+			// Silent - errors handled in approveAsset
+		}
+		isSubmitting = false;
 	}
 
 	async function getBalance() {
@@ -75,7 +84,7 @@
 
 			<div>
 				{#if $allowances['CAP']?.['FundStore'] * 1 <= amount * 1}
-				<Button noSubmit={true} label={`Approve CAP`} on:click={_approveAsset} />
+				<Button isLoading={isSubmitting} noSubmit={true} label={`Approve CAP`} on:click={_approveAsset} />
 				{:else}
 				<Button isLoading={isSubmitting} label={`Stake`} />
 				{/if}

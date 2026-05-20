@@ -71,6 +71,11 @@ export async function approveAsset(assetLabel, spenderName) {
 			return true;
 		}
 	} catch(e) {
+		const msg = (e?.message || '').toLowerCase();
+		// Silent fail for user-rejected transactions (MetaMask cancel etc.)
+		if (msg.includes('user denied') || msg.includes('user rejected') || msg.includes('user cancelled')) {
+			return false;
+		}
 		showError(e);
 	}
 }
