@@ -70,7 +70,10 @@ export async function approveAsset(assetLabel, spenderName) {
 			getAllowance(assetLabel, spenderName);
 			return true;
 		}
+		return false;
 	} catch(e) {
+		if (e?.code === 4001 || e?.code === 'ACTION_REJECTED' || e?.error?.code === 4001) return false;
 		showError(e);
+		return false;
 	}
 }
