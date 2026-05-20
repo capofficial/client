@@ -6,7 +6,8 @@
 	import Cell from '@components/layout/table/Cell.svelte'
 
 	import { onMount, onDestroy } from 'svelte'
-	import { LOADING_ICON } from '@lib/icons'
+	import tooltip from '@lib/tooltip'
+	import { LOADING_ICON, SHARE_ICON } from '@lib/icons'
 
 	import { DEFAULT_HISTORY_COUNT, DEFAULT_HISTORY_SORT_KEY } from '@lib/config'
 	import { 
@@ -100,7 +101,7 @@
 	});
 
 	let columns = [];
-	$: columns = allColumns.filter((item) => $historyColumnsToShow.includes(item.key));
+	$: columns = allColumns.filter((item) => item.permanent || $historyColumnsToShow.includes(item.key));
 
 	let formattedHistory = [];
 	$: formattedHistory = $historySorted.map((item) => formatHistoryItem(item));
@@ -323,6 +324,15 @@
 			{#if $historyColumnsToShow.includes('cancelOrderId')}
 				<Cell>{item.cancelOrderId * 1 > 0 ? item.cancelOrderId : '-'}</Cell>
 			{/if}
+
+			<Cell isTools={true}>
+				<a use:tooltip={{content: 'Share'}} on:click|stopPropagation={() => {
+					showModal('ShareTrade', {
+						kind: 'history',
+						trade: item
+					})
+				}}>{@html SHARE_ICON}</a>
+			</Cell>
 
 
 		</Row>

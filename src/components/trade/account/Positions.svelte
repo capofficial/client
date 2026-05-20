@@ -10,7 +10,7 @@
 
 
 	import { onDestroy } from 'svelte'
-	import { XMARK_ICON, PENCIL_ICON } from '@lib/icons'
+	import { XMARK_ICON, PENCIL_ICON, SHARE_ICON } from '@lib/icons'
 
 	import { DEFAULT_POSITIONS_SORT_KEY, BPS_DIVIDER } from '@lib/config'
 	import { 
@@ -42,7 +42,7 @@
 	$: fetchData($address);
 
 	let columns = [];
-	$: columns = allColumns.filter((item) => $positionsColumnsToShow.includes(item.key));
+	$: columns = allColumns.filter((item) => item.permanent || $positionsColumnsToShow.includes(item.key));
 
 	let formattedPositions = [];
 	$: formattedPositions = $positionsSorted.map((pos) => formatPosition(pos));
@@ -334,6 +334,18 @@
 			{/if}
 
 			<Cell isTools={true}>
+				<a use:tooltip={{content: 'Share'}} on:click|stopPropagation={() => {
+					showModal('ShareTrade', {
+						kind: 'position',
+						trade: position,
+						meta: {
+							currentPrice: $prices[position.market],
+							funding: fundings[`${position.asset}:${position.market}`],
+							liqPrice: liqPrices[`${position.asset}:${position.market}`],
+							pnl: totalUpls[`${position.asset}:${position.market}`]
+						}
+					})
+				}}>{@html SHARE_ICON}</a>
 				<a use:tooltip={{content: 'Edit'}} on:click|stopPropagation={() => { showModal('EditMargin', {position, funding: fundings[`${position.asset}:${position.market}`]}) }}>{@html PENCIL_ICON}</a>
 				<a use:tooltip={{content: 'Close'}} on:click|stopPropagation={() => { showModal('ClosePosition', position) }}>{@html XMARK_ICON}</a>
 			</Cell>
