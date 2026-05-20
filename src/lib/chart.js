@@ -3,7 +3,7 @@ import { createChart, ColorType, LineStyle } from 'lightweight-charts'
 
 import { CURRENCY_DECIMALS } from './config'
 import { formatUnits, formatOrder, formatPosition, formatForDisplay, formatPriceForDisplay } from './formatters'
-import { selectedMarket, orders, positions, chartResolution, chartLoading, showOrdersOnChart, showPositionsOnChart, hoveredOHLC } from './stores'
+import { selectedMarket, orders, positions, chartResolution, chartLoading, chartIndicators, showOrdersOnChart, showPositionsOnChart, hoveredOHLC } from './stores'
 import { saveUserSetting, getPrecision } from './utils'
 
 import { getMarketCandles } from '@api/prices'
@@ -16,6 +16,7 @@ let earliestCandleDate;
 
 let chart;
 let candlestickSeries;
+let indicatorSeries = {};
 
 // how much history to load for each resolution (in ms)
 const lookbacks = {
@@ -43,6 +44,275 @@ function applyWatermark() {
 	        vertAlign: 'center',
 	    },
 	});
+}
+
+function getCloses() {
+	return candles
+		.map((candle) => ({
+			time: candle.time,
+			value: candle.close * 1
+		}))
+		.filter((point) => point.time && !isNaN(point.value));
+}
+
+function movingAverage(points, period) {
+	let data = [];
+	let sum = 0;
+
+	points.forEach((point, index) => {
+		sum += point.value;
+		if (index >= period) {
+			sum -= points[index - period].value;
+		}
+		if (index >= period - 1) {
+			data.push({
+				time: point.time,
+				value: sum / period
+			});
+		}
+	});
+
+	return data;
+}
+
+function exponentialMovingAverage(points, period) {
+	if (points.length < period) return [];
+
+	const multiplier = 2 / (period + 1);
+	let data = [];
+	let seed = 0;
+
+	for (let i = 0; i < period; i += 1) {
+		seed += points[i].value;
+	}
+
+	let ema = seed / period;
+	data.push({
+		time: points[period - 1].time,
+		value: ema
+	});
+
+	for (let i = period; i < points.length; i += 1) {
+		ema = (points[i].value - ema) * multiplier + ema;
+		data.push({
+			time: points[i].time,
+			value: ema
+		});
+	}
+
+	return data;
+}
+
+function relativeStrengthIndex(points, period = 14) {
+	if (points.length <= period) return [];
+
+	let gains = 0;
+	let losses = 0;
+	let data = [];
+
+	for (let i = 1; i <= period; i += 1) {
+		const change = points[i].value - points[i - 1].value;
+		if (change >= 0) {
+			gains += change;
+		} else {
+			losses -= change;
+		}
+	}
+
+	let averageGain = gains / period;
+	let averageLoss = losses / period;
+
+	for (let i = period; i < points.length; i += 1) {
+		if (i > period) {
+			const change = points[i].value - points[i - 1].value;
+			const gain = Math.max(change, 0);
+			const loss = Math.max(-change, 0);
+			averageGain = (averageGain * (period - 1) + gain) / period;
+			averageLoss = (averageLoss * (period - 1) + loss) / period;
+		}
+
+		const rsi = averageLoss === 0 ? 100 : 100 - (100 / (1 + averageGain / averageLoss));
+		data.push({
+			time: points[i].time,
+			value: rsi
+		});
+	}
+
+	return data;
+}
+
+function mapByTime(points) {
+	return points.reduce((acc, point) => {
+		acc[point.time] = point.value;
+		return acc;
+	}, {});
+}
+
+function macd(points, fastPeriod = 12, slowPeriod = 26, signalPeriod = 9) {
+	const fast = mapByTime(exponentialMovingAverage(points, fastPeriod));
+	const slow = mapByTime(exponentialMovingAverage(points, slowPeriod));
+	const macdLine = points
+		.filter((point) => fast[point.time] !== undefined && slow[point.time] !== undefined)
+		.map((point) => ({
+			time: point.time,
+			value: fast[point.time] - slow[point.time]
+		}));
+	const signalLine = exponentialMovingAverage(macdLine, signalPeriod);
+	const signal = mapByTime(signalLine);
+	const histogram = macdLine
+		.filter((point) => signal[point.time] !== undefined)
+		.map((point) => ({
+			time: point.time,
+			value: point.value - signal[point.time],
+			color: point.value - signal[point.time] >= 0 ? 'rgba(64,214,67,0.45)' : 'rgba(255,83,36,0.45)'
+		}));
+
+	return {
+		macdLine,
+		signalLine,
+		histogram
+	};
+}
+
+function removeIndicatorSeries(key) {
+	const group = indicatorSeries[key];
+	if (!group) return;
+
+	for (const series of group) {
+		chart.removeSeries(series);
+	}
+
+	delete indicatorSeries[key];
+}
+
+function ensureIndicatorSeries(key) {
+	if (indicatorSeries[key]) return indicatorSeries[key];
+
+	if (key === 'sma20') {
+		indicatorSeries[key] = [
+			chart.addLineSeries({
+				color: '#5C9DFF',
+				lineWidth: 2,
+				priceLineVisible: false,
+				lastValueVisible: false
+			})
+		];
+	} else if (key === 'ema20') {
+		indicatorSeries[key] = [
+			chart.addLineSeries({
+				color: '#F5B84B',
+				lineWidth: 2,
+				priceLineVisible: false,
+				lastValueVisible: false
+			})
+		];
+	} else if (key === 'rsi14') {
+		indicatorSeries[key] = [
+			chart.addLineSeries({
+				color: '#B785FF',
+				lineWidth: 2,
+				priceScaleId: 'rsi',
+				priceLineVisible: false,
+				lastValueVisible: true
+			}),
+			chart.addLineSeries({
+				color: 'rgba(179,179,179,0.35)',
+				lineWidth: 1,
+				lineStyle: LineStyle.Dashed,
+				priceScaleId: 'rsi',
+				priceLineVisible: false,
+				lastValueVisible: false
+			}),
+			chart.addLineSeries({
+				color: 'rgba(179,179,179,0.35)',
+				lineWidth: 1,
+				lineStyle: LineStyle.Dashed,
+				priceScaleId: 'rsi',
+				priceLineVisible: false,
+				lastValueVisible: false
+			})
+		];
+		chart.priceScale('rsi').applyOptions({
+			scaleMargins: {
+				top: 0.72,
+				bottom: 0.12
+			}
+		});
+	} else if (key === 'macd') {
+		indicatorSeries[key] = [
+			chart.addLineSeries({
+				color: '#5C9DFF',
+				lineWidth: 2,
+				priceScaleId: 'macd',
+				priceLineVisible: false,
+				lastValueVisible: false
+			}),
+			chart.addLineSeries({
+				color: '#F5B84B',
+				lineWidth: 2,
+				priceScaleId: 'macd',
+				priceLineVisible: false,
+				lastValueVisible: false
+			}),
+			chart.addHistogramSeries({
+				priceScaleId: 'macd',
+				priceLineVisible: false,
+				lastValueVisible: false
+			})
+		];
+		chart.priceScale('macd').applyOptions({
+			scaleMargins: {
+				top: 0.84,
+				bottom: 0.02
+			}
+		});
+	}
+
+	return indicatorSeries[key];
+}
+
+function updateIndicatorSeries() {
+	if (!chart || !candles.length) return;
+
+	const settings = get(chartIndicators) || {};
+	const closes = getCloses();
+	const activeKeys = ['sma20', 'ema20', 'rsi14', 'macd'];
+
+	for (const key of activeKeys) {
+		if (!settings[key]) {
+			removeIndicatorSeries(key);
+			continue;
+		}
+
+		const series = ensureIndicatorSeries(key);
+		if (!series) continue;
+
+		if (key === 'sma20') {
+			series[0].setData(movingAverage(closes, 20));
+		} else if (key === 'ema20') {
+			series[0].setData(exponentialMovingAverage(closes, 20));
+		} else if (key === 'rsi14') {
+			const rsi = relativeStrengthIndex(closes, 14);
+			series[0].setData(rsi);
+			series[1].setData(rsi.map((point) => ({ time: point.time, value: 70 })));
+			series[2].setData(rsi.map((point) => ({ time: point.time, value: 30 })));
+		} else if (key === 'macd') {
+			const data = macd(closes);
+			series[0].setData(data.macdLine);
+			series[1].setData(data.signalLine);
+			series[2].setData(data.histogram);
+		}
+	}
+}
+
+export function toggleChartIndicator(key) {
+	const next = {
+		...(get(chartIndicators) || {}),
+		[key]: !(get(chartIndicators) || {})[key]
+	};
+	chartIndicators.set(next);
+	saveUserSetting('chartIndicators', next);
+	updateIndicatorSeries();
 }
 
 export function initChart(cb) {
@@ -142,14 +412,16 @@ export function initChart(cb) {
 	showPositionsOnChart.subscribe(() => {
 		loadPositionLines();
 	});
+	chartIndicators.subscribe(() => {
+		updateIndicatorSeries();
+	});
 
 	chart.subscribeCrosshairMove(param => {
-		if (!param?.seriesPrices || param?.seriesPrices.size == 0) {
+		const value = param?.seriesPrices?.get(candlestickSeries);
+		if (!value) {
 			hoveredOHLC.set();
 		} else {
-			param?.seriesPrices.forEach((value) => {
-		    	hoveredOHLC.set(value);
-		    });
+			hoveredOHLC.set(value);
 		}
 	});
 
@@ -249,6 +521,7 @@ export async function loadCandles(_end) {
 
 	// set data
 	candlestickSeries.setData(candles || []);
+	updateIndicatorSeries();
 
 	// Set chart precision
 	if (candles.length) {
@@ -318,6 +591,8 @@ export function onNewPrice(price) {
 		candlestickSeries.update(lastCandle);
 	}
 
+	updateIndicatorSeries();
+
 }
 
 // Order and position lines
@@ -353,7 +628,7 @@ function loadOrderLines(_orders) {
 			    lineWidth: 1,
 			    lineStyle: LineStyle.Solid,
 			    axisLabelVisible: true,
-			    title: `${_order.isLong ? '▲' : '▼'} ${formatForDisplay(_order.size)} ${_order.asset}`,
+			    title: `${_order.isLong ? '?' : '?'} ${formatForDisplay(_order.size)} ${_order.asset}`,
 			})
 		);
 
@@ -392,7 +667,7 @@ function loadPositionLines(_positions) {
 			    lineWidth: 1,
 			    lineStyle: LineStyle.Solid,
 			    axisLabelVisible: true,
-			    title: `${_position.isLong ? '▲' : '▼'} ${formatForDisplay(_position.size)} ${_position.asset}`,
+			    title: `${_position.isLong ? '?' : '?'} ${formatForDisplay(_position.size)} ${_position.asset}`,
 			})
 		);
 
