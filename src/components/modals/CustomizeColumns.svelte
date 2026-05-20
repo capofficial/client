@@ -10,6 +10,10 @@
 
 	let isColumnShown = {};
 
+	for (const col of data.allColumns) {
+		if (col.permanent) isColumnShown[col.key] = true;
+	}
+
 	let columnsShown;
 	if (data.panel == 'orders') {
 		for (const key of $ordersColumnsToShow) {
@@ -31,7 +35,7 @@
 		// set store
 		let columnsToShow = [];
 		for (const col of data.allColumns) {
-			if (isColumnShown[col.key]) columnsToShow.push(col.key);
+			if (col.permanent || isColumnShown[col.key]) columnsToShow.push(col.key);
 		}
 		if (data.panel == 'orders') {
 			ordersColumnsToShow.set(columnsToShow);
