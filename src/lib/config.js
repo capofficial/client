@@ -27,6 +27,12 @@ export const DEFAULT_HISTORY_SORT_KEY = ['timestamp', true];
 
 export const DEFAULT_HISTORY_COUNT = 50;
 
+export const DEFAULT_POOL_TRANSACTIONS_COUNT = 50;
+
+export const POOL_TRANSACTIONS_BLOCK_RANGE = 9999;
+
+export const POOL_TRANSACTIONS_MAX_RANGES = 1;
+
 export const EXCLUDED_MARKETS = []; // ['HSI', 'KOSPI', 'USD-CNY', 'USD-JPY', 'USD-KRW', 'WTI-USD', 'XBR-USD', 'SPX500', 'DJI', 'NASDAQ', 'FTSE', 'DAX', 'NIKKEI', 'ASX200']; // dead and non chainlink markets, in private beta only
 
 export const CURRENCY_DECIMALS = {
@@ -97,6 +103,7 @@ export const CHAINDATA = {
 		label: 'arbitrum',
 		explorer: 'https://arbiscan.io',
 		rpc: 'https://arb1.arbitrum.io/rpc', // for walletconnect
+		fallbackRpcs: ['https://arbitrum-one.publicnode.com'],
 		dataEndpoint: 'https://data.cap.io/api',
 		dataStore: '0xa64694E51B22A081EA1e4051EF4EA1b715b47026',
 		cap: '0x031d35296154279dc1984dcd93e392b1f946737b',
