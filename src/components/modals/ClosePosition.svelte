@@ -96,7 +96,7 @@
 			</div>
 
 			<div class='row'>
-				<LabelValue label='Max' value={`${formatForDisplay(data.size)} ${data.asset}`} on:click={() => amount = data.size} isClickable={true} />
+				<LabelValue label='Max' value={`${formatForDisplay(data.size)} ${data.asset}`} on:click={() => amount = formatForDisplay(data.size)} isClickable={true} />
 			</div>
 
 			<div class='row'>
