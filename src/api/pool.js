@@ -198,13 +198,17 @@ async function getPoolContractForTransactions() {
 	const rpc = getChainData('fallbackRpcs')?.[0];
 	const dataStoreAddress = getChainData('dataStore');
 	if (rpc && dataStoreAddress) {
-		const fallbackProvider = new ethers.providers.JsonRpcProvider(rpc);
-		const dataStore = new ethers.Contract(dataStoreAddress, ABIS.DataStore, fallbackProvider);
-		const poolAddress = await dataStore.getAddress('Pool');
-		return {
-			pool: new ethers.Contract(poolAddress, ABIS.Pool, fallbackProvider),
-			provider: fallbackProvider
-		};
+		try {
+			const fallbackProvider = new ethers.providers.JsonRpcProvider(rpc);
+			const dataStore = new ethers.Contract(dataStoreAddress, ABIS.DataStore, fallbackProvider);
+			const poolAddress = await dataStore.getAddress('Pool');
+			return {
+				pool: new ethers.Contract(poolAddress, ABIS.Pool, fallbackProvider),
+				provider: fallbackProvider
+			};
+		} catch(e) {
+			console.warn('Fallback RPC failed while loading pool transactions', e);
+		}
 	}
 
 	try {
