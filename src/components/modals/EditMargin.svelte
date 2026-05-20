@@ -9,10 +9,10 @@
 
 	import { ADDRESS_ZERO } from '@lib/config'
 	import { formatForDisplay } from '@lib/formatters'
-	import { approveAsset, getAllowance } from '@api/assets'
+	import { approveAsset, getAllowance, getUserAssetBalances } from '@api/assets'
 	import { addMargin, removeMargin } from '@api/positions'
 	import { focusInput, hideModal } from '@lib/ui'
-	import { allowances, selectedMarketInfo } from '@lib/stores'
+	import { allowances, selectedMarketInfo, balances } from '@lib/stores'
 
 	export let data;
 
@@ -101,6 +101,7 @@
 	$: getAllowance(data.position.asset, 'FundStore');
 
 	onMount(() => {
+		getUserAssetBalances();
 		focusInput(`Add ${data.position.asset}`);
 	});
 
@@ -149,6 +150,14 @@
 			
 			<div class='group'>
 				<Input label={`${selected} ${data.position.asset}`} bind:value={margin} />
+			</div>
+
+			<div class='row'>
+				{#if selected == 'Add'}
+					<LabelValue label='Wallet Balance' value={`${formatForDisplay($balances[data.position.asset]) || 0} ${data.position.asset}`} isClickable={true} on:click={() => margin = $balances[data.position.asset]} />
+				{:else}
+					<LabelValue label='Removable Margin' value={`${formatForDisplay(data.position.margin * 1 + funding * 1)} ${data.position.asset}`} isClickable={true} on:click={() => margin = data.position.margin * 1 + funding * 1} />
+				{/if}
 			</div>
 
 			<div class='row'>
