@@ -6,6 +6,7 @@
 
 	import { pageName, showMobileNav } from '@lib/stores'
 	import { TROPHY_ICON, BULLET_LIST_ICON } from '@lib/icons'
+	import { showModal } from '@lib/ui'
 
 	function toggleMobileNav() {
 		showMobileNav.set(!$showMobileNav);
@@ -121,6 +122,7 @@
 	<a class:active={$pageName == 'Trade'} href='/trade'>Trade</a>
 	<a class:active={$pageName == 'Pool'} href='/pool'>Pool</a>
 	<a class:active={$pageName == 'Stake'} href='/stake'>Stake</a>
+	<a on:click|stopPropagation={() => {showModal('Welcome')}}>Guide</a>
 	<a on:click|stopPropagation={toggleMobileNav} class:active={$showMobileNav}>…</a>
 </div>
 
@@ -132,6 +134,7 @@
 	<a on:click={toggleMobileNav} href='/trade'>Trade</a>
 	<a on:click={toggleMobileNav} href='/pool'>Pool</a>
 	<a on:click={toggleMobileNav} href='/stake'>Stake</a>
+	<a on:click|stopPropagation={() => {toggleMobileNav(); showModal('Welcome')}}>Guide</a>
 	<a on:click={toggleMobileNav} href='https://docs.cap.io' target='_blank' class='display-desktop'>Docs</a>
 </div>
 {/if}

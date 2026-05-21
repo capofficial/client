@@ -14,11 +14,16 @@
 	import UnstakeCAP from '../modals/UnstakeCAP.svelte'
 	import HistoryOrderStatus from '../modals/HistoryOrderStatus.svelte'
 	import Settings from '../modals/Settings.svelte'
+	import Welcome from '../modals/Welcome.svelte'
 
 </script>
 
 {#if $activeModal && $activeModal.name == 'Settings'}
 <Settings />
+{/if}
+
+{#if $activeModal && $activeModal.name == 'Welcome'}
+<Welcome />
 {/if}
 
 {#if $activeModal && $activeModal.name == 'AssetSelect'}
