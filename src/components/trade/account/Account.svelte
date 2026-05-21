@@ -10,8 +10,10 @@
 	import tooltip from '@lib/tooltip'
 
 	import { DEFAULT_CHAIN_ID } from '@lib/config'
-	import { TABLE_ICON, FILTER_ICON, XMARK_ICON, TROPHY_ICON } from '@lib/icons'
-	import { address, chainId, ordersSorted, positionsSorted } from '@lib/stores'
+	import { TABLE_ICON, FILTER_ICON, XMARK_ICON, TROPHY_ICON, DOWNLOAD_ICON } from '@lib/icons'
+
+	import { exportHistory } from '@lib/exporthistory'
+	import { address, chainId, ordersSorted, positionsSorted, historyOrderStatusToShow } from '@lib/stores'
 	import { showModal } from '@lib/ui'
 
 	import { cancelMultipleOrders, getUserOrders } from '@api/orders'
@@ -74,6 +76,19 @@
 		let orderIds = $ordersSorted.map((o) => o.orderId);
 		const success = await cancelMultipleOrders(orderIds);
 		isCancelling = false;
+	}
+
+	let isExporting = false;
+	async function handleExport() {
+		if (isExporting) return;
+		isExporting = true;
+		try {
+			const statuses = $historyOrderStatusToShow;
+			await exportHistory(statuses);
+		} catch(e) {
+			console.error('Export failed', e);
+		}
+		isExporting = false;
 	}
 
 	let isLoading = true, t;
@@ -191,6 +206,7 @@
 		<div class='tools'>
 			{#if panel == 'history'}
 				<a on:click|stopPropagation={() => {showModal('HistoryOrderStatus')}} use:tooltip={{content: 'Filter history'}}>{@html FILTER_ICON}</a>
+				<a on:click|stopPropagation={handleExport} use:tooltip={{content: isExporting ? 'Exporting...' : 'Export CSV'}} class:disabled={isExporting}>{@html DOWNLOAD_ICON}</a>
 			{/if}
 			<a use:tooltip={{content: 'Customize columns'}} on:click|stopPropagation={() => {showModal('CustomizeColumns', {panel, allColumns: allColumns[panel]})}}>{@html TABLE_ICON}</a>
 			{#if panel == 'orders' && $ordersSorted.length}
