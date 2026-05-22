@@ -54,6 +54,14 @@ export async function depositCAP(_amount) {
 		}
 		return false;
 	} catch(e) {
+		const errorString = (e?.message || String(e)).toLowerCase();
+		if (
+			errorString.includes('user denied') ||
+			errorString.includes('user rejected') ||
+			errorString.includes('action_rejected')
+		) {
+			return false;
+		}
 		showError(e);
 	}
 }
