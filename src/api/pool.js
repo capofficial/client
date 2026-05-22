@@ -1,8 +1,10 @@
 import { get } from 'svelte/store'
-import { CURRENCY_DECIMALS, BPS_DIVIDER } from '@lib/config'
+import { ethers } from 'ethers'
+import { Alchemy } from 'alchemy-sdk'
+import { CURRENCY_DECIMALS, BPS_DIVIDER, ALCHEMY_SETTINGS } from '@lib/config'
 import { getContract } from '@lib/contracts'
 import { formatUnits, parseUnits } from '@lib/formatters'
-import { address, poolBalances, bufferBalances, poolStakes, poolStatsDaily, poolStatsWeekly, poolWithdrawalFees, poolDepositTaxes, poolWithdrawalTaxes, globalUPLs } from '@lib/stores'
+import { address, poolBalances, bufferBalances, poolStakes, poolStatsDaily, poolStatsWeekly, poolWithdrawalFees, poolDepositTaxes, poolWithdrawalTaxes, globalUPLs, poolTransactions, lastPoolTransactionsCount } from '@lib/stores'
 import { getAssetAddress, getAssetAddresses, getLabelForAsset, getChainData } from '@lib/utils'
 import { showToast, showError } from '@lib/ui'
 
@@ -129,5 +131,169 @@ export async function withdraw(_asset, _amount) {
 		return false;
 	} catch(e) {
 		showError(e);
+	}
+}
+
+let isLoadingPoolTransactions = false;
+
+export async function getPoolTransactions(params) {
+	if (isLoadingPoolTransactions) return false;
+	isLoadingPoolTransactions = true;
+
+	try {
+		const alchemy = new Alchemy({network: 'arb-mainnet', apiKey: ALCHEMY_SETTINGS.apiKey});
+		const poolContract = await getContract('Pool', false, true);
+
+		if (!poolContract) {
+			isLoadingPoolTransactions = false;
+			return false;
+		}
+
+		if (!params) params = {};
+		let { first, skip } = params;
+		if (!first) first = 50;
+		if (!skip) skip = 0;
+
+		const currentTransactions = get(poolTransactions);
+
+		// Get Pool events
+		const fromBlock = skip === 0 ? undefined : await getStartBlock(poolContract, skip);
+
+		const eventFilters = [
+			{
+				address: poolContract,
+				topics: [ethers.utils.id('PoolDeposit(address,address,uint256,uint256,uint256)')]
+			},
+			{
+				address: poolContract,
+				topics: [ethers.utils.id('PoolWithdrawal(address,address,uint256,uint256,uint256)')]
+			},
+			{
+				address: poolContract,
+				topics: [ethers.utils.id('PoolPayIn(address,address,string,uint256,uint256,uint256,uint256)')]
+			},
+			{
+				address: poolContract,
+				topics: [ethers.utils.id('PoolPayOut(address,address,string,uint256,uint256,uint256)')]
+			}
+		];
+
+		let allLogs = [];
+		for (const filter of eventFilters) {
+			const logs = await alchemy.core.getLogs({
+				...filter,
+				fromBlock: fromBlock || '0x0',
+				toBlock: 'latest'
+			});
+			allLogs = allLogs.concat(logs);
+		}
+
+		// Sort by block number and transaction index descending
+		allLogs.sort((a, b) => {
+			if (b.blockNumber !== a.blockNumber) {
+				return b.blockNumber - a.blockNumber;
+			}
+			return b.transactionIndex - a.transactionIndex;
+		});
+
+		// Paginate
+		const paginatedLogs = allLogs.slice(skip, skip + first);
+
+		// Format logs
+		const transactions = await formatPoolLogs(paginatedLogs);
+
+		lastPoolTransactionsCount.set(transactions.length);
+
+		if (skip > 0) {
+			poolTransactions.set([...currentTransactions, ...transactions]);
+		} else {
+			poolTransactions.set(transactions);
+		}
+
+		isLoadingPoolTransactions = false;
+		return true;
+	} catch(e) {
+		console.error('getPoolTransactions error', e);
+		isLoadingPoolTransactions = false;
+		return false;
+	}
+}
+
+async function getStartBlock(contract, skip) {
+	return undefined;
+}
+
+async function formatPoolLogs(logs) {
+	const iface = new ethers.utils.Interface([
+		'event PoolDeposit(address indexed user, address indexed asset, uint256 amount, uint256 clpAmount, uint256 poolBalance)',
+		'event PoolWithdrawal(address indexed user, address indexed asset, uint256 amount, uint256 clpAmount, uint256 poolBalance)',
+		'event PoolPayIn(address indexed user, address indexed asset, string market, uint256 amount, uint256 bufferToPoolAmount, uint256 poolBalance, uint256 bufferBalance)',
+		'event PoolPayOut(address indexed user, address indexed asset, string market, uint256 amount, uint256 poolBalance, uint256 bufferBalance)'
+	]);
+
+	const formatted = [];
+	for (const log of logs) {
+		try {
+			const parsed = iface.parseLog(log);
+			if (!parsed) continue;
+
+			let transaction = {
+				type: '',
+				user: parsed.args.user,
+				asset: getLabelForAsset(parsed.args.asset),
+				amount: formatUnits(parsed.args.amount || 0, CURRENCY_DECIMALS[getLabelForAsset(parsed.args.asset)] || 18),
+				blockNumber: log.blockNumber,
+				transactionHash: log.transactionHash,
+				timestamp: 0
+			};
+
+			const block = await getBlockTimestamp(log.blockNumber);
+			transaction.timestamp = block;
+
+			switch (parsed.name) {
+				case 'PoolDeposit':
+					transaction.type = 'Deposit';
+					transaction.clpAmount = formatUnits(parsed.args.clpAmount, 18);
+					transaction.poolBalance = formatUnits(parsed.args.poolBalance, CURRENCY_DECIMALS[getLabelForAsset(parsed.args.asset)] || 18);
+					break;
+				case 'PoolWithdrawal':
+					transaction.type = 'Withdrawal';
+					transaction.clpAmount = formatUnits(parsed.args.clpAmount, 18);
+					transaction.poolBalance = formatUnits(parsed.args.poolBalance, CURRENCY_DECIMALS[getLabelForAsset(parsed.args.asset)] || 18);
+					break;
+				case 'PoolPayIn':
+					transaction.type = 'Pay In';
+					transaction.market = parsed.args.market;
+					transaction.bufferToPoolAmount = formatUnits(parsed.args.bufferToPoolAmount, CURRENCY_DECIMALS[getLabelForAsset(parsed.args.asset)] || 18);
+					transaction.poolBalance = formatUnits(parsed.args.poolBalance, CURRENCY_DECIMALS[getLabelForAsset(parsed.args.asset)] || 18);
+					transaction.bufferBalance = formatUnits(parsed.args.bufferBalance, CURRENCY_DECIMALS[getLabelForAsset(parsed.args.asset)] || 18);
+					break;
+				case 'PoolPayOut':
+					transaction.type = 'Pay Out';
+					transaction.market = parsed.args.market;
+					transaction.poolBalance = formatUnits(parsed.args.poolBalance, CURRENCY_DECIMALS[getLabelForAsset(parsed.args.asset)] || 18);
+					transaction.bufferBalance = formatUnits(parsed.args.bufferBalance, CURRENCY_DECIMALS[getLabelForAsset(parsed.args.asset)] || 18);
+					break;
+			}
+
+			formatted.push(transaction);
+		} catch(e) {
+			console.error('Error parsing log', e);
+		}
+	}
+	return formatted;
+}
+
+const blockTimestampCache = {};
+async function getBlockTimestamp(blockNumber) {
+	if (blockTimestampCache[blockNumber]) return blockTimestampCache[blockNumber];
+	try {
+		const alchemy = new Alchemy({network: 'arb-mainnet', apiKey: ALCHEMY_SETTINGS.apiKey});
+		const block = await alchemy.core.getBlock(blockNumber);
+		const timestamp = block.timestamp;
+		blockTimestampCache[blockNumber] = timestamp;
+		return timestamp;
+	} catch(e) {
+		return 0;
 	}
 }

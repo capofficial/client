@@ -167,6 +167,10 @@ export const historySorted = derived([history, historySortKey], ([$history, $his
 export const lastHistoryItemsCount = writable(0); // how many items were fetched on the last history page requested (used for infinite scroll)
 export const historyOrderStatusToShow = writable(getUserSetting('historyOrderStatusToShow') || ['cancelled', 'executed', 'liquidated'])
 
+// Pool Transactions
+export const poolTransactions = writable([]);
+export const lastPoolTransactionsCount = writable(0);
+
 // Markets
 export const showMarkets = writable(false);
 export const marketSearchQuery = writable();
