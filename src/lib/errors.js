@@ -52,6 +52,12 @@ export function parseError(e) {
 		return DEFAULT_ERROR;
 	}
 	error_string = error_string.toLowerCase();
+	// Wallet rejection / user denied — return null to suppress error display
+	if (error_string.includes('user denied') ||
+		error_string.includes('user rejected') ||
+		error_string.includes('action_rejected')) {
+		return null;
+	}
 	for (const key in ERROR_STRINGS) {
 		if (error_string.includes(key)) return ERROR_STRINGS[key];
 	}

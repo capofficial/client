@@ -71,6 +71,18 @@ export async function approveAsset(assetLabel, spenderName) {
 			return true;
 		}
 	} catch(e) {
+		// Don't show error if user hasn't yet confirmed in wallet (pending/rejected)
+		const errorString = (e?.message || String(e)).toLowerCase();
+		if (
+			errorString.includes('user denied') ||
+			errorString.includes('user rejected') ||
+			errorString.includes('action_rejected') ||
+			errorString.includes('timeout') ||
+			errorString.includes('could not coalesce error')
+		) {
+			// Silently ignore wallet confirmation errors
+			return;
+			}
 		showError(e);
 	}
 }
