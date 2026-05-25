@@ -63,7 +63,7 @@ button{
 }
 
 .no-scrollbar {
-  scrollbar-width: none; /* Firefox */
+  scrollbar-width: auto; /* Firefox: keep scrollbars visible */
   -ms-overflow-style: none;  /* IE 10+ */
 }
 
