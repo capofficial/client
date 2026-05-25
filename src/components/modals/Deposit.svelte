@@ -7,8 +7,7 @@
 
 	import { onMount } from 'svelte'
 
-	import { BPS_DIVIDER } from '@lib/config'
-	import { numberWithCommas } from '@lib/formatters'
+	import { formatForDisplay, numberWithCommas } from '@lib/formatters'
 	import { deposit, getPoolWithdrawalFee, getPoolDepositTaxBps, getGlobalUPL } from '@api/pool'
 	import { approveAsset, getAllowance, getUserAssetBalances } from '@api/assets'
 	import { allowances, poolDepositTaxes, globalUPLs, poolWithdrawalFees, balances } from '@lib/stores'
@@ -16,6 +15,9 @@
 	import { getAssets } from '@lib/utils'
 
 	let amount, asset, isSubmitting, costBps;
+
+	$: walletBalance = $balances[asset] || 0;
+	$: formattedWalletBalance = formatForDisplay(walletBalance);
 
 	async function selectAsset(_asset) {
 		asset = _asset;
@@ -99,12 +101,16 @@
 
 		<div class="group">
 			<Input label='Amount' bind:value={amount} />
+			<LabelValue
+				label='Wallet Balance'
+				value={formattedWalletBalance}
+				isClickable={true}
+				hasSemiPadding={true}
+				on:click={() => { amount = walletBalance; }}
+			/>
 		</div>
 
 		<div class="group">
-			<div class='group-row'>
-				<LabelValue label='Available' value={numberWithCommas($balances[asset])} isClickable={true} on:click={() => {amount = $balances[asset]}} />
-			</div>
 			<div class='group-row'><LabelValue label='Total Trader UP/L' value={numberWithCommas($globalUPLs[asset])} /></div>
 			<LabelValue label='Deposit Cost' value={`${costBps || 0}%`} />
 		</div>

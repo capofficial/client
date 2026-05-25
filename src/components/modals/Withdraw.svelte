@@ -7,7 +7,6 @@
 	
 	import { onMount } from 'svelte'
 
-	import { BPS_DIVIDER } from '@lib/config'
 	import { poolStakes, globalUPLs } from '@lib/stores'
 	import { withdraw, getPoolWithdrawalTaxBps, getGlobalUPL } from '@api/pool'
 	import { focusInput, hideModal } from '@lib/ui'
@@ -15,6 +14,9 @@
 	import { getAssets } from '@lib/utils'
 
 	let amount, asset, costBps, isSubmitting;
+
+	$: withdrawableAmount = $poolStakes[asset] || 0;
+	$: formattedWithdrawableAmount = formatForDisplay(withdrawableAmount);
 
 	async function selectAsset(_asset) {
 		asset = _asset;
@@ -87,11 +89,17 @@
 
 			<div class="group">
 				<Input label='Amount' bind:value={amount} />
+				<LabelValue
+					label='Available to Withdraw'
+					value={formattedWithdrawableAmount}
+					isClickable={true}
+					hasSemiPadding={true}
+					on:click={() => { amount = withdrawableAmount; }}
+				/>
 			</div>
 
 			<div class="group">
-				<div class='group-row'><LabelValue label='Available' value={formatForDisplay($poolStakes[asset])} isClickable={true} on:click={() => {amount = $poolStakes[asset]}} /></div>
-					<div class='group-row'><LabelValue label='Total Trader UP/L' value={numberWithCommas($globalUPLs[asset])} /></div>
+				<div class='group-row'><LabelValue label='Total Trader UP/L' value={numberWithCommas($globalUPLs[asset])} /></div>
 				<LabelValue label='Withdrawal Cost' value={`${costBps || 0}%`} />
 			</div>
 
