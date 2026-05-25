@@ -17,6 +17,10 @@
 		saveUserSetting(`leverage-${$selectedMarket}`, $leverage);
 	}
 
+	$: if ($leverage != null && $leverage * 1 < 1) {
+		leverage.set(1);
+	}
+
 	$: saveLeverage($leverage);
 
 </script>
