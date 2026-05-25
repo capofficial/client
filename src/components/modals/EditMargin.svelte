@@ -9,10 +9,10 @@
 
 	import { ADDRESS_ZERO } from '@lib/config'
 	import { formatForDisplay } from '@lib/formatters'
-	import { approveAsset, getAllowance } from '@api/assets'
+	import { approveAsset, getAllowance, getUserAssetBalances } from '@api/assets'
 	import { addMargin, removeMargin } from '@api/positions'
 	import { focusInput, hideModal } from '@lib/ui'
-	import { allowances, selectedMarketInfo } from '@lib/stores'
+	import { allowances, selectedMarketInfo, balances } from '@lib/stores'
 
 	export let data;
 
@@ -85,10 +85,17 @@
 	}
 
 	let newLeverage = 0;
+	let availableToRemove = 0;
 	function calculateNewLeverage() {
 		newLeverage = data.position.size / newMargin;
 	}
 
+	function calculateAvailableToRemove() {
+		const next = Number(data.position.margin) + Number(funding);
+		availableToRemove = Number.isFinite(next) && next > 0 ? next : 0;
+	}
+
+	$: calculateAvailableToRemove();
 	$: calculateNewLiquidationPrice(margin, selected)
 
 	let isApproving = false;
@@ -102,6 +109,7 @@
 
 	onMount(() => {
 		focusInput(`Add ${data.position.asset}`);
+		getUserAssetBalances([data.position.asset]);
 	});
 
 </script>
@@ -149,6 +157,24 @@
 			
 			<div class='group'>
 				<Input label={`${selected} ${data.position.asset}`} bind:value={margin} />
+			</div>
+
+			<div class='row'>
+				{#if selected == 'Add'}
+					<LabelValue
+						label='Wallet Balance'
+						value={`${formatForDisplay($balances[data.position.asset]) || 0} ${data.position.asset}`}
+						isClickable={true}
+						on:click={() => { margin = $balances[data.position.asset] }}
+					/>
+				{:else}
+					<LabelValue
+						label='Available to Remove'
+						value={`${formatForDisplay(availableToRemove) || 0} ${data.position.asset}`}
+						isClickable={true}
+						on:click={() => { margin = availableToRemove }}
+					/>
+				{/if}
 			</div>
 
 			<div class='row'>
