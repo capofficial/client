@@ -90,8 +90,15 @@
 			</div>
 
 			<div class="group">
-				<div class='group-row'><LabelValue label='Available' value={formatForDisplay($poolStakes[asset])} isClickable={true} on:click={() => {amount = $poolStakes[asset]}} /></div>
-					<div class='group-row'><LabelValue label='Total Trader UP/L' value={numberWithCommas($globalUPLs[asset])} /></div>
+				<div class='group-row'>
+					<LabelValue
+						label='Available to Withdraw'
+						value={`${formatForDisplay($poolStakes[asset]) || 0} ${asset}`}
+						isClickable={true}
+						on:click={() => { amount = $poolStakes[asset] }}
+					/>
+				</div>
+				<div class='group-row'><LabelValue label='Total Trader UP/L' value={numberWithCommas($globalUPLs[asset])} /></div>
 				<LabelValue label='Withdrawal Cost' value={`${costBps || 0}%`} />
 			</div>
 
