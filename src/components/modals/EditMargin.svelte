@@ -151,9 +151,12 @@
 				<Input label={`${selected} ${data.position.asset}`} bind:value={margin} />
 			</div>
 
-			<div class='row'>
-				<LabelValue label='New Liq. Price' value={`${formatForDisplay(newLiqPrice) || "-"}`} />
-			</div>
+		<div class='row'>
+			<LabelValue label='Current Liq. Price' value={`${formatForDisplay(data.position.liqprice) || "-"}`} />
+		</div>
+		<div class='row'>
+			<LabelValue label='New Liq. Price' value={`${formatForDisplay(newLiqPrice) || "-"}`} />
+		</div>
 
 			<div class='row'>
 				<LabelValue label='New Leverage' value={`${formatForDisplay(newLeverage) || "-"}`} />
