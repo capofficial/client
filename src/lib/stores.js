@@ -76,16 +76,18 @@ function getPoolPerformance(stats, latestIndex, oldestIndex) {
 	for (const assetLabel in stats) {
 		let data = stats[assetLabel]; // array
 		if (!data.length) continue;
-		if (oldestIndex >= data.length) {
-			oldestIndex = data.length - 1;
-		}
-		let oldestStat = formatPoolStat(data[oldestIndex]);
+		const normalizedLatestIndex = Math.max(0, latestIndex);
+		const normalizedOldestIndex = Math.min(data.length - 1, Math.max(normalizedLatestIndex, oldestIndex));
+		const windowStats = data.slice(normalizedLatestIndex, normalizedOldestIndex + 1).map(formatPoolStat);
+		if (!windowStats.length) continue;
+		let oldestStat = windowStats[windowStats.length - 1];
 		// startingBalance allows you to calculate performance
-		let startingBalance = oldestStat.startingBalance;
-		let latestStat = formatPoolStat(data[latestIndex]);
-		let totalDeposits = data.reduce((sum, item) => sum + (item.deposits || 0), 0);
-		let totalWithdrawals = data.reduce((sum, item) => sum + (item.withdrawals || 0), 0);
-		perf[assetLabel] = latestStat.balance == 0 ? 0 : (latestStat.balance - startingBalance - (totalDeposits || 0) + (totalWithdrawals || 0)) / latestStat.balance;
+		let startingBalance = oldestStat.startingBalance * 1 || 0;
+		let latestStat = windowStats[0];
+		let latestBalance = latestStat.balance * 1 || 0;
+		let totalDeposits = windowStats.reduce((sum, item) => sum + (item.deposits * 1 || 0), 0);
+		let totalWithdrawals = windowStats.reduce((sum, item) => sum + (item.withdrawals * 1 || 0), 0);
+		perf[assetLabel] = latestBalance == 0 ? 0 : (latestBalance - startingBalance - totalDeposits + totalWithdrawals) / latestBalance;
 	}
 	return perf;
 }
