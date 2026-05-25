@@ -103,7 +103,7 @@
 
 		<div class="group">
 			<div class='group-row'>
-				<LabelValue label='Available' value={numberWithCommas($balances[asset])} isClickable={true} on:click={() => {amount = $balances[asset]}} />
+				<LabelValue label='Wallet Balance' value={numberWithCommas($balances[asset])} isClickable={true} on:click={() => {amount = `${$balances[asset] || 0}`}} />
 			</div>
 			<div class='group-row'><LabelValue label='Total Trader UP/L' value={numberWithCommas($globalUPLs[asset])} /></div>
 			<LabelValue label='Deposit Cost' value={`${costBps || 0}%`} />
