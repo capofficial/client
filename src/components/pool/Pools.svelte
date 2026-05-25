@@ -31,8 +31,14 @@
 
 	function setFeeAPYs(_balances) {
 		if (!_balances) return;
-		if (_balances['ETH']) feeAPY['ETH'] = 100 * 95 * 12 / _balances['ETH']; // Approx 95 ETH per month in fees
-		if (_balances['USDC']) feeAPY['USDC'] = 100 * 100000 * 12 / _balances['USDC']; // Approx 100,000 USDC per month in fees
+		if (_balances['ETH'] && _balances['ETH'] > 0) feeAPY['ETH'] = 100 * 95 * 12 / _balances['ETH']; // Approx 95 ETH per month in fees
+		if (_balances['USDC'] && _balances['USDC'] > 0) feeAPY['USDC'] = 100 * 100000 * 12 / _balances['USDC']; // Approx 100,000 USDC per month in fees
+	}
+
+	// Guard against NaN/Infinity/undefined in metric display
+	function safeMetric(val) {
+		if (val === undefined || val === null || val === '' || isNaN(val) || !isFinite(val)) return '-';
+		return val;
 	}
 
 	$: setFeeAPYs($poolBalances);
@@ -161,18 +167,18 @@
 			<div class='cell highlighted'>% of Pool</div>
 		</div>
 		<div class='table-body'>
-			{#each assets as asset}
+		{#each assets as asset}
 			<div class='row'>
 				<div class='cell la'><img src={`/asset-logos/${asset}.svg`} /> {asset}</div>
-				<div class='cell'><span>{numberWithCommas($poolBalances[asset]) || 0}<br/><span class='grayed'>${formatForDisplay(getAmountInUsd(asset, $poolBalances[asset], $prices))}</span></span></div>
-				<div class='cell'>{formatForDisplay(feeAPY[asset])}%</div>
+				<div class='cell'><span>{safeMetric(numberWithCommas($poolBalances[asset])) || 0}<br/><span class='grayed'>${formatForDisplay(getAmountInUsd(asset, $poolBalances[asset], $prices))}</span></span></div>
+				<div class='cell'>{feeAPY[asset] ? formatForDisplay(feeAPY[asset]) + '%' : '-'}</div>
 				<div class='cell'>30%+</div>
-				<div class='cell'>{numberWithCommas($globalUPLs[asset])}</div>
-				<div class='cell'>{numberWithCommas($bufferBalances[asset])}</div>
-				<div class='cell highlighted'><span>{numberWithCommas($poolStakes[asset]) || 0}<br><span class='grayed'>${getAmountInUsd(asset, $poolStakes[asset], $prices)}</span></span></div>
-				<div class='cell highlighted'>{$poolBalances[asset] == 0 ? 'N/A' : formatForDisplay(($poolStakes[asset])/$poolBalances[asset]  *100 )+ '%'}</div>
+				<div class='cell'>{safeMetric($globalUPLs[asset])}</div>
+				<div class='cell'>{safeMetric($bufferBalances[asset])}</div>
+				<div class='cell highlighted'><span>{safeMetric(numberWithCommas($poolStakes[asset])) || 0}<br><span class='grayed'>${getAmountInUsd(asset, $poolStakes[asset], $prices)}</span></span></div>
+				<div class='cell highlighted'>{$poolBalances[asset] > 0 ? formatForDisplay(($poolStakes[asset])/$poolBalances[asset] * 100) + '%' : 'N/A'}</div>
 			</div>
-			{/each}
+		{/each}
 			<div class='row'>
 				<div class='cell la'>Total</div>
 				<div class='cell'>${numberWithCommas(getTotalAmountInUsd($poolBalances, $prices))}</div>
