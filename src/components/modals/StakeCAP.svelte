@@ -69,7 +69,7 @@
 					value={formattedWalletBalance}
 					isClickable={true}
 					hasSemiPadding={true}
-					on:click={() => { amount = formattedWalletBalance; }}
+					on:click={() => { amount = walletBalance; }}
 				/>
 			</div>
 
