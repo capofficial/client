@@ -3,6 +3,7 @@
 
 	import { onMount } from 'svelte'
 
+	import Input from '@components/layout/Input.svelte'
 	import Slider from '@components/layout/Slider.svelte'
 
 	import tooltip from '@lib/tooltip'
@@ -17,6 +18,18 @@
 		saveUserSetting(`leverage-${$selectedMarket}`, $leverage);
 	}
 
+	function clampLeverage() {
+		if ($leverage == null || $leverage === '') return;
+		let value = Number($leverage);
+		if (!Number.isFinite(value)) return;
+		value = Math.max(1, value);
+		if ($selectedMarketInfo?.maxLeverage) {
+			value = Math.min($selectedMarketInfo.maxLeverage * 1, value);
+		}
+		if (value !== $leverage) leverage.set(value);
+	}
+
+	$: clampLeverage($leverage, $selectedMarketInfo);
 	$: saveLeverage($leverage);
 
 </script>
@@ -40,6 +53,10 @@
 	<div class='container'>
 
 		<div class='value'>{$leverage}×</div>
+
+		<div class='bottom-spacing'>
+			<Input label='Leverage' bind:value={$leverage} isSecondaryColor={true} />
+		</div>
 
 		<Slider bind:value={$leverage} maxValue={$selectedMarketInfo.maxLeverage} noTooltip={true} integersOnly={true} showDots={false}/>
 	
