@@ -99,6 +99,9 @@
 				value = Math.ceil(value);
 			}
 		}
+		if (!nullValue && value * 1 < 1) {
+			value = 1;
+		}
 	}
 
 	function setProgressPercent() {
