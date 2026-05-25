@@ -1,6 +1,20 @@
-import { get } from 'svelte/store'
+export function focusInput(node) {
+	node.focus()
+}
 
-import { BPS_DIVIDER, CHAINDATA, USD_CONVERSION_MARKETS } from './config'
+export function getLiquidationPrice(position, marginChange) {
+	if (!position || !position.size) return null
+	
+	const newMargin = position.margin + marginChange
+	if (newMargin <= 0) return null
+	
+	// Liquidation price formula: entryPrice +/- (entryPrice * newMargin / size)
+	// For longs: entryPrice * (1 - newMargin/size) - for shorts: entryPrice * (1 + newMargin/size)
+	const direction = position.isLong ? 1 : -1
+	const liquidationPrice = position.entryPrice * (1 - direction * newMargin / position.size)
+	
+	return liquidationPrice
+}
 import { formatForDisplay } from './formatters'
 import { chainId, leverage, selectedMarket, selectedMarketInfo } from './stores'
 
