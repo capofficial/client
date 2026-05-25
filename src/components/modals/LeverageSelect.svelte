@@ -1,22 +1,27 @@
 <script>
 	import Modal from './Modal.svelte'
 
-	import { onMount } from 'svelte'
-
+	import Input from '@components/layout/Input.svelte'
 	import Slider from '@components/layout/Slider.svelte'
-
-	import tooltip from '@lib/tooltip'
-	import { formatForDisplay } from '@lib/formatters'
-	import { PENCIL_ICON, RULER_ICON, RULER_FILLED_ICON } from '@lib/icons'
 
 	import { leverage, selectedMarket, selectedMarketInfo } from '@lib/stores'
 	import { saveUserSetting } from '@lib/utils'
+
+	function clampLeverage() {
+		if ($leverage == null || !$selectedMarketInfo?.maxLeverage) return;
+		const next = Math.round($leverage * 1);
+		const clamped = Math.min($selectedMarketInfo.maxLeverage * 1, Math.max(1, next));
+		if (clamped !== $leverage * 1) {
+			leverage.set(clamped);
+		}
+	}
 
 	function saveLeverage() {
 		if ($leverage == null || $leverage * 1 < 1) return;
 		saveUserSetting(`leverage-${$selectedMarket}`, $leverage);
 	}
 
+	$: clampLeverage($leverage, $selectedMarketInfo);
 	$: saveLeverage($leverage);
 
 </script>
@@ -27,6 +32,10 @@
 		font-size: 48px;
 		text-align: center;
 		padding-bottom: 25px;
+	}
+
+	.leverage-input {
+		padding-top: 16px;
 	}
 	
 </style>
@@ -42,6 +51,10 @@
 		<div class='value'>{$leverage}×</div>
 
 		<Slider bind:value={$leverage} maxValue={$selectedMarketInfo.maxLeverage} noTooltip={true} integersOnly={true} showDots={false}/>
+
+		<div class='leverage-input'>
+			<Input label='Leverage' bind:value={$leverage} />
+		</div>
 	
 	</div>
 
