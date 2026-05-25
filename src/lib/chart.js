@@ -3,7 +3,7 @@ import { createChart, ColorType, LineStyle } from 'lightweight-charts'
 
 import { CURRENCY_DECIMALS } from './config'
 import { formatUnits, formatOrder, formatPosition, formatForDisplay, formatPriceForDisplay } from './formatters'
-import { selectedMarket, orders, positions, chartResolution, chartLoading, showOrdersOnChart, showPositionsOnChart, hoveredOHLC } from './stores'
+import { selectedMarket, orders, positions, chartResolution, chartLoading, showOrdersOnChart, showPositionsOnChart, showLiqPriceOnChart, hoveredOHLC } from './stores'
 import { saveUserSetting, getPrecision } from './utils'
 
 import { getMarketCandles } from '@api/prices'
@@ -142,6 +142,9 @@ export function initChart(cb) {
 	showPositionsOnChart.subscribe(() => {
 		loadPositionLines();
 	});
+	showLiqPriceOnChart.subscribe(() => {
+		loadLiqPriceLines();
+	});
 
 	chart.subscribeCrosshairMove(param => {
 		if (!param?.seriesPrices || param?.seriesPrices.size == 0) {
@@ -272,6 +275,7 @@ export async function loadCandles(_end) {
 	// redraw order and position lines
 	loadOrderLines();
 	loadPositionLines();
+	loadLiqPriceLines();
 
 
 	chartLoading.set(false);
@@ -324,6 +328,7 @@ export function onNewPrice(price) {
 
 let orderLines = [];
 let positionLines = [];
+let liqPriceLines = [];
 
 function loadOrderLines(_orders) {
 
@@ -433,4 +438,44 @@ function clearPositionLines() {
 	}
 	candlestickSeries.setMarkers([]);
 	positionLines = [];
+}
+
+function loadLiqPriceLines(_positions) {
+	if (!_positions) _positions = get(positions);
+
+	if (!candlestickSeries) {
+		setTimeout(() => {
+			loadLiqPriceLines(_positions);
+		}, 2000);
+		return;
+	}
+
+	clearLiqPriceLines();
+
+	if (!get(showLiqPriceOnChart)) return;
+
+	for (let _position of _positions) {
+		_position = formatPosition(_position);
+
+		if (_position.market != get(selectedMarket)) continue;
+		if (!_position.liqprice || isNaN(_position.liqprice * 1)) continue;
+
+		liqPriceLines.push(
+			candlestickSeries.createPriceLine({
+			    price: _position.liqprice * 1,
+			    color: '#FF2D00',
+			    lineWidth: 1,
+			    lineStyle: LineStyle.Dashed,
+			    axisLabelVisible: true,
+			    title: `⚠ LIQ ${formatForDisplay(_position.liqprice)}`,
+			})
+		);
+	}
+}
+
+function clearLiqPriceLines() {
+	for (const priceline of liqPriceLines) {
+		candlestickSeries.removePriceLine(priceline);
+	}
+	liqPriceLines = [];
 }
