@@ -3,8 +3,8 @@ import { createChart, ColorType, LineStyle } from 'lightweight-charts'
 
 import { CURRENCY_DECIMALS } from './config'
 import { formatUnits, formatOrder, formatPosition, formatForDisplay, formatPriceForDisplay } from './formatters'
-import { selectedMarket, orders, positions, chartResolution, chartLoading, showOrdersOnChart, showPositionsOnChart, hoveredOHLC } from './stores'
-import { saveUserSetting, getPrecision } from './utils'
+import { selectedMarket, orders, positions, chartResolution, chartLoading, showOrdersOnChart, showPositionsOnChart, hoveredOHLC, marketInfos } from './stores'
+import { saveUserSetting, getPrecision, calculateLiquidationPrice } from './utils'
 
 import { getMarketCandles } from '@api/prices'
 
@@ -395,6 +395,27 @@ function loadPositionLines(_positions) {
 			    title: `${_position.isLong ? '▲' : '▼'} ${formatForDisplay(_position.size)} ${_position.asset}`,
 			})
 		);
+
+		const selectedMarketInfo = get(marketInfos)?.[_position.market];
+		const liquidationPrice = calculateLiquidationPrice({
+			liqThreshold: selectedMarketInfo?.liqThreshold,
+			price: _position.price,
+			leverage: _position.leverage,
+			isLong: _position.isLong
+		});
+
+		if (Number.isFinite(liquidationPrice) && liquidationPrice > 0) {
+			positionLines.push(
+				candlestickSeries.createPriceLine({
+					price: liquidationPrice,
+					color: '#D94D1A',
+					lineWidth: 1,
+					lineStyle: LineStyle.Dashed,
+					axisLabelVisible: true,
+					title: `Liq ${_position.asset}`,
+				})
+			);
+		}
 
 		// markers.push({
 		// 	time: _position.timestamp.toNumber(),
