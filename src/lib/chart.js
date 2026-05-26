@@ -1,9 +1,9 @@
 import { get } from 'svelte/store'
 import { createChart, ColorType, LineStyle } from 'lightweight-charts'
 
-import { CURRENCY_DECIMALS } from './config'
+import { CURRENCY_DECIMALS, BPS_DIVIDER } from './config'
 import { formatUnits, formatOrder, formatPosition, formatForDisplay, formatPriceForDisplay } from './formatters'
-import { selectedMarket, orders, positions, chartResolution, chartLoading, showOrdersOnChart, showPositionsOnChart, hoveredOHLC } from './stores'
+import { selectedMarket, orders, positions, chartResolution, chartLoading, showOrdersOnChart, showPositionsOnChart, showLiquidationPriceOnChart, hoveredOHLC, fundingTrackers, marketInfos } from './stores'
 import { saveUserSetting, getPrecision } from './utils'
 
 import { getMarketCandles } from '@api/prices'
@@ -140,6 +140,15 @@ export function initChart(cb) {
 		loadPositionLines(_positions);
 	});
 	showPositionsOnChart.subscribe(() => {
+		loadPositionLines();
+	});
+	showLiquidationPriceOnChart.subscribe(() => {
+		loadPositionLines();
+	});
+	fundingTrackers.subscribe(() => {
+		loadPositionLines();
+	});
+	marketInfos.subscribe(() => {
 		loadPositionLines();
 	});
 
@@ -324,6 +333,7 @@ export function onNewPrice(price) {
 
 let orderLines = [];
 let positionLines = [];
+let liquidationLines = [];
 
 function loadOrderLines(_orders) {
 
@@ -373,9 +383,9 @@ function loadPositionLines(_positions) {
 	}
 
 	clearPositionLines();
+	clearLiquidationLines();
 
-
-	if (!get(showPositionsOnChart)) return;
+	if (!get(showPositionsOnChart) && !get(showLiquidationPriceOnChart)) return;
 
 	let markers = [];
 
@@ -385,16 +395,48 @@ function loadPositionLines(_positions) {
 
 		if (_position.market != get(selectedMarket)) continue;
 
-		positionLines.push(
-			candlestickSeries.createPriceLine({
-			    price: _position.price,
-			    color: _position.isLong ? '#00D604' : '#FF5000',
-			    lineWidth: 1,
-			    lineStyle: LineStyle.Solid,
-			    axisLabelVisible: true,
-			    title: `${_position.isLong ? '▲' : '▼'} ${formatForDisplay(_position.size)} ${_position.asset}`,
-			})
-		);
+		if (get(showPositionsOnChart)) {
+			positionLines.push(
+				candlestickSeries.createPriceLine({
+				    price: _position.price,
+				    color: _position.isLong ? '#00D604' : '#FF5000',
+				    lineWidth: 1,
+				    lineStyle: LineStyle.Solid,
+				    axisLabelVisible: true,
+				    title: `${_position.isLong ? '▲' : '▼'} ${formatForDisplay(_position.size)} ${_position.asset}`,
+				})
+			);
+		}
+
+		if (get(showLiquidationPriceOnChart)) {
+			const liqThreshold = get(marketInfos)?.[_position.market]?.liqThreshold;
+			const fundingTracker = get(fundingTrackers)?.[_position.asset]?.[_position.market];
+			if (liqThreshold && fundingTracker != undefined) {
+				let ftDiff = fundingTracker * 1 - (_position.fundingTracker * 1);
+				if (_position.isLong) ftDiff = -1 * ftDiff;
+				const funding = _position.size * ftDiff / BPS_DIVIDER || 0;
+				const marginWithFunding = _position.margin * 1 + funding * 1;
+				const liqFactor = liqThreshold / BPS_DIVIDER;
+				let liqPrice;
+				if (_position.isLong) {
+					liqPrice = _position.price * 1 - liqFactor * marginWithFunding * _position.price / _position.size;
+				} else {
+					liqPrice = _position.price * 1 + liqFactor * marginWithFunding * _position.price / _position.size;
+				}
+				if (!isNaN(liqPrice) && isFinite(liqPrice)) {
+					liquidationLines.push(
+						candlestickSeries.createPriceLine({
+							price: liqPrice,
+							color: '#FF5A5F',
+							lineWidth: 1,
+							lineStyle: LineStyle.Dashed,
+							axisLabelVisible: true,
+							title: `Liq ${_position.isLong ? '▲' : '▼'} ${formatForDisplay(_position.size)} ${_position.asset}`,
+						})
+					);
+				}
+			}
+		}
 
 		// markers.push({
 		// 	time: _position.timestamp.toNumber(),
@@ -433,4 +475,11 @@ function clearPositionLines() {
 	}
 	candlestickSeries.setMarkers([]);
 	positionLines = [];
+}
+
+function clearLiquidationLines() {
+	for (const priceline of liquidationLines) {
+		candlestickSeries.removePriceLine(priceline);
+	}
+	liquidationLines = [];
 }
