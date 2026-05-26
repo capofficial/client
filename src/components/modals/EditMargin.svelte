@@ -8,11 +8,11 @@
 	import LabelValue from '@components/layout/LabelValue.svelte'
 
 	import { ADDRESS_ZERO } from '@lib/config'
-	import { formatForDisplay } from '@lib/formatters'
+	import { formatForDisplay, numberWithCommas } from '@lib/formatters'
 	import { approveAsset, getAllowance } from '@api/assets'
 	import { addMargin, removeMargin } from '@api/positions'
 	import { focusInput, hideModal } from '@lib/ui'
-	import { allowances, selectedMarketInfo } from '@lib/stores'
+	import { allowances, selectedMarketInfo, balances } from '@lib/stores'
 
 	export let data;
 
@@ -134,6 +134,17 @@
 		line-height: 1.318;
 	}
 
+	.balance-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 6px 0;
+		font-size: 85%;
+		color: var(--text2);
+		border-bottom: 1px solid var(--border);
+		margin-bottom: 6px;
+	}
+
 </style>
 
 <Modal title='Edit Margin' width={280}>
@@ -150,6 +161,18 @@
 			<div class='group'>
 				<Input label={`${selected} ${data.position.asset}`} bind:value={margin} />
 			</div>
+
+			{#if selected == 'Add'}
+			<div class='balance-row'>
+				<span>Wallet Balance</span>
+				<span>{$balances[data.position.asset] !== undefined ? numberWithCommas($balances[data.position.asset]) + ' ' + data.position.asset : '-'}</span>
+			</div>
+			{:else}
+			<div class='balance-row'>
+				<span>Available to Remove</span>
+				<span>{numberWithCommas(data.position.margin)} {data.position.asset}</span>
+			</div>
+			{/if}
 
 			<div class='row'>
 				<LabelValue label='New Liq. Price' value={`${formatForDisplay(newLiqPrice) || "-"}`} />
