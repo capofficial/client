@@ -8,11 +8,11 @@
 	import LabelValue from '@components/layout/LabelValue.svelte'
 
 	import { ADDRESS_ZERO } from '@lib/config'
-	import { formatForDisplay } from '@lib/formatters'
-	import { approveAsset, getAllowance } from '@api/assets'
+	import { formatForDisplay, numberWithCommas } from '@lib/formatters'
+	import { approveAsset, getAllowance, getUserAssetBalances } from '@api/assets'
 	import { addMargin, removeMargin } from '@api/positions'
 	import { focusInput, hideModal } from '@lib/ui'
-	import { allowances, selectedMarketInfo } from '@lib/stores'
+	import { allowances, balances, selectedMarketInfo } from '@lib/stores'
 
 	export let data;
 
@@ -52,15 +52,18 @@
 		}, 50);
 	}
 
-	let funding = data.funding || 0;
+	let funding = data.funding || data.position.funding || 0;
+	let currentMargin = data.position.margin * 1 + funding * 1;
+	let maxRemovableMargin = currentMargin > 0 ? currentMargin : 0;
 	let newLiqPrice = data.position.liqprice;
 	let newMargin = 0;
+	let availableWalletBalance = 0;
 	function calculateNewLiquidationPrice(marginDelta, mode) {
 
 		if (!marginDelta) marginDelta = 0;
 
 		if (mode == 'Add') {
-			newMargin = ((data.position.margin*1 + funding*1) + marginDelta);
+			newMargin = currentMargin + marginDelta;
 
 			if (data.position.isLong) {
 				newLiqPrice = data.position.price * 1 - newMargin * data.position.price / data.position.size;
@@ -69,16 +72,16 @@
 			}
 			if (newLiqPrice < 0) newLiqPrice = 0;
 		} else {
-			if (marginDelta >= (data.position.margin*1 + funding*1)) {
+			if (marginDelta >= currentMargin) {
 				newMargin = 0;
-				margin = (data.position.margin*1 + funding*1);
+				margin = currentMargin;
 			} else {
-				newMargin = ((data.position.margin*1 + funding*1) - marginDelta);
+				newMargin = currentMargin - marginDelta;
 			}
 			if (data.position.isLong) {
-				newLiqPrice = data.position.price * 1 - ((data.position.margin*1 + funding*1) - marginDelta) * data.position.price / data.position.size;
+				newLiqPrice = data.position.price * 1 - (currentMargin - marginDelta) * data.position.price / data.position.size;
 			} else {
-				newLiqPrice = data.position.price * 1 + ((data.position.margin*1 + funding*1 - marginDelta)) * data.position.price / data.position.size;
+				newLiqPrice = data.position.price * 1 + (currentMargin - marginDelta) * data.position.price / data.position.size;
 			}
 		}
 		calculateNewLeverage();
@@ -90,6 +93,7 @@
 	}
 
 	$: calculateNewLiquidationPrice(margin, selected)
+	$: availableWalletBalance = $balances[data.position.asset] || 0;
 
 	let isApproving = false;
 	async function _approveAsset() {
@@ -102,6 +106,7 @@
 
 	onMount(() => {
 		focusInput(`Add ${data.position.asset}`);
+		getUserAssetBalances([data.position.asset]);
 	});
 
 </script>
@@ -149,6 +154,14 @@
 			
 			<div class='group'>
 				<Input label={`${selected} ${data.position.asset}`} bind:value={margin} />
+			</div>
+
+			<div class='row'>
+				{#if selected == 'Add'}
+					<LabelValue label='Wallet Balance' value={numberWithCommas(availableWalletBalance)} isClickable={true} on:click={() => { margin = availableWalletBalance }} />
+				{:else}
+					<LabelValue label='Available Margin' value={numberWithCommas(maxRemovableMargin)} isClickable={true} on:click={() => { margin = maxRemovableMargin }} />
+				{/if}
 			</div>
 
 			<div class='row'>
