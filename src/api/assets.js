@@ -71,6 +71,14 @@ export async function approveAsset(assetLabel, spenderName) {
 			return true;
 		}
 	} catch(e) {
-		showError(e);
+		// Don't show premature error — user may still be approving in wallet
+		const msg = (e && (e.message || e.data?.message || '')).toLowerCase();
+		if (msg.includes('user denied') || msg.includes('user rejected')) {
+			// User rejected the approval — no action needed
+			return false;
+		}
+		// For other errors, log but don't show toast during approval flow
+		console.warn('approveAsset error:', e.message || e);
+		return false;
 	}
 }
