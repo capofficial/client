@@ -35,7 +35,10 @@
 	}
 
 	async function _approveAsset() {
+		isSubmitting = true;
 		const result = await approveAsset('CAP', 'FundStore');
+		isSubmitting = false;
+		if (!result) return;
 	}
 
 	async function getBalance() {
