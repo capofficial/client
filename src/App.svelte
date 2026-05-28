@@ -13,6 +13,7 @@
 	import { component, address, pageName, countryDisallowed } from '@lib/stores'
 	import { hidePopoversOnKeydown, hidePopoversOnClick } from '@lib/ui'
 	import { runAndInterval, hashString, getChainData } from '@lib/utils'
+	import { showModal } from '@lib/ui'
 
 	import { getUserAssetBalances } from '@api/assets'
 	import { listenToEvents } from '@api/listener'
@@ -31,6 +32,12 @@
 		window.onpopstate = () => loadRoute();
 
 		getMarketPrices('all');
+
+		// Show welcome modal on first visit (if not dismissed)
+		if (!localStorage.getItem('cap_welcome_dismissed')) {
+			// Small delay to ensure UI is ready
+			setTimeout(() => showModal('Welcome'), 800);
+		}
 	});
 
 	onDestroy(() => {
