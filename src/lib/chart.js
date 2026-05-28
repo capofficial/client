@@ -3,7 +3,7 @@ import { createChart, ColorType, LineStyle } from 'lightweight-charts'
 
 import { CURRENCY_DECIMALS } from './config'
 import { formatUnits, formatOrder, formatPosition, formatForDisplay, formatPriceForDisplay } from './formatters'
-import { selectedMarket, orders, positions, chartResolution, chartLoading, showOrdersOnChart, showPositionsOnChart, hoveredOHLC } from './stores'
+import { selectedMarket, orders, positions, chartResolution, chartLoading, showOrdersOnChart, showPositionsOnChart, hoveredOHLC, chartIndicators } from './stores'
 import { saveUserSetting, getPrecision } from './utils'
 
 import { getMarketCandles } from '@api/prices'
@@ -16,6 +16,13 @@ let earliestCandleDate;
 
 let chart;
 let candlestickSeries;
+let indicatorSeries = {};
+
+const indicatorOptions = {
+	sma20: { title: 'SMA 20', period: 20, type: 'sma', color: '#f5c542' },
+	ema20: { title: 'EMA 20', period: 20, type: 'ema', color: '#45a3ff' },
+	sma50: { title: 'SMA 50', period: 50, type: 'sma', color: '#b36bff' },
+};
 
 // how much history to load for each resolution (in ms)
 const lookbacks = {
@@ -142,6 +149,9 @@ export function initChart(cb) {
 	showPositionsOnChart.subscribe(() => {
 		loadPositionLines();
 	});
+	chartIndicators.subscribe(() => {
+		renderIndicators();
+	});
 
 	chart.subscribeCrosshairMove(param => {
 		if (!param?.seriesPrices || param?.seriesPrices.size == 0) {
@@ -186,6 +196,77 @@ export async function setResolution(resolution) {
 	chartResolution.set(resolution);
 	saveUserSetting('chartResolution', resolution);
 	await loadCandles();
+}
+
+export function toggleIndicator(indicator) {
+	let indicators = get(chartIndicators) || [];
+	if (indicators.includes(indicator)) {
+		indicators = indicators.filter((item) => item != indicator);
+	} else {
+		indicators = [...indicators, indicator];
+	}
+	chartIndicators.set(indicators);
+	saveUserSetting('chartIndicators', indicators);
+}
+
+function calculateSMA(data, period) {
+	let sum = 0;
+	return data.reduce((points, candle, index) => {
+		sum += candle.close * 1;
+		if (index >= period) sum -= data[index - period].close * 1;
+		if (index >= period - 1) {
+			points.push({ time: candle.time, value: sum / period });
+		}
+		return points;
+	}, []);
+}
+
+function calculateEMA(data, period) {
+	const multiplier = 2 / (period + 1);
+	let ema;
+	return data.reduce((points, candle, index) => {
+		const close = candle.close * 1;
+		if (index == period - 1) {
+			ema = data.slice(0, period).reduce((sum, item) => sum + item.close * 1, 0) / period;
+		} else if (index >= period) {
+			ema = (close - ema) * multiplier + ema;
+		}
+		if (index >= period - 1 && ema != undefined) {
+			points.push({ time: candle.time, value: ema });
+		}
+		return points;
+	}, []);
+}
+
+function clearIndicators() {
+	if (!chart) return;
+	for (const key in indicatorSeries) {
+		chart.removeSeries(indicatorSeries[key]);
+	}
+	indicatorSeries = {};
+}
+
+function renderIndicators() {
+	clearIndicators();
+	if (!chart || !candles.length) return;
+
+	for (const indicator of (get(chartIndicators) || [])) {
+		const options = indicatorOptions[indicator];
+		if (!options) continue;
+
+		const series = chart.addLineSeries({
+			color: options.color,
+			lineWidth: 2,
+			priceLineVisible: false,
+			lastValueVisible: false,
+			title: options.title,
+		});
+		const data = options.type == 'ema'
+			? calculateEMA(candles, options.period)
+			: calculateSMA(candles, options.period);
+		series.setData(data);
+		indicatorSeries[indicator] = series;
+	}
 }
 
 let lastMarket;
@@ -249,6 +330,7 @@ export async function loadCandles(_end) {
 
 	// set data
 	candlestickSeries.setData(candles || []);
+	renderIndicators();
 
 	// Set chart precision
 	if (candles.length) {
@@ -317,6 +399,7 @@ export function onNewPrice(price) {
 		candles[candles.length - 1] = lastCandle;
 		candlestickSeries.update(lastCandle);
 	}
+	renderIndicators();
 
 }
 
