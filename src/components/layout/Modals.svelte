@@ -14,6 +14,7 @@
 	import UnstakeCAP from '../modals/UnstakeCAP.svelte'
 	import HistoryOrderStatus from '../modals/HistoryOrderStatus.svelte'
 	import Settings from '../modals/Settings.svelte'
+	import Welcome from '../modals/Welcome.svelte'
 
 </script>
 
@@ -66,5 +67,9 @@
 {/if}
 
 {#if $activeModal && $activeModal.name == 'MarketInfo'}
-<MarketInfo data={$activeModal.data} />
+	<MarketInfo data={$activeModal.data} />
+{/if}
+
+{#if $activeModal && $activeModal.name == 'Welcome'}
+	<Welcome />
 {/if}
