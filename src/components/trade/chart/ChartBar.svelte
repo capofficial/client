@@ -1,8 +1,14 @@
 <script>
 
-	import { setResolution } from '@lib/chart'
-	import { chartResolution, chartLoading } from '@lib/stores'
+	import { setResolution, toggleIndicator } from '@lib/chart'
+	import { chartResolution, chartLoading, chartIndicators } from '@lib/stores'
 	import { LOADING_ICON } from '@lib/icons'
+
+	const indicatorControls = [
+		{ key: 'sma20', label: 'SMA20' },
+		{ key: 'ema20', label: 'EMA20' },
+		{ key: 'sma50', label: 'SMA50' },
+	];
 
 </script>
 
@@ -44,6 +50,11 @@
 	.loading-icon :global(svg) {
 		width: 18px;
 	}
+	.divider {
+		width: 1px;
+		height: 18px;
+		background-color: var(--border);
+	}
 
 </style>
 
@@ -54,5 +65,9 @@
 	<a class:active={$chartResolution == 3600} on:click={async () => {await setResolution(3600)}}>1h</a>
 	<a class:active={$chartResolution == 14400} on:click={async () => {await setResolution(14400)}}>4h</a>
 	<a class:active={$chartResolution == 86400} on:click={async () => {await setResolution(86400)}}>1D</a>
+	<div class='divider'></div>
+	{#each indicatorControls as indicator}
+		<a class:active={$chartIndicators.includes(indicator.key)} on:click={() => {toggleIndicator(indicator.key)}}>{indicator.label}</a>
+	{/each}
 	{#if $chartLoading}<div class='loading-icon'>{@html LOADING_ICON}</div>{/if}
 </div>

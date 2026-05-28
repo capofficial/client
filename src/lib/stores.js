@@ -36,6 +36,7 @@ export const unsupportedNetwork = writable();
 export const chartHeight = writable(getUserSetting('chartHeight') || 320);
 export const chartResolution = writable(getUserSetting('chartResolution') || 900)
 export const chartLoading = writable(false);
+export const chartIndicators = writable(getUserSetting('chartIndicators') || []);
 export const hoveredOHLC = writable();
 export const accountHeight = writable(getUserSetting('accountHeight') || 250);
 
