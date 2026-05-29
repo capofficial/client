@@ -104,7 +104,7 @@
 			</div>
 
 			<div class='row'>
-				<LabelValue label='Size to Close (%)' value={`${formatForDisplay(sizeToClosePercent)}%`} />
+				<LabelValue label='Size to Close (%)' value={`${sizeToClosePercent.toFixed(2)}%`} />
 			</div>
 
 			<OrderDetails market={data.market} asset={data.asset} size={amount} isClose={true} clickableFee={false} />
