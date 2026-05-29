@@ -1,0 +1,41 @@
+.tab-content {
+  padding: 20px 0;
+}
+
+.tab-content h5 {
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.tab-content h6 {
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.tab-content p {
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+.tab-content ul {
+  margin-bottom: 20px;
+}
+
+.tab-content li {
+  margin-bottom: 8px;
+}
+
+.bridge-steps .step,
+.instruction-section {
+  margin-bottom: 20px;
+}
+
+.bridge-steps .step:last-child,
+.instruction-section:last-child {
+  margin-bottom: 0;
+}
+
+.bridge-steps .step h6,
+.instruction-section h6 {
+  color: #007bff;
+}
