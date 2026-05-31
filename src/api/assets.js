@@ -48,21 +48,36 @@ export async function getAllowance(assetLabel, spenderName) {
 	}
 	const _address = get(address);
 	if (!_address) return;
-	const contract = await getContract(assetLabel);
-	const spenderContract = await getContract(spenderName);
-	const allowance = formatUnits(await contract.allowance(_address, spenderContract.address), CURRENCY_DECIMALS[assetLabel]);
-	allowances.update((x) => {
-		if (!x[assetLabel]) x[assetLabel] = {};
-		x[assetLabel][spenderName] = allowance;
-		return x;
-	});
+	try {
+		const contract = await getContract(assetLabel);
+		const spenderContract = await getContract(spenderName);
+		if (!contract || !spenderContract) return;
+		const allowance = formatUnits(await contract.allowance(_address, spenderContract.address), CURRENCY_DECIMALS[assetLabel]);
+		allowances.update((x) => {
+			if (!x[assetLabel]) x[assetLabel] = {};
+			x[assetLabel][spenderName] = allowance;
+			return x;
+		});
+	} catch (e) {
+		// Silently fail — allowance will remain at last known value
+	}
 }
 
 export async function approveAsset(assetLabel, spenderName) {
-	const contract = await getContract(assetLabel, true);
-	const spenderContract = await getContract(spenderName);
-	const spenderAddress = spenderContract.address;
 	try {
+		const contract = await getContract(assetLabel, true);
+		const spenderContract = await getContract(spenderName);
+
+		if (!contract) {
+			showError(`Asset contract not found for ${assetLabel}. Are you on the correct network?`);
+			return;
+		}
+		if (!spenderContract) {
+			showError(`Spender contract not found for ${spenderName}. Are you on the correct network?`);
+			return;
+		}
+
+		const spenderAddress = spenderContract.address;
 		let tx = await contract.approve(spenderAddress, ethers.constants.MaxUint256);
 		let receipt = await tx.wait();
 		if (receipt && receipt.status == 1) {
@@ -70,7 +85,10 @@ export async function approveAsset(assetLabel, spenderName) {
 			getAllowance(assetLabel, spenderName);
 			return true;
 		}
-	} catch(e) {
+	} catch (e) {
+		// Suppress user-rejection errors (MetaMask ACTION_REJECTED / code 4001)
+		if (e?.code === 4001 || e?.error?.code === 4001) return;
+		if (e?.code === 'ACTION_REJECTED') return;
 		showError(e);
 	}
 }
