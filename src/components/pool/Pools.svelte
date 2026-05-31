@@ -27,16 +27,6 @@
 		clearTimeout(t);
 	});
 
-	let feeAPY = {};
-
-	function setFeeAPYs(_balances) {
-		if (!_balances) return;
-		if (_balances['ETH']) feeAPY['ETH'] = 100 * 95 * 12 / _balances['ETH']; // Approx 95 ETH per month in fees
-		if (_balances['USDC']) feeAPY['USDC'] = 100 * 100000 * 12 / _balances['USDC']; // Approx 100,000 USDC per month in fees
-	}
-
-	$: setFeeAPYs($poolBalances);
-
 </script>
 
 <style>
@@ -165,8 +155,8 @@
 			<div class='row'>
 				<div class='cell la'><img src={`/asset-logos/${asset}.svg`} /> {asset}</div>
 				<div class='cell'><span>{numberWithCommas($poolBalances[asset]) || 0}<br/><span class='grayed'>${formatForDisplay(getAmountInUsd(asset, $poolBalances[asset], $prices))}</span></span></div>
-				<div class='cell'>{formatForDisplay(feeAPY[asset])}%</div>
-				<div class='cell'>30%+</div>
+				<div class='cell'>N/A</div>
+				<div class='cell'>N/A</div>
 				<div class='cell'>{numberWithCommas($globalUPLs[asset])}</div>
 				<div class='cell'>{numberWithCommas($bufferBalances[asset])}</div>
 				<div class='cell highlighted'><span>{numberWithCommas($poolStakes[asset]) || 0}<br><span class='grayed'>${getAmountInUsd(asset, $poolStakes[asset], $prices)}</span></span></div>
@@ -187,7 +177,7 @@
 	</div>
 
 	<div class='footnote'>
-		¹ Does not include trader wins and losses.<br/>
+		¹ APY is hidden until it can be calculated from reliable pool performance data.<br/>
 		² Sum total of unrealized trader wins or losses. Updated every ~15min.
 	</div>
 </div>
