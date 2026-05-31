@@ -31,8 +31,17 @@
 
 	function setFeeAPYs(_balances) {
 		if (!_balances) return;
-		if (_balances['ETH']) feeAPY['ETH'] = 100 * 95 * 12 / _balances['ETH']; // Approx 95 ETH per month in fees
-		if (_balances['USDC']) feeAPY['USDC'] = 100 * 100000 * 12 / _balances['USDC']; // Approx 100,000 USDC per month in fees
+		// Guard against division by zero or undefined values
+		if (_balances['ETH'] && _balances['ETH'] > 0) {
+			feeAPY['ETH'] = 100 * 95 * 12 / _balances['ETH']; // Approx 95 ETH per month in fees
+		} else {
+			feeAPY['ETH'] = 0;
+		}
+		if (_balances['USDC'] && _balances['USDC'] > 0) {
+			feeAPY['USDC'] = 100 * 100000 * 12 / _balances['USDC']; // Approx 100,000 USDC per month in fees
+		} else {
+			feeAPY['USDC'] = 0;
+		}
 	}
 
 	$: setFeeAPYs($poolBalances);
@@ -164,13 +173,13 @@
 			{#each assets as asset}
 			<div class='row'>
 				<div class='cell la'><img src={`/asset-logos/${asset}.svg`} /> {asset}</div>
-				<div class='cell'><span>{numberWithCommas($poolBalances[asset]) || 0}<br/><span class='grayed'>${formatForDisplay(getAmountInUsd(asset, $poolBalances[asset], $prices))}</span></span></div>
-				<div class='cell'>{formatForDisplay(feeAPY[asset])}%</div>
+				<div class='cell'><span>{numberWithCommas($poolBalances[asset] || 0)}<br/><span class='grayed'>${formatForDisplay(getAmountInUsd(asset, $poolBalances[asset] || 0, $prices))}</span></span></div>
+				<div class='cell'>{formatForDisplay(feeAPY[asset] || 0)}%</div>
 				<div class='cell'>30%+</div>
-				<div class='cell'>{numberWithCommas($globalUPLs[asset])}</div>
-				<div class='cell'>{numberWithCommas($bufferBalances[asset])}</div>
-				<div class='cell highlighted'><span>{numberWithCommas($poolStakes[asset]) || 0}<br><span class='grayed'>${getAmountInUsd(asset, $poolStakes[asset], $prices)}</span></span></div>
-				<div class='cell highlighted'>{$poolBalances[asset] == 0 ? 'N/A' : formatForDisplay(($poolStakes[asset])/$poolBalances[asset]  *100 )+ '%'}</div>
+				<div class='cell'>{numberWithCommas($globalUPLs[asset] || 0)}</div>
+				<div class='cell'>{numberWithCommas($bufferBalances[asset] || 0)}</div>
+				<div class='cell highlighted'><span>{numberWithCommas($poolStakes[asset] || 0)}<br><span class='grayed'>${getAmountInUsd(asset, $poolStakes[asset] || 0, $prices)}</span></span></div>
+				<div class='cell highlighted'>{!$poolBalances[asset] || $poolBalances[asset] == 0 ? 'N/A' : formatForDisplay(($poolStakes[asset] || 0)/$poolBalances[asset] * 100) + '%'}</div>
 			</div>
 			{/each}
 			<div class='row'>

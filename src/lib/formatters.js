@@ -94,7 +94,7 @@ export function formatForDisplay(amount, fix) {
 
 	amount = amount * 1;
 
-	if (!amount || isNaN(amount)) return 0;
+	if (!amount || isNaN(amount) || !isFinite(amount)) return 0;
 
 	if (!fix && (amount * 1).toFixed(6)*1 == Math.round(amount * 1)) return Math.round(amount);
 	
@@ -130,7 +130,7 @@ export function formatPriceForDisplay(price) {
 }
 
 export function numberWithCommas(amount) {
-	if (!amount) return 0;
+	if (!amount || isNaN(amount) || !isFinite(amount)) return 0;
 	let formattedAmount = formatForDisplay(amount) * 1;
 	return formattedAmount.toLocaleString(get(locale));
 }
