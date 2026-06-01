@@ -70,22 +70,31 @@ export const totalSupplyCAP = writable(0);
 export const CAPStake = writable(0);
 
 // Pool performance stats (including fees)
+function numericStatValue(value) {
+	const number = value * 1;
+	return Number.isFinite(number) ? number : 0;
+}
+
 function getPoolPerformance(stats, latestIndex, oldestIndex) {
 	if (!stats) return;
 	let perf = {};
 	for (const assetLabel in stats) {
 		let data = stats[assetLabel]; // array
 		if (!data.length) continue;
-		if (oldestIndex >= data.length) {
-			oldestIndex = data.length - 1;
+		const boundedOldestIndex = Math.min(oldestIndex, data.length - 1);
+		const boundedLatestIndex = Math.min(latestIndex, boundedOldestIndex);
+		const periodStats = data.slice(boundedLatestIndex, boundedOldestIndex + 1);
+		if (!periodStats.length) {
+			continue;
 		}
-		let oldestStat = formatPoolStat(data[oldestIndex]);
+		let oldestStat = formatPoolStat(data[boundedOldestIndex]);
 		// startingBalance allows you to calculate performance
-		let startingBalance = oldestStat.startingBalance;
-		let latestStat = formatPoolStat(data[latestIndex]);
-		let totalDeposits = data.reduce((sum, item) => sum + (item.deposits || 0), 0);
-		let totalWithdrawals = data.reduce((sum, item) => sum + (item.withdrawals || 0), 0);
-		perf[assetLabel] = latestStat.balance == 0 ? 0 : (latestStat.balance - startingBalance - (totalDeposits || 0) + (totalWithdrawals || 0)) / latestStat.balance;
+		let startingBalance = numericStatValue(oldestStat.startingBalance);
+		let latestStat = formatPoolStat(data[boundedLatestIndex]);
+		let latestBalance = numericStatValue(latestStat.balance);
+		let totalDeposits = periodStats.reduce((sum, item) => sum + numericStatValue(item.deposits), 0);
+		let totalWithdrawals = periodStats.reduce((sum, item) => sum + numericStatValue(item.withdrawals), 0);
+		perf[assetLabel] = latestBalance == 0 ? 0 : (latestBalance - startingBalance - totalDeposits + totalWithdrawals) / latestBalance;
 	}
 	return perf;
 }
