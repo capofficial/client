@@ -94,7 +94,7 @@ export function formatForDisplay(amount, fix) {
 
 	amount = amount * 1;
 
-	if (!amount || isNaN(amount)) return 0;
+	if (!amount || isNaN(amount)) return '0';
 
 	if (!fix && (amount * 1).toFixed(6)*1 == Math.round(amount * 1)) return Math.round(amount);
 	
@@ -111,7 +111,7 @@ export function formatForDisplay(amount, fix) {
 	} else if (amount * 1 >= 0.001 || amount * 1 <= -0.001)  {
 		return +(amount * 1).toFixed(6);
 	} else {
-		return +(amount * 1).toFixed(8);
+		return (amount * 1).toFixed(8);
 	}
 
 }
