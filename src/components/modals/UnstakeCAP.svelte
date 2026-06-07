@@ -33,6 +33,10 @@
 		focusInput('Amount');
 	});
 
+	function setMaxAmount() {
+		amount = $CAPStake || 0;
+	}
+
 
 </script>
 
@@ -53,7 +57,7 @@
 					value={formattedCAPStaked}
 					isClickable={true}
 					hasSemiPadding={true}
-					on:click={() => { amount = formattedCAPStaked; }}
+					on:click={setMaxAmount}
 				/>
 			</div>
 

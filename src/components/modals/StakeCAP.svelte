@@ -42,6 +42,10 @@
 		walletBalance = await getCAPWalletBalance();
 	}
 
+	function setMaxAmount() {
+		amount = walletBalance || 0;
+	}
+
 	checkAllowance();
 	getBalance();
 
@@ -69,7 +73,7 @@
 					value={formattedWalletBalance}
 					isClickable={true}
 					hasSemiPadding={true}
-					on:click={() => { amount = formattedWalletBalance; }}
+					on:click={setMaxAmount}
 				/>
 			</div>
 
