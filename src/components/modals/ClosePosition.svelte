@@ -20,6 +20,7 @@
 	export let data;
 
 	let amount, isSubmitting, sizeToClosePercent = 0;
+	$: maxSizeToClose = formatForDisplay(data.size);
 
 	async function submit() {
 		if (!amount) return focusInput('Size to Close');
@@ -96,7 +97,7 @@
 			</div>
 
 			<div class='row'>
-				<LabelValue label='Max' value={`${formatForDisplay(data.size)} ${data.asset}`} on:click={() => amount = data.size} isClickable={true} />
+				<LabelValue label='Max' value={`${maxSizeToClose} ${data.asset}`} on:click={() => amount = `${maxSizeToClose}`} isClickable={true} />
 			</div>
 
 			<div class='row'>
