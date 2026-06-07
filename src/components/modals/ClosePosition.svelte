@@ -56,6 +56,17 @@
 
 	$: setSizeToClosePercent(amount);
 
+	function cleanSizeToClose(_amount) {
+		if (!_amount) return '';
+		const amountNumber = Math.min(_amount * 1, data.size * 1);
+		if (!amountNumber || isNaN(amountNumber)) return '';
+		return `${+(amountNumber).toFixed(6)}`;
+	}
+
+	function setMaxSizeToClose() {
+		amount = cleanSizeToClose(data.size);
+	}
+
 	let isApproving = false;
 	async function _approveAsset() {
 		isApproving = true;
@@ -96,7 +107,7 @@
 			</div>
 
 			<div class='row'>
-				<LabelValue label='Max' value={`${formatForDisplay(data.size)} ${data.asset}`} on:click={() => amount = data.size} isClickable={true} />
+				<LabelValue label='Max' value={`${formatForDisplay(data.size)} ${data.asset}`} on:click={setMaxSizeToClose} isClickable={true} />
 			</div>
 
 			<div class='row'>
