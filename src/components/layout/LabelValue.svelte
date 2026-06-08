@@ -8,6 +8,8 @@
 	export let value;
 	export let formatValue = false;
 	export let note = false;
+	export let valueNote = false;
+	export let valueNoteTrigger = 'mouseenter focus';
 	export let isClickable = false;
 	export let noPadding = false;
 	export let isSecondaryColor = false;
@@ -18,6 +20,12 @@
 	let tooltipOptions = {
 		content: note,
 		allowHTML: true
+	};
+
+	$: valueTooltipOptions = {
+		content: valueNote,
+		allowHTML: true,
+		trigger: valueNoteTrigger
 	};
 
 </script>
@@ -72,7 +80,7 @@
 
 <div class='flex-row' class:padded={hasPadding} class:semipadded={hasSemiPadding} class:noPadding={noPadding}>
 	<div class='label' class:fullOpacity={fullOpacityLabel} class:hasNote={note != false} use:tooltip={tooltipOptions}>{label}</div>
-	<div class='value' on:click|stopPropagation class:clickable={isClickable} class:secondary={isSecondaryColor}>
+	<div class='value' on:click|stopPropagation class:clickable={isClickable} class:secondary={isSecondaryColor} use:tooltip={valueTooltipOptions}>
 		{#if formatValue} 
 			{formatForDisplay(value)}
 		{:else}

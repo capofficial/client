@@ -2,7 +2,7 @@
 
 	import LabelValue from '@components/layout/LabelValue.svelte'
 
-	import { BPS_DIVIDER } from '@lib/config'
+	import { BPS_DIVIDER, BASE_FEES_BPS } from '@lib/config'
 	import { marketInfos } from '@lib/stores'
 
 	import { formatForDisplay } from '@lib/formatters'
@@ -43,11 +43,43 @@
 	let feeAmount = 0;
 	$: feeAmount = getFeeAmount(totalSize, market, $marketInfos);
 
+	function getFeeRate() {
+		return $marketInfos[market]?.fee || 0;
+	}
+
+	function getBaseFeeRate() {
+		return BASE_FEES_BPS[market] || getFeeRate();
+	}
+
+	function getReferralDiscountRate() {
+		const discount = getBaseFeeRate() - getFeeRate();
+		return discount > 0 ? discount : 0;
+	}
+
+	function getFeeDetails() {
+		const baseFeeRate = getBaseFeeRate();
+		const feeRate = getFeeRate();
+		const referralDiscountRate = getReferralDiscountRate();
+
+		if (!baseFeeRate) return 'Fee details loading...';
+
+		return [
+			`Base fee: ${formatForDisplay(baseFeeRate / 100)}%`,
+			`Referral discount: ${formatForDisplay(referralDiscountRate / 100)}%`,
+			`Current fee: ${formatForDisplay(feeRate / 100)}%`
+		].join('<br>');
+	}
+
+	let feeDetails;
+	$: feeDetails = getFeeDetails(market, $marketInfos);
 
 </script>
 
 <LabelValue 
-	label={`Fee (${formatForDisplay(($marketInfos[market]?.fee || 0)/100)}%)`} 
+	label={`Fee (${formatForDisplay(getFeeRate()/100)}%)`}
 	value={`${feeAmount ? `${formatForDisplay(feeAmount)} ${asset}` : '-'}`}
+	valueNote={feeDetails}
+	valueNoteTrigger='click mouseenter focus'
+	isClickable={true}
 	isSecondaryColor={isSecondaryColor}
 />
