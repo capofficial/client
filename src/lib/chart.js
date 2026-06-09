@@ -434,3 +434,33 @@ function clearPositionLines() {
 	candlestickSeries.setMarkers([]);
 	positionLines = [];
 }
+
+// --- Ajout du prix de liquidation (bounty) ---
+let liquidationLine = null;
+
+export function updateLiquidationPrice(positions) {
+    if (!chart || !candlestickSeries) return;
+
+    // Supprime l'ancienne ligne si elle existe
+    if (liquidationLine) {
+        candlestickSeries.removePriceLine(liquidationLine);
+        liquidationLine = null;
+    }
+
+    // Trouve la première position avec un prix de liquidation
+    const position = positions?.[0];
+    if (!position || !position.liqprice) return;
+
+    const liqPrice = parseFloat(position.liqprice);
+    if (isNaN(liqPrice) || liqPrice <= 0) return;
+
+    // Crée la ligne de prix de liquidation (rouge pointillée)
+    liquidationLine = candlestickSeries.createPriceLine({
+        price: liqPrice,
+        color: '#ff4444',
+        lineWidth: 2,
+        lineStyle: 2, // pointillés
+        axisLabelVisible: true,
+        title: 'Liq',
+    });
+}
