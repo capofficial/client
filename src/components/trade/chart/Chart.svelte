@@ -4,8 +4,8 @@
 
 	import ChartBar from './ChartBar.svelte'
 
-	import { initChart, loadCandles, onNewPrice } from '@lib/chart'
-	import { chartHeight, selectedMarket, hoveredOHLC, prices } from '@lib/stores'
+	import { initChart, loadCandles, onNewPrice, updateLiquidationPrice } from '@lib/chart'
+	import { chartHeight, selectedMarket, hoveredOHLC, prices, positions } from '@lib/stores'
 	import { setPageTitle } from '@lib/ui'
 	import { formatPriceForDisplay, formatMarketName, formatPnl } from '@lib/formatters'
 
@@ -32,6 +32,7 @@
 	}
 
 	$: setNewPrice($prices);
+    $: updateLiquidationPrice($positions);
 
 </script>
 
