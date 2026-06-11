@@ -6,6 +6,93 @@ import { address, poolBalances, bufferBalances, poolStakes, poolStatsDaily, pool
 import { getAssetAddress, getAssetAddresses, getLabelForAsset, getChainData } from '@lib/utils'
 import { showToast, showError } from '@lib/ui'
 
+const POOL_TRANSACTION_EVENTS = [
+	'PoolDeposit',
+	'PoolWithdrawal',
+	'PoolPayIn',
+	'PoolPayOut'
+];
+
+function getPoolTransactionType(eventName) {
+	switch(eventName) {
+		case 'PoolDeposit':
+			return 'Deposit';
+		case 'PoolWithdrawal':
+			return 'Withdrawal';
+		case 'PoolPayIn':
+			return 'Pay In';
+		case 'PoolPayOut':
+			return 'Pay Out';
+		default:
+			return eventName;
+	}
+}
+
+function formatPoolEventAmount(amount, asset) {
+	const decimals = CURRENCY_DECIMALS[asset] || 18;
+	return formatUnits(amount, decimals);
+}
+
+function formatPoolTransaction(log) {
+	if (!log || !log.args) return;
+
+	const asset = getLabelForAsset(log.args.asset) || '';
+
+	return {
+		id: `${log.transactionHash}-${log.logIndex}`,
+		type: getPoolTransactionType(log.event),
+		asset,
+		amount: formatPoolEventAmount(log.args.amount, asset),
+		market: log.args.market || '',
+		user: log.args.user,
+		poolBalance: log.args.poolBalance ? formatPoolEventAmount(log.args.poolBalance, asset) : undefined,
+		blockNumber: log.blockNumber,
+		logIndex: log.logIndex,
+		transactionHash: log.transactionHash
+	};
+}
+
+export async function getPoolTransactions(options = {}) {
+	const contract = await getContract('Pool');
+	if (!contract || !contract.provider) {
+		return {
+			items: [],
+			nextBeforeBlock: null
+		};
+	}
+
+	const pageSize = options.pageSize || 20;
+	const blockSpan = options.blockSpan || 10000;
+	const maxWindows = options.maxWindows || 6;
+	const latestBlock = await contract.provider.getBlockNumber();
+	let toBlock = options.beforeBlock == null ? latestBlock : options.beforeBlock;
+	let nextBeforeBlock = toBlock;
+	let items = [];
+	let windowsScanned = 0;
+
+	while (items.length < pageSize && nextBeforeBlock !== null && windowsScanned < maxWindows) {
+		toBlock = nextBeforeBlock;
+		const fromBlock = Math.max(0, toBlock - blockSpan + 1);
+		const eventLogs = await Promise.all(POOL_TRANSACTION_EVENTS.map((eventName) => {
+			return contract.queryFilter(contract.filters[eventName](), fromBlock, toBlock);
+		}));
+
+		items = items.concat(eventLogs.flat().map(formatPoolTransaction).filter(Boolean));
+		nextBeforeBlock = fromBlock > 0 ? fromBlock - 1 : null;
+		windowsScanned++;
+	}
+
+	items = items.sort((a, b) => {
+		if (a.blockNumber == b.blockNumber) return b.logIndex - a.logIndex;
+		return b.blockNumber - a.blockNumber;
+	});
+
+	return {
+		items,
+		nextBeforeBlock
+	};
+}
+
 export async function getPoolBalances() {
 	const contract = await getContract('PoolStore');
 	const assetAddresses = getAssetAddresses();
