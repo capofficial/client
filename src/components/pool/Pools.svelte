@@ -1,17 +1,24 @@
 <script>
-	import { onDestroy } from 'svelte'
+	import { onDestroy, onMount } from 'svelte'
 	import Button from '@components/layout/Button.svelte'
 
-	import { getPoolBalances, getBufferBalances, getUserPoolStakes, getGlobalUPL } from '@api/pool'
+	import { getPoolBalances, getBufferBalances, getUserPoolStakes, getGlobalUPL, getPoolTransactions } from '@api/pool'
 	import { address, poolBalances, bufferBalances, prices, poolStakes, globalUPLs } from '@lib/stores'
-	import { getAssets, getAmountInUsd, getTotalAmountInUsd  } from '@lib/utils'
+	import { getAssets, getAmountInUsd, getTotalAmountInUsd, getChainData, shortAddress  } from '@lib/utils'
 	import { formatForDisplay, numberWithCommas } from '@lib/formatters'
 	import { showModal } from '@lib/ui'
 	import { connect } from '@lib/connect'
 
 	let assets = getAssets();
 
+	const TRANSACTION_PAGE_SIZE = 20;
 	let isLoading = true, t;
+	let poolTransactions = [];
+	let transactionBeforeBlock = null;
+	let hasMoreTransactions = true;
+	let isLoadingTransactions = false;
+	let transactionSentinel;
+	let transactionObserver;
 	async function fetchData() {
 		clearTimeout(t);
 		const done = await getPoolBalances();
@@ -19,12 +26,59 @@
 		getUserPoolStakes();
 		getGlobalUPL('ETH');
 		getGlobalUPL('USDC');
-		if (done) isLoading = false;
+		if (done) {
+			isLoading = false;
+			loadPoolTransactions(true);
+		}
 	}
 	$: fetchData($address);
 
+	async function loadPoolTransactions(reset) {
+		if (isLoadingTransactions) return;
+		if (!reset && !hasMoreTransactions) return;
+
+		isLoadingTransactions = true;
+		try {
+			const result = await getPoolTransactions({
+				beforeBlock: reset ? null : transactionBeforeBlock,
+				pageSize: TRANSACTION_PAGE_SIZE
+			});
+
+			poolTransactions = reset ? result.items : poolTransactions.concat(result.items);
+			transactionBeforeBlock = result.nextBeforeBlock;
+			hasMoreTransactions = result.nextBeforeBlock !== null;
+		} catch(e) {
+			hasMoreTransactions = false;
+			console.error(e);
+		}
+		isLoadingTransactions = false;
+	}
+
+	function getTransactionUrl(transaction) {
+		const explorer = getChainData('explorer');
+		if (!explorer || !transaction || !transaction.transactionHash) return;
+		return `${explorer}/tx/${transaction.transactionHash}`;
+	}
+
+	function formatTransactionAmount(transaction) {
+		if (!transaction) return;
+		const amount = numberWithCommas(transaction.amount);
+		return transaction.asset ? `${amount} ${transaction.asset}` : amount;
+	}
+
+	onMount(() => {
+		if (typeof IntersectionObserver == 'undefined') return;
+
+		transactionObserver = new IntersectionObserver((entries) => {
+			if (entries[0].isIntersecting && poolTransactions.length) loadPoolTransactions();
+		}, {rootMargin: '160px'});
+
+		if (transactionSentinel) transactionObserver.observe(transactionSentinel);
+	});
+
 	onDestroy(() => {
 		clearTimeout(t);
+		if (transactionObserver) transactionObserver.disconnect();
 	});
 
 	let feeAPY = {};
@@ -42,7 +96,7 @@
 <style>
 
 	@media all and (max-width: 600px) {
-		.table, .header {
+		.table, .header, .transactions-table {
 			min-width: 960px;
 		}
 	}
@@ -130,6 +184,96 @@
 		font-size: 80%;
 		line-height: 1.618;
 	}
+
+	.transactions {
+		margin-top: 32px;
+	}
+
+	.transactions-header {
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: 16px;
+		margin-bottom: 16px;
+	}
+
+	.transactions-title {
+		font-weight: 600;
+		font-size: 18px;
+	}
+
+	.transactions-subtitle {
+		color: var(--text300);
+		font-size: 90%;
+		margin-top: 4px;
+	}
+
+	.transactions-table {
+		border: 1px solid var(--layer100);
+		border-radius: 6px;
+		overflow: hidden;
+	}
+
+	.transactions-table-header, .transaction-row {
+		display: grid;
+		grid-template-columns: 1fr 1.1fr 1.2fr 1.2fr 1fr 1fr;
+		align-items: center;
+	}
+
+	.transactions-table-header {
+		min-height: 38px;
+		border-bottom: 1px solid var(--layer100);
+		color: var(--text300);
+		font-size: 85%;
+	}
+
+	.transaction-row {
+		min-height: 50px;
+		border-bottom: 1px solid var(--layer0-hover);
+	}
+
+	.transaction-row:last-child {
+		border-bottom: 0;
+	}
+
+	.transaction-cell {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		text-align: right;
+		height: 100%;
+		padding: 0 25px;
+	}
+
+	.transaction-cell.la {
+		justify-content: flex-start;
+		text-align: left;
+	}
+
+	.type-pill {
+		border: 1px solid var(--layer100);
+		border-radius: 999px;
+		padding: 3px 9px;
+		background: var(--layer50);
+		font-size: 90%;
+	}
+
+	.empty-transactions, .transactions-loading {
+		padding: 20px 25px;
+		color: var(--text300);
+	}
+
+	.load-more-row {
+		display: flex;
+		justify-content: center;
+		padding-top: 16px;
+	}
+
+	.tx-link {
+		color: inherit;
+		text-decoration: underline;
+		text-underline-offset: 3px;
+	}
 </style>
 
 <div class='pools'>
@@ -189,5 +333,56 @@
 	<div class='footnote'>
 		¹ Does not include trader wins and losses.<br/>
 		² Sum total of unrealized trader wins or losses. Updated every ~15min.
+	</div>
+
+	<div class='transactions'>
+		<div class='transactions-header'>
+			<div>
+				<div class='transactions-title'>Pool Transactions</div>
+				<div class='transactions-subtitle'>Recent deposits, withdrawals, trader wins, and trader losses.</div>
+			</div>
+		</div>
+
+		<div class='transactions-table'>
+			<div class='transactions-table-header'>
+				<div class='transaction-cell la'>Type</div>
+				<div class='transaction-cell'>Asset / Market</div>
+				<div class='transaction-cell'>Amount</div>
+				<div class='transaction-cell'>Pool Balance</div>
+				<div class='transaction-cell'>Wallet</div>
+				<div class='transaction-cell'>Tx</div>
+			</div>
+			<div class='transactions-table-body'>
+				{#each poolTransactions as transaction (transaction.id)}
+					<div class='transaction-row'>
+						<div class='transaction-cell la'><span class='type-pill'>{transaction.type}</span></div>
+						<div class='transaction-cell'>{transaction.market || transaction.asset}</div>
+						<div class='transaction-cell'>{formatTransactionAmount(transaction)}</div>
+						<div class='transaction-cell'>{transaction.poolBalance ? `${numberWithCommas(transaction.poolBalance)} ${transaction.asset}` : '-'}</div>
+						<div class='transaction-cell' title={transaction.user}>{shortAddress(transaction.user)}</div>
+						<div class='transaction-cell'>
+							{#if getTransactionUrl(transaction)}
+								<a class='tx-link' href={getTransactionUrl(transaction)} target='_blank' rel='noreferrer'>{shortAddress(transaction.transactionHash)}</a>
+							{:else}
+								{shortAddress(transaction.transactionHash)}
+							{/if}
+						</div>
+					</div>
+				{:else}
+					{#if isLoadingTransactions}
+						<div class='transactions-loading'>Loading transactions...</div>
+					{:else}
+						<div class='empty-transactions'>No pool transactions found.</div>
+					{/if}
+				{/each}
+			</div>
+		</div>
+
+		<div bind:this={transactionSentinel}></div>
+		{#if hasMoreTransactions}
+			<div class='load-more-row'>
+				<Button isSmall={true} label={isLoadingTransactions ? `Loading...` : `Load More`} on:click={() => {loadPoolTransactions()}} />
+			</div>
+		{/if}
 	</div>
 </div>
