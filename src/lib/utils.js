@@ -143,3 +143,32 @@ export function getMargin(size, leverage) {
 export function getSize(margin, leverage) {
 	return Math.ceil(10**8 * (margin || 0) * leverage) / 10**8;
 }
+
+// ====== bounty/13: localStorageStore helper ======
+// localStorageStore — Svelte writable store that auto-persists to localStorage.
+// Returns a Svelte writable. SSR-safe: falls back to defaultValue when localStorage
+// is missing (e.g. Node prerender).
+
+import { writable } from 'svelte/store'
+
+export function localStorageStore(key, defaultValue) {
+	let initial = defaultValue
+	try {
+		if (typeof localStorage !== 'undefined') {
+			const raw = localStorage.getItem(key)
+			if (raw !== null) {
+				try { initial = JSON.parse(raw) } catch (_) { initial = raw }
+			}
+		}
+	} catch (_) { /* ignore */ }
+
+	const store = writable(initial)
+	try {
+		if (typeof localStorage !== 'undefined') {
+			store.subscribe((v) => {
+				try { localStorage.setItem(key, JSON.stringify(v)) } catch (_) {}
+			})
+		}
+	} catch (_) { /* ignore */ }
+	return store
+}
