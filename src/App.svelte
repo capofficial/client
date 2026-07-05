@@ -10,9 +10,9 @@
 
 	import { USD_CONVERSION_MARKETS } from '@lib/config'
 	import { checkCountry, loadRoute, catchLinks, navigateTo } from '@lib/routing'
-	import { component, address, pageName, countryDisallowed } from '@lib/stores'
+	import { component, address, pageName, countryDisallowed, activeModal } from '@lib/stores'
 	import { hidePopoversOnKeydown, hidePopoversOnClick } from '@lib/ui'
-	import { runAndInterval, hashString, getChainData } from '@lib/utils'
+	import { runAndInterval, hashString, getChainData, getUserSetting } from '@lib/utils'
 
 	import { getUserAssetBalances } from '@api/assets'
 	import { listenToEvents } from '@api/listener'
@@ -31,6 +31,15 @@
 		window.onpopstate = () => loadRoute();
 
 		getMarketPrices('all');
+
+		// Show welcome modal for first-time users
+		const welcomeShown = getUserSetting('welcomeShown');
+		if (!welcomeShown) {
+			// Small delay to let the app initialize
+			setTimeout(() => {
+				activeModal.set({ name: 'Welcome' });
+			}, 500);
+		}
 	});
 
 	onDestroy(() => {
