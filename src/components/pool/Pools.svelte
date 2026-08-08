@@ -1,6 +1,7 @@
 <script>
 	import { onDestroy } from 'svelte'
 	import Button from '@components/layout/Button.svelte'
+	import PoolTransactions from './PoolTransactions.svelte'
 
 	import { getPoolBalances, getBufferBalances, getUserPoolStakes, getGlobalUPL } from '@api/pool'
 	import { address, poolBalances, bufferBalances, prices, poolStakes, globalUPLs } from '@lib/stores'
@@ -190,4 +191,6 @@
 		¹ Does not include trader wins and losses.<br/>
 		² Sum total of unrealized trader wins or losses. Updated every ~15min.
 	</div>
+
+	<PoolTransactions />
 </div>
