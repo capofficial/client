@@ -21,7 +21,7 @@
 	let requestId = 0;
 
 	async function loadTransactions(reset = false) {
-		if (isLoading || (!reset && !hasMore)) return;
+		if (!reset && (isLoading || !hasMore)) return;
 		isLoading = true;
 		error = '';
 		const currentRequest = ++requestId;
