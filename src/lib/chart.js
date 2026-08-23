@@ -1,7 +1,147 @@
 import { get } from 'svelte/store'
+import {
+  sma, ema, rsi, macd, bollinger, INDICATOR_META, DEFAULT_PREFS
+} from "./indicators.js"
 import { createChart, ColorType, LineStyle } from 'lightweight-charts'
 
+// ---- technical indicators (issue #16) ----------------------------------
+const INDICATOR_PREF_KEY = "cap.chart.indicators.v1"
+let indicatorPrefs = readIndicatorPrefs()
+const indicatorSeries = {} // key -> series (BB stored as [upper, mid, lower])
+
+function readIndicatorPrefs () {
+  try {
+    const raw = localStorage.getItem(INDICATOR_PREF_KEY)
+    if (raw) return Object.assign({}, DEFAULT_PREFS, JSON.parse(raw))
+  } catch (e) { /* corrupted value -> fall back to defaults */ }
+  return Object.assign({}, DEFAULT_PREFS)
+}
+
+function writeIndicatorPrefs () {
+  try { localStorage.setItem(INDICATOR_PREF_KEY, JSON.stringify(indicatorPrefs)) } catch (e) {}
+}
+
+const lineOpts = (color, width = 1) => ({
+  color,
+  lineWidth: width,
+  priceLineVisible: false,
+  lastValueVisible: false,
+  crosshairMarkerVisible: false
+})
+
+function addOverlayLine (key, data, color, width) {
+  const s = chart.addLineSeries(Object.assign(lineOpts(color, width), {
+    priceScaleId: key // private invisible scale: overlays never squash candle autoscale
+  }))
+  chart.priceScale(key).applyOptions({ visible: false, autoScale: true })
+  s.setData(data)
+  indicatorSeries[key] = s
+  return s
+}
+
+function applyIndicators () {
+  clearIndicators()
+  if (!candles || !candles.length) return
+  if (indicatorPrefs.ma20) addOverlayLine("ma20", sma(candles, 20), INDICATOR_META.ma20.color, 2)
+  if (indicatorPrefs.ma50) addOverlayLine("ma50", sma(candles, 50), INDICATOR_META.ma50.color, 2)
+  if (indicatorPrefs.ema12) addOverlayLine("ema12", ema(candles, 12), INDICATOR_META.ema12.color, 2)
+  if (indicatorPrefs.bb) {
+    const bb = bollinger(candles, 20, 2)
+    indicatorSeries.bb = [
+      addOverlayLine("bbU", bb.upper, INDICATOR_META.bb.color),
+      addOverlayLine("bbM", bb.mid, INDICATOR_META.bb.color),
+      addOverlayLine("bbL", bb.lower, INDICATOR_META.bb.color)
+    ]
+  }
+  if (indicatorPrefs.rsi) {
+    const s = addOverlayLine("rsi", rsi(candles, 14), INDICATOR_META.rsi.color, 2)
+    s.createPriceLine({ price: 70, color: "#94a3b8", lineWidth: 1, lineStyle: 2, axisLabelVisible: false, title: "" })
+    s.createPriceLine({ price: 30, color: "#94a3b8", lineWidth: 1, lineStyle: 2, axisLabelVisible: false, title: "" })
+  }
+  if (indicatorPrefs.macd) {
+    const data = macd(candles)
+    const m = addOverlayLine("macd", data.map(d => ({ time: d.time, value: d.macd })), INDICATOR_META.macd.color, 2)
+    const sig = addOverlayLine("macdSig", data.filter(d => d.signal != null).map(d => ({ time: d.time, value: d.signal })), "#f97316")
+    const hist = chart.addHistogramSeries({
+      priceScaleId: "macd",
+      priceLineVisible: false,
+      lastValueVisible: false,
+      base: 0
+    })
+    hist.setData(data.filter(d => d.histogram != null).map(d => ({
+      time: d.time, value: d.histogram, color: d.histogram >= 0 ? "#16a34a" : "#dc2626"
+    })))
+    m.createPriceLine({ price: 0, color: "#94a3b8", lineWidth: 1, lineStyle: 2, axisLabelVisible: false, title: "" })
+    indicatorSeries.macd = m
+    indicatorSeries.macdSig = sig
+    indicatorSeries.macdHist = hist
+  }
+}
+
+function clearIndicators () {
+  for (const key of Object.keys(indicatorSeries)) {
+    const s = indicatorSeries[key]
+    if (Array.isArray(s)) s.forEach(x => chart.removeSeries(x))
+    else chart.removeSeries(s)
+    delete indicatorSeries[key]
+  }
+}
+
+// Called on every live candle tick: recompute and push only the last point.
+function updateIndicators () {
+  if (!candles || !candles.length) return
+  const last = a => a[a.length - 1]
+  if (indicatorSeries.ma20) { const p = sma(candles, 20); if (p.length) indicatorSeries.ma20.update(last(p)) }
+  if (indicatorSeries.ma50) { const p = sma(candles, 50); if (p.length) indicatorSeries.ma50.update(last(p)) }
+  if (indicatorSeries.ema12) { const p = ema(candles, 12); if (p.length) indicatorSeries.ema12.update(last(p)) }
+  if (indicatorSeries.bb) {
+    const bb = bollinger(candles, 20, 2)
+    if (bb.mid.length) {
+      indicatorSeries.bb[0].update(last(bb.upper))
+      indicatorSeries.bb[1].update(last(bb.mid))
+      indicatorSeries.bb[2].update(last(bb.lower))
+    }
+  }
+  if (indicatorSeries.rsi) { const p = rsi(candles, 14); if (p.length) indicatorSeries.rsi.update(last(p)) }
+  if (indicatorSeries.macd) {
+    const data = macd(candles)
+    if (data.length) {
+      const d = last(data)
+      indicatorSeries.macd.update({ time: d.time, value: d.macd })
+      if (d.signal != null) indicatorSeries.macdSig.update({ time: d.time, value: d.signal })
+      if (d.histogram != null) indicatorSeries.macdHist.update({ time: d.time, value: d.histogram, color: d.histogram >= 0 ? "#16a34a" : "#dc2626" })
+    }
+  }
+}
+
+function buildIndicatorToolbar (container) {
+  const bar = document.createElement("div")
+  bar.style.cssText = "display:flex;gap:4px;padding:4px 8px;font-size:11px;user-select:none"
+  for (const key of Object.keys(INDICATOR_META)) {
+    const btn = document.createElement("button")
+    btn.textContent = INDICATOR_META[key].label
+    btn.style.cssText = "cursor:pointer;border:1px solid #2a3140;background:transparent;color:#9aa4b2;border-radius:4px;padding:2px 8px;font-size:11px"
+    const paint = () => {
+      btn.style.borderColor = indicatorPrefs[key] ? INDICATOR_META[key].color : "#2a3140"
+      btn.style.color = indicatorPrefs[key] ? INDICATOR_META[key].color : "#9aa4b2"
+    }
+    btn.addEventListener("click", () => {
+      indicatorPrefs[key] = !indicatorPrefs[key]
+      writeIndicatorPrefs()
+      paint()
+      applyIndicators()
+    })
+    paint()
+    bar.appendChild(btn)
+  }
+  container.insertBefore(bar, container.firstChild)
+}
+// ------------------------------------------------------------------------
+  buildIndicatorToolbar(container)
+
+  applyIndicators()
 import { CURRENCY_DECIMALS } from './config'
+  updateIndicators()
 import { formatUnits, formatOrder, formatPosition, formatForDisplay, formatPriceForDisplay } from './formatters'
 import { selectedMarket, orders, positions, chartResolution, chartLoading, showOrdersOnChart, showPositionsOnChart, hoveredOHLC } from './stores'
 import { saveUserSetting, getPrecision } from './utils'
