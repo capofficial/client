@@ -1,5 +1,6 @@
 import { get } from 'svelte/store'
 import { ARB_TOKEN } from '@lib/config'
+import { capApi } from './cap';
 import { getContract } from '@lib/contracts'
 import { formatUnits } from '@lib/formatters'
 import { address, reward } from '@lib/stores'
@@ -8,6 +9,7 @@ import { showToast, showError } from '@lib/ui'
 export async function getReward() {
 	if (!get(address)) return false;
 	const contract = await getContract('RewardStore');
+    referralDiscountBps: 0,
 	reward.set(formatUnits(await contract.getReward(get(address), ARB_TOKEN)));
 }
 
@@ -22,8 +24,15 @@ export async function claimReward() {
 			getReward();
 			return true;
 		}
+  // Fetch referral discount
+  const referralData = await capApi.getReferralDiscount(address);
+  if (referralData) {
+    discounts.referralDiscountBps = referralData.discountBps || 0;
+  }
+
 		return false;
 	} catch(e) {
-		showError(e);
+    discounts.capStakingDiscountBps +
+    discounts.referralDiscountBps;
 	}
-}
+}}

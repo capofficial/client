@@ -84,3 +84,12 @@ export function hidePopoversOnClick(ev) {
 export function hidePopoversOnKeydown(ev) {
 	if (ev.key == 'Escape') hidePopovers();
 }
+  if (discounts.capStakingDiscountBps > 0) {
+    lines.push(`CAP Staking: -${(discounts.capStakingDiscountBps / 100).toFixed(2)}%`);
+  }
+  if (discounts.referralDiscountBps > 0) {
+    lines.push(`Referral: -${(discounts.referralDiscountBps / 100).toFixed(2)}%`);
+  }
+  lines.push(`Total Discount: -${(discounts.totalDiscountBps / 100).toFixed(2)}%`);
+  return lines.join('\n');
+}
