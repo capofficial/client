@@ -2,6 +2,32 @@ import { get } from 'svelte/store'
 import { parseError } from './errors'
 import { activeModal, toasts, showMarkets, activeError, showMobileNav } from './stores'
 
+export function createInfiniteScroll(node, options) {
+  let { loading, hasMore, threshold = 200 } = options;
+  
+  const handleScroll = () => {
+    if (loading || !hasMore) return;
+    const rect = node.getBoundingClientRect();
+    if (rect.bottom - window.innerHeight < threshold) {
+      node.dispatchEvent(new CustomEvent('loadMore'));
+    }
+  };
+  
+  window.addEventListener('scroll', handleScroll, { passive: true });
+  
+  return {
+    update(newOptions) {
+      ({ loading, hasMore, threshold = 200 } = newOptions);
+    },
+    destroy() {
+      window.removeEventListener('scroll', handleScroll);
+    }
+  };
+}
+
+// Svelte action for infinite scroll container
+export const infiniteScroll = createInfiniteScroll;
+
 export function setPageTitle(title) {
 	document.title = `${title} | CAP`;
 }
