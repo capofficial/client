@@ -1,86 +1,143 @@
-import { get } from 'svelte/store'
-import { parseError } from './errors'
-import { activeModal, toasts, showMarkets, activeError, showMobileNav } from './stores'
+import { formatCurrency, formatPercent } from './formatters';
 
-export function setPageTitle(title) {
-	document.title = `${title} | CAP`;
-}
+const PRESET_PERCENTS = [0.5, 1, 2, 3, 5];
 
-export function focusInput(id, select) {
-	const elem = document.getElementById(id);
-	if (elem) {
-		elem.focus();
-		if (select) elem.select();
-	}
-}
+export function createTpSlInput(container, opts = {}) {
+  const {
+    label,
+    type, // 'tp' or 'sl'
+    entryPrice,
+    positionSize,
+    side, // 'long' or 'short'
+    currentPrice,
+    onChange,
+  } = opts;
 
-let toastId = 0;
+  const wrapper = document.createElement('div');
+  wrapper.className = `tp-sl-input tp-sl-${type}`;
 
-// Toasts
-export function showToast(message, type) {
-	if (!message) return;
-	if (!type) type = 0; // 0 = error, 1 = success, 2 = info
-	toastId++;
-	toasts.update((_toasts) => {
-		_toasts.push({message, type, id: toastId});
-		return _toasts;
-	});
-	let _toastId = toastId;
-	setTimeout(() => {
-		hideToast(_toastId);
-	}, 7*1000);
-}
+  const labelEl = document.createElement('label');
+  labelEl.textContent = label || (type === 'tp' ? 'Take Profit' : 'Stop Loss');
+  wrapper.appendChild(labelEl);
 
-export function hideToast(id) {
-	toasts.update((_toasts) => {
-		_toasts = _toasts.filter((t) => {
-			return t.id != id;
-		});
-		return _toasts;
-	});
-}
+  const inputRow = document.createElement('div');
+  inputRow.className = 'tp-sl-row';
 
-// Error modal
-export function showError(e) {
-	const message = parseError(e);
-	if (!message) return;
-	if (typeof(e) == 'object') {
-		try {
-			e = JSON.stringify(e);
-		} catch(_e) {
-			e = e.toString();
-		} finally {}
-	}
-	activeError.set({message, rawError: e});
-}
-export function hideError() {
-	activeError.set({})
-}
+  const priceInput = document.createElement('input');
+  priceInput.type = 'number';
+  priceInput.step = 'any';
+  priceInput.placeholder = 'Price';
+  priceInput.className = 'tp-sl-price';
 
-// Modals
-export function showModal(name, data) {
-	activeModal.set({name, data});
-}
-export function hideModal() {
-	activeModal.set({});
-}
+  const percentInput = document.createElement('input');
+  percentInput.type = 'number';
+  percentInput.step = 'any';
+  percentInput.placeholder = '%';
+  percentInput.className = 'tp-sl-percent';
 
-function hidePopovers() {
-	const ae = get(activeError);
-	if (ae && ae.message) {
-		hideError();
-	} else {
-		hideModal();
-		showMarkets.set(false);
-		showMobileNav.set(false);
-	}
-}
+  const pnlInput = document.createElement('input');
+  pnlInput.type = 'number';
+  pnlInput.step = 'any';
+  pnlInput.placeholder = 'P/L $';
+  pnlInput.className = 'tp-sl-pnl';
 
-export function hidePopoversOnClick(ev) {
-	if (ev.altKey || ev.ctrlKey || ev.metaKey || ev.shiftKey || ev.defaultPrevented) return true;
-	hidePopovers();
-}
+  inputRow.append(priceInput, percentInput, pnlInput);
+  wrapper.appendChild(inputRow);
 
-export function hidePopoversOnKeydown(ev) {
-	if (ev.key == 'Escape') hidePopovers();
+  const presets = document.createElement('div');
+  presets.className = 'tp-sl-presets';
+  PRESET_PERCENTS.forEach(pct => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = `+${pct}%`;
+    btn.className = 'tp-sl-preset-btn';
+    btn.onclick = () => setFromPercent(pct);
+    presets.appendChild(btn);
+  });
+  wrapper.appendChild(presets);
+
+  const info = document.createElement('div');
+  info.className = 'tp-sl-info';
+  wrapper.appendChild(info);
+
+  container.appendChild(wrapper);
+
+  let suppressSync = false;
+
+  function calcPnl(price) {
+    if (!entryPrice || !positionSize) return { amount: 0, percent: 0 };
+    const diff = side === 'long' ? price - entryPrice : entryPrice - price;
+    const amount = diff * positionSize;
+    const percent = (diff / entryPrice) * 100;
+    return { amount, percent };
+  }
+
+  function updateInfo(price) {
+    const { amount, percent } = calcPnl(price);
+    info.textContent = `P/L: ${formatCurrency(amount)} (${formatPercent(percent)})`;
+  }
+
+  function setFromPrice(price, source) {
+    if (suppressSync) return;
+    suppressSync = true;
+    priceInput.value = price;
+    const { amount, percent } = calcPnl(price);
+    percentInput.value = percent.toFixed(4);
+    pnlInput.value = amount.toFixed(2);
+    updateInfo(price);
+    suppressSync = false;
+    if (source !== 'price') onChange?.({ type, price, percent, pnl: amount });
+  }
+
+  function setFromPercent(pct, source) {
+    if (!entryPrice) return;
+    const direction = side === 'long' ? 1 : -1;
+    const price = entryPrice * (1 + (direction * pct) / 100);
+    if (suppressSync) return;
+    suppressSync = true;
+    percentInput.value = pct;
+    priceInput.value = price.toFixed(6);
+    const { amount } = calcPnl(price);
+    pnlInput.value = amount.toFixed(2);
+    updateInfo(price);
+    suppressSync = false;
+    if (source !== 'percent') onChange?.({ type, price, percent: pct, pnl: amount });
+  }
+
+  function setFromPnl(pnlAmount, source) {
+    if (!entryPrice || !positionSize) return;
+    const diff = pnlAmount / positionSize;
+    const price = side === 'long' ? entryPrice + diff : entryPrice - diff;
+    if (suppressSync) return;
+    suppressSync = true;
+    pnlInput.value = pnlAmount;
+    priceInput.value = price.toFixed(6);
+    const { percent } = calcPnl(price);
+    percentInput.value = percent.toFixed(4);
+    updateInfo(price);
+    suppressSync = false;
+    if (source !== 'pnl') onChange?.({ type, price, percent, pnl: pnlAmount });
+  }
+
+  priceInput.addEventListener('input', () => {
+    const v = parseFloat(priceInput.value);
+    if (!isNaN(v)) setFromPrice(v, 'price');
+  });
+
+  percentInput.addEventListener('input', () => {
+    const v = parseFloat(percentInput.value);
+    if (!isNaN(v)) setFromPercent(v, 'percent');
+  });
+
+  pnlInput.addEventListener('input', () => {
+    const v = parseFloat(pnlInput.value);
+    if (!isNaN(v)) setFromPnl(v, 'pnl');
+  });
+
+  return {
+    setPrice: p => setFromPrice(p),
+    setPercent: p => setFromPercent(p),
+    setPnl: p => setFromPnl(p),
+    destroy: () => wrapper.remove(),
+  };
 }
