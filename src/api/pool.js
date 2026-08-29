@@ -1,9 +1,17 @@
 import { get } from 'svelte/store'
 import { CURRENCY_DECIMALS, BPS_DIVIDER } from '@lib/config'
+import { formatAmount, formatDate } from '$lib/formatters';
+
 import { getContract } from '@lib/contracts'
 import { formatUnits, parseUnits } from '@lib/formatters'
 import { address, poolBalances, bufferBalances, poolStakes, poolStatsDaily, poolStatsWeekly, poolWithdrawalFees, poolDepositTaxes, poolWithdrawalTaxes, globalUPLs } from '@lib/stores'
-import { getAssetAddress, getAssetAddresses, getLabelForAsset, getChainData } from '@lib/utils'
+  const data = await res.json();
+  return data.map(tx => ({
+    ...tx,
+    amountFormatted: formatAmount(tx.amount, tx.token),
+    dateFormatted: formatDate(tx.timestamp),
+    typeLabel: tx.type === 'deposit' ? 'Deposit' : tx.type === 'withdraw' ? 'Withdrawal' : tx.type === 'payin' ? 'Pay In' : 'Payout'
+  }));
 import { showToast, showError } from '@lib/ui'
 
 export async function getPoolBalances() {
