@@ -1,3 +1,72 @@
+/**
+ * Generates a shareable trade summary image using Canvas API.
+ * @param {Object} trade - Trade or position object
+ * @param {Object} opts - Optional overrides (theme, size)
+ * @returns {Promise<Blob>} PNG blob ready for upload/share
+ */
+export async function generateTradeShareImage(trade, opts = {}) {
+  const width = opts.width || 1200;
+  const height = opts.height || 630;
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+
+  // Background
+  const bg = opts.bg || '#0B1220';
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, width, height);
+
+  // Accent bar
+  const accent = trade.pnl >= 0 ? '#22C55E' : '#EF4444';
+  ctx.fillStyle = accent;
+  ctx.fillRect(0, 0, width, 8);
+
+  // Title
+  ctx.fillStyle = '#F1F5F9';
+  ctx.font = 'bold 48px Inter, system-ui, sans-serif';
+  ctx.textBaseline = 'top';
+  const sideLabel = (trade.side || trade.direction || '').toUpperCase();
+  const market = (trade.market || trade.asset || '').toUpperCase();
+  ctx.fillText(`${sideLabel} ${market}`, 60, 60);
+
+  // PnL
+  ctx.fillStyle = accent;
+  ctx.font = 'bold 96px Inter, system-ui, sans-serif';
+  const pnlValue = Number(trade.pnl ?? trade.realizedPnl ?? 0);
+  const sign = pnlValue >= 0 ? '+' : '';
+  const currency = trade.currency || 'USD';
+  ctx.fillText(`${sign}${pnlValue.toLocaleString(undefined, { maximumFractionDigits: 2 })} ${currency}`, 60, 160);
+
+  // Metadata lines
+  ctx.fillStyle = '#94A3B8';
+  ctx.font = '32px Inter, system-ui, sans-serif';
+  const entry = trade.entryPrice ?? trade.avgEntry ?? '-';
+  const exit = trade.exitPrice ?? trade.avgExit ?? '-';
+  const leverage = trade.leverage ? `${trade.leverage}x` : '-';
+  const lines = [
+    `Entry: ${entry}`,
+    `Exit: ${exit}`,
+    `Leverage: ${leverage}`,
+    `Status: ${(trade.status || (trade.isOpen ? 'OPEN' : 'CLOSED')).toString().toUpperCase()}`
+  ];
+  lines.forEach((line, i) => {
+    ctx.fillText(line, 60, 320 + i * 48);
+  });
+
+  // Branding footer
+  ctx.fillStyle = '#64748B';
+  ctx.font = '24px Inter, system-ui, sans-serif';
+  ctx.fillText('Shared via CAP', 60, height - 40);
+
+  return await new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (!blob) return reject(new Error('Failed to generate trade share image'));
+      resolve(blob);
+    }, 'image/png');
+  });
+}
+
 import { get } from 'svelte/store'
 
 import { BPS_DIVIDER, CHAINDATA, USD_CONVERSION_MARKETS } from './config'

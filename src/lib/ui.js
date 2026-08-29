@@ -1,5 +1,6 @@
 import { get } from 'svelte/store'
 import { parseError } from './errors'
+import { generateTradeShareImage } from './utils.js';
 import { activeModal, toasts, showMarkets, activeError, showMobileNav } from './stores'
 
 export function setPageTitle(title) {
@@ -42,6 +43,36 @@ export function hideToast(id) {
 
 // Error modal
 export function showError(e) {
+
+/**
+ * Triggers native share or downloads the generated trade image.
+ * @param {Object} trade - Trade/position data
+ */
+export async function shareTradeImage(trade) {
+  try {
+    const blob = await generateTradeShareImage(trade);
+    const file = new File([blob], `cap-trade-${trade.id || Date.now()}.png`, { type: 'image/png' });
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({
+        title: 'CAP Trade',
+        text: `${(trade.side || '').toUpperCase()} ${(trade.market || '').toUpperCase()} - PnL ${trade.pnl ?? trade.realizedPnl}`,
+        files: [file]
+      });
+    } else {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = file.name;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Trade image downloaded', 'success');
+    }
+  } catch (err) {
+    console.error('[shareTradeImage]', err);
+    showToast(err?.message || 'Failed to share trade', 'error');
+  }
+}
 	const message = parseError(e);
 	if (!message) return;
 	if (typeof(e) == 'object') {
