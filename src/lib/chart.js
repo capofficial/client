@@ -1,11 +1,68 @@
-import { get } from 'svelte/store'
+import { createChart } from 'lightweight-charts';
+import { chartMode } from './stores.js';
+import { capApi } from '../api/cap.js';
 import { createChart, ColorType, LineStyle } from 'lightweight-charts'
+let currentChart = null;
+let currentContainer = null;
 
-import { CURRENCY_DECIMALS } from './config'
-import { formatUnits, formatOrder, formatPosition, formatForDisplay, formatPriceForDisplay } from './formatters'
-import { selectedMarket, orders, positions, chartResolution, chartLoading, showOrdersOnChart, showPositionsOnChart, hoveredOHLC } from './stores'
-import { saveUserSetting, getPrecision } from './utils'
+export async function initChart(container, marketId) {
+  if (currentChart) {
+    currentChart.remove();
+    currentChart = null;
+  }
+  currentContainer = container;
 
+  let mode = 'simple';
+  chartMode.subscribe((v) => (mode = v))();
+
+  if (mode === 'full') {
+    // Full TradingView widget embed
+    container.innerHTML = '';
+    const script = document.createElement('script');
+    script.src = 'https://s3.tradingview.com/tv.js';
+    script.onload = () => {
+      new window.TradingView.widget({
+        container_id: container.id,
+        symbol: marketId,
+        theme: 'dark',
+        autosize: true,
+        studies: ['MASimple@tv-basicstudies', 'RSI@tv-basicstudies', 'MACD@tv-basicstudies'],
+        drawings_access: { type: 'black', tools: [{ name: 'Regression Trend' }] },
+        save_image: false,
+        locale: 'en',
+        overrides: {},
+        disabled_features: [],
+        enabled_features: [],
+        custom_css_url: '',
+        load_last_chart: true,
+        time_frames: [],
+        user_id: '',
+        charts_storage_api_version: '1.1',
+        charts_storage_url: '/api/chart-storage',
+        client_id: 'cap_client',
+        fullscreen: false,
+        debug: false,
+      });
+    };
+    document.head.appendChild(script);
+    return null;
+  }
+
+  // Simple lightweight-charts fallback
+  const chart = createChart(container, { width: container.clientWidth, height: 400 });
+  const series = chart.addLineSeries();
+  const res = await capApi.getMarketCandles(marketId);
+  series.setData(res.candles || []);
+  currentChart = chart;
+  return { chart, series };
+
+
+export function setChartMode(mode) {
+  chartMode.set(mode);
+  if (currentContainer) {
+    initChart(currentContainer, currentContainer.dataset.marketId);
+  }
+}
 import { getMarketCandles } from '@api/prices'
 
 let candles = []; // current candle set

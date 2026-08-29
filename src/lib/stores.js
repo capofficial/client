@@ -1,5 +1,6 @@
 import { ethers } from 'ethers'
 import { writable, derived } from 'svelte/store'
+export const chartMode = writable(localStorage.getItem('chartMode') || 'simple');
 
 import { DEFAULT_LOCALE, DEFAULT_MARKET, DEFAULT_CURRENCY, DEFAULT_LEVERAGE, BPS_DIVIDER, DEFAULT_MARKETS_SORT_KEY, DEFAULT_ORDERS_SORT_KEY, DEFAULT_POSITIONS_SORT_KEY, DEFAULT_HISTORY_SORT_KEY } from './config'
 import { formatPoolStat } from './formatters'
@@ -8,6 +9,10 @@ import { getUserSetting, calculateLiquidationPrice, getMargin } from './utils'
 // Language
 export const locale = writable(getUserSetting('locale') || DEFAULT_LOCALE);
 
+
+chartMode.subscribe((value) => {
+  localStorage.setItem('chartMode', value);
+});
 // Router
 export const component = writable();
 export const pageName = writable();

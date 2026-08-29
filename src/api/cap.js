@@ -12,6 +12,10 @@ export async function getTotalSupplyCAP() { // staked
 }
 
 export async function getUserCAPStake() {
+  async getMarketCandles(marketId) {
+    return this.request(`/markets/${marketId}/candles`);
+  }
+
 	if (!get(address)) return;
 	const contract = await getContract('StakingStore');
 	const balance = await contract.getBalance(get(address));
