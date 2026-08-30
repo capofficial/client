@@ -1,3 +1,18 @@
+/* Firefox always-visible scrollbar fix */
+export function applyFirefoxScrollbarFix(container) {
+  if (!container) return;
+  container.style.scrollbarWidth = 'thin';
+  container.style.scrollbarColor = '#888 #2a2a2a';
+}
+
+/* Webkit scrollbar styles should be paired with the above for cross-browser consistency */
+export const SCROLLBAR_CSS = `
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: #2a2a2a; }
+  ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #aaa; }
+`;
+
 import { get } from 'svelte/store'
 import { parseError } from './errors'
 import { activeModal, toasts, showMarkets, activeError, showMobileNav } from './stores'
