@@ -8,7 +8,8 @@
     "dev": "rollup -c -w",
     "start": "sirv build --single",
     "deploy-ipfs": "npm run build && npx ipfs-deploy build",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "test:tpsl": "node scripts/check-tpsl-calculations.mjs"
   },
   "repository": {
     "type": "git",
