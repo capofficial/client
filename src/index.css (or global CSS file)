@@ -1,0 +1,19 @@
+/* Add this to your global CSS file if you don't have a custom-scrollbar class */
+/* This is for styling the scrollbar in the modal content */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #374151; /* gray-700 */
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #4b5563; /* gray-600 */
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #6b7280; /* gray-500 */
+}
