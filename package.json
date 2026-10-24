@@ -4,6 +4,7 @@
   "description": "CAP v4 UI Client",
   "main": "index.js",
   "scripts": {
+    "test": "node --test test/welcome.test.mjs",
     "build": "rollup -c",
     "dev": "rollup -c -w",
     "start": "sirv build --single",

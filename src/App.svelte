@@ -19,10 +19,11 @@
 	import { getMarketPrices } from '@api/prices'
 
 	let interval1;
+	let countryCheckComplete = false;
 
 	onMount(async () => {
 
-		checkCountry();
+		const countryCheck = checkCountry();
 
 		loadRoute();
 		catchLinks((path) => navigateTo(path));
@@ -31,6 +32,9 @@
 		window.onpopstate = () => loadRoute();
 
 		getMarketPrices('all');
+
+		await countryCheck;
+		countryCheckComplete = true;
 	});
 
 	onDestroy(() => {
@@ -252,7 +256,7 @@
 
 {#if $pageName != 'Home'}
 <Errors />
-<Modals />
+<Modals welcomeReady={countryCheckComplete && !$countryDisallowed} />
 <Toasts />
 <Header />
 {/if}

@@ -1,5 +1,18 @@
 <script>
-	import { activeModal } from '@lib/stores'
+	import { activeModal, pageName } from '@lib/stores'
+	import { createWelcomeSession } from '@lib/welcome'
+	import { showModal, hideModal } from '@lib/ui'
+	import Welcome from '../modals/Welcome.svelte'
+
+	export let welcomeReady = false;
+	const welcome = createWelcomeSession();
+
+	$: if (welcome.shouldOpen({ ready: welcomeReady, page: $pageName, modal: $activeModal?.name })) showModal('Welcome');
+
+	function dismissWelcome() {
+		welcome.dismiss();
+		hideModal();
+	}
 
 	import AssetSelect from '../modals/AssetSelect.svelte'
 	import LeverageSelect from '../modals/LeverageSelect.svelte'
@@ -16,6 +29,10 @@
 	import Settings from '../modals/Settings.svelte'
 
 </script>
+
+{#if welcomeReady && $pageName == 'Trade' && $activeModal?.name == 'Welcome'}
+<Welcome on:dismiss={dismissWelcome} />
+{/if}
 
 {#if $activeModal && $activeModal.name == 'Settings'}
 <Settings />
