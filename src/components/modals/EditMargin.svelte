@@ -11,6 +11,7 @@
 	import { formatForDisplay } from '@lib/formatters'
 	import { approveAsset, getAllowance } from '@api/assets'
 	import { addMargin, removeMargin } from '@api/positions'
+	import { balances } from '@lib/stores'
 	import { focusInput, hideModal } from '@lib/ui'
 	import { allowances, selectedMarketInfo } from '@lib/stores'
 
@@ -149,6 +150,10 @@
 			
 			<div class='group'>
 				<Input label={`${selected} ${data.position.asset}`} bind:value={margin} />
+			</div>
+
+			<div class='row'>
+				<LabelValue label={selected == 'Add' ? 'Wallet Balance' : 'Available to Remove'} value={selected == 'Add' ? `${formatForDisplay($balances[data.position.asset]) || '0'}` : `${formatForDisplay(data.position.margin) || '0'}`} />
 			</div>
 
 			<div class='row'>
